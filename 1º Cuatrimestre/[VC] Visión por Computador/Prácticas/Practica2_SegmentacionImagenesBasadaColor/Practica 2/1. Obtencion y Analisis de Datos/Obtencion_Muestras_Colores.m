@@ -3,6 +3,7 @@
 
 % PRIMERO: Añadimos al path la carpeta donde tenemos las imágenes que vamos
 % a utilizar.
+clear
 addpath('../../Material_Imagenes\01_MuestrasColores\');
 
 
@@ -86,7 +87,7 @@ for i = 1:numImagenes
     % normalizados de  R G B,H S I,Y U V,L a b en los píxeles etiquetados 
     % de todas las imágenes marcadas manualmente.
 
-    for j=ValoresCodif
+    for j = ValoresCodif
 
         % Concatenamos los valores que hay en la imagen segmentada que
         % tengan el valor de cada elemento del vector de valores
@@ -109,7 +110,11 @@ for i = 1:numImagenes
     end
 end
 
+    % TERCERO: Por último, podemos guardar los resultados de los colores y
+    % las codificaciones de cada píxel de las imagenes segmentadas.
 
      nombre_fichero = ['./Variables_Generadas/ValoresColores'];
      save(nombre_fichero,"ValoresColores","CodifValoresColores");
 
+     rmpath('../../Material_Imagenes\01_MuestrasColores\');
+     clear
