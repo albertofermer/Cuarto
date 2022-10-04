@@ -1,0 +1,24 @@
+===================================================================================
+Computación Cuántica
+
+
+
+
+
+
+===================================================================================
+Transformers
+
+
+
+
+
+
+
+===================================================================================
+GPT-3 (Generative Pre-trained Transformer 3)
+
+GPT-3 es un modelo de lenguaje que puede escribir automáticamente correos electrónicos, noticias y otros textos, así como crear un código en varios lenguajes de programación.
+
+===================================================================================
+DALL-E 2
