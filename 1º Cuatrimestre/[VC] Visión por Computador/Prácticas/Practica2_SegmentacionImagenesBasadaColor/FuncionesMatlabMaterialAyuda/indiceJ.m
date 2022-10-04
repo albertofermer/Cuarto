@@ -1,5 +1,8 @@
 % Cálculo del Índice J (Técnica Métrica)
-function J = indiceJ(inputs,outputs)
+function J = indiceJ(X,Y)
+
+    inputs = X';
+    outputs = Y';
 
     s = size(inputs);
     classes = unique(outputs);

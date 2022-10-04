@@ -48,7 +48,7 @@ for i = 1:numImagenes
     % El nivel de iluminación se calcula como la media de intensidad de
     % los canales R, G y B.
 
-    I_i = uint8(mean(I_color,3));
+    I_i = uint8(mean(I_color,3)); % (R + G + B) / 3
 
         % Normalización:
 
@@ -59,9 +59,12 @@ for i = 1:numImagenes
         % Las componentes deben implementarse a partir de las
         % transformaciones facilitadas en el apartado 2.2 del Tema 2.
 
-     Y = R_i * 0.299; 
+     Y = R_i * 0.299 + 0.587*G_i + 0.114*Bl_i; 
      U = 0.492 * (Bl_i - Y); 
      V = 0.877 * (R_i - Y);
+
+     U = mat2gray(U,[-0.6,0.6]);
+     V = mat2gray(V,[-0.6,0.6]);
 
     % imshow(cat(3,Y,U,V));
 
@@ -73,9 +76,10 @@ for i = 1:numImagenes
     B_i = I_lab(:,:,3);
 
         % Normalización:
-        L_i = (double(L_i) + 128) / 255;
-        A_i = (double(A_i) + 128) / 255;
-        B_i = (double(B_i) + 128) / 255;
+        L_i = L_i/100;
+        A_i = mat2gray(A_i,[-128,127]);
+        B_i = mat2gray(B_i,[-128,127]);
+
     % Guardo las matrices de la imagen i.
 
     RGB = [R_i,G_i,Bl_i];
@@ -144,7 +148,10 @@ end
     valoresPlot = [".black",".b",".g",".r"];
 
     for i = 1:length(valoresCodif)
-        plot3(R(CodifValoresColores == valoresCodif(i)),G(CodifValoresColores == valoresCodif(i)),B(CodifValoresColores == valoresCodif(i)),valoresPlot(i)), hold on
+        plot3(R(CodifValoresColores == valoresCodif(i)), ...
+            G(CodifValoresColores == valoresCodif(i)), ...
+            B(CodifValoresColores == valoresCodif(i)), ...
+            valoresPlot(i)), hold on
     end
     grid on
     title('Representación RGB')
@@ -162,7 +169,9 @@ end
     S = ValoresColores(:,5);
 
     for i = 1:length(valoresCodif)
-        plot(H(CodifValoresColores == valoresCodif(i)),S(CodifValoresColores == valoresCodif(i)),valoresPlot(i)), hold on
+        plot(H(CodifValoresColores == valoresCodif(i)),...
+            S(CodifValoresColores == valoresCodif(i)), ...
+            valoresPlot(i)), hold on
     end
 
     grid on
@@ -180,7 +189,9 @@ end
     V = ValoresColores(:,9);
 
     for i = 1:length(valoresCodif)
-        plot(U(CodifValoresColores == valoresCodif(i)),V(CodifValoresColores == valoresCodif(i)),valoresPlot(i)), hold on
+        plot(U(CodifValoresColores == valoresCodif(i)),...
+            V(CodifValoresColores == valoresCodif(i)),...
+            valoresPlot(i)), hold on
     end
 
     grid on
@@ -200,7 +211,9 @@ end
     b = ValoresColores(:,12);
 
     for i = 1:length(valoresCodif)
-        plot(a(CodifValoresColores == valoresCodif(i)),b(CodifValoresColores == valoresCodif(i)),valoresPlot(i)), hold on
+        plot(a(CodifValoresColores == valoresCodif(i)),...
+            b(CodifValoresColores == valoresCodif(i)),...
+            valoresPlot(i)), hold on
     end
 
     grid on
@@ -220,7 +233,10 @@ end
 
     figure()
     for i = 1:length(valoresCodif)
-        plot(Hrecalculado(CodifValoresColores == valoresCodif(i)),S(CodifValoresColores == valoresCodif(i)),valoresPlot(i)), hold on
+
+        plot(Hrecalculado(CodifValoresColores == valoresCodif(i)), ...
+            S(CodifValoresColores == valoresCodif(i)), ...
+            valoresPlot(i)), hold on
     end
 
     grid on
@@ -236,4 +252,4 @@ end
      nombre_fichero = './Variables_Generadas/ValoresColores';
      save(nombre_fichero,"ValoresColores","CodifValoresColores");
 
-    clear
+    %clear

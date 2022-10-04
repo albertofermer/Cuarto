@@ -1,19 +1,42 @@
+
+    addpath('./Funciones Necesarias/')
 % Problema de Clasificación binaria de píxeles.
 %   Clase '0' :- Píxel de otro color.
 %   Clase '1' :- Píxel de color rojo-fresa.
 
 % Cargamos los datos de la etapa anterior.
     load('./Variables Necesarias/ValoresColores.mat');
-    RGB = cat(3,ValoresColores(:,:,1),ValoresColores(:,:,2),ValoresColores(:,:,3));
-    HSI = cat(3,ValoresColores(:,:,4),ValoresColores(:,:,5),ValoresColores(:,:,6));
-    YUV = cat(3,ValoresColores(:,:,7),ValoresColores(:,:,8),ValoresColores(:,:,9));
-    Lab = cat(3,ValoresColores(:,:,10),ValoresColores(:,:,11),ValoresColores(:,:,12));
 
-    % Cuantificar la separabilidad que tienen los espacios de color
-    % anteriores mediante CSM ( Class Scattered Matrix ).
+    CoI = ValoresColores(CodifValoresColores == 255,:);
+    YoI = CodifValoresColores == 255;
+    
+    valores_agrupaciones = 3:6;
+    separabilidad_i = zeros(size(valores_agrupaciones));
+    espacios_ccas = {
+        [0 0 0];
+        [0 0 0 0];
+        [0 0 0 0 0];
+        [0 0 0 0 0 0]};
 
-    % calcula_varianza_entre_clases ?
-    % funcion_calcula_descriptores ?
-    %
-    % ¿¿ indiceJ ??
+     for i = 1:length(valores_agrupaciones)
+        [espacioccas, separabilidad_i(i)] = funcion_selecciona_vector_ccas(ValoresColores, ...
+            YoI,valores_agrupaciones(i));
+        espacios_ccas(i) = {espacioccas};
+     end
 
+
+    % Nos quedaremos con los siguientes descriptores:
+        % RGB
+        % Lab
+        % Mejor combinación de 3 descriptores.
+        % Combinación más adecuada de más de 3 descriptores.
+
+    RGB = ValoresColores(:,1:3);
+    Lab = ValoresColores(:,10:12);
+
+    comb3descr = ValoresColores(:,cell2mat(espacios_ccas(1)));
+    [~,pos] = max(separabilidad_i(2:end)); pos = pos + 1;
+    combinacion_mas_de_tres_descriptores = cell2mat(espacios_ccas(pos));
+
+     save('./Variables Generadas/espacioccasYseparabilidad',"espacios_ccas","separabilidad_i");
+     save('./Variables Generadas/variablesGeneradas',"RGB","Lab","comb3descr","combinacion_mas_de_tres_descriptores");
