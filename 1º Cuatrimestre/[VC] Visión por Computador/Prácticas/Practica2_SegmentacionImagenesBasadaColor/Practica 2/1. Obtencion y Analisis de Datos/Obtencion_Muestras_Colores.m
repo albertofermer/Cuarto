@@ -5,7 +5,6 @@
 
 % PRIMERO: Añadimos al path la carpeta donde tenemos las imágenes que vamos
 % a utilizar.
-clear
 addpath('../../Material_Imagenes\01_MuestrasColores\');
 
 
@@ -59,9 +58,9 @@ for i = 1:numImagenes
         % Las componentes deben implementarse a partir de las
         % transformaciones facilitadas en el apartado 2.2 del Tema 2.
 
-     Y = R_i * 0.299 + 0.587*G_i + 0.114*Bl_i; 
-     U = 0.492 * (Bl_i - Y); 
-     V = 0.877 * (R_i - Y);
+     Y = double(R_i) * 0.299 + 0.587*double(G_i) + 0.114*double(Bl_i); 
+     U = 0.492 * (double(Bl_i) - Y); 
+     V = 0.877 * (double(R_i) - Y);
 
      U = mat2gray(U,[-0.6,0.6]);
      V = mat2gray(V,[-0.6,0.6]);
@@ -86,9 +85,6 @@ for i = 1:numImagenes
     HSI = [H_i,S_i,I_i];
     YUV = [Y, U, V];
     LAB = [L_i,A_i,B_i];
-
-    % nombre_fichero = ['./Variables_Generadas/Datos_Color_',num2str(i)];
-    % save(nombre_fichero,"RGB","HSI","LAB","YUV");
 
 
     % 3. Genera la matriz ValoresColores, compuesta por los valores 

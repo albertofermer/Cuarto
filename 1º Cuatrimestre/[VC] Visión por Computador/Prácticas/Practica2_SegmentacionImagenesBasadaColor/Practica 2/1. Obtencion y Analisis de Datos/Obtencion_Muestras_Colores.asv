@@ -59,9 +59,12 @@ for i = 1:numImagenes
         % Las componentes deben implementarse a partir de las
         % transformaciones facilitadas en el apartado 2.2 del Tema 2.
 
-     Y = R_i * 0.299 + 0.587*; 
+     Y = R_i * 0.299 + 0.587*G_i + 0.114*Bl_i; 
      U = 0.492 * (Bl_i - Y); 
      V = 0.877 * (R_i - Y);
+
+     U = mat2gray(U,[-0.6,0.6]);
+     V = mat2gray(V,[-0.6,0.6]);
 
     % imshow(cat(3,Y,U,V));
 
@@ -73,18 +76,16 @@ for i = 1:numImagenes
     B_i = I_lab(:,:,3);
 
         % Normalización:
-        L_i = (double(L_i) + 128) / 255;
-        A_i = (double(A_i) + 128) / 255;
-        B_i = (double(B_i) + 128) / 255;
+        L_i = L_i/100;
+        A_i = mat2gray(A_i,[-128,127]);
+        B_i = mat2gray(B_i,[-128,127]);
+
     % Guardo las matrices de la imagen i.
 
     RGB = [R_i,G_i,Bl_i];
     HSI = [H_i,S_i,I_i];
     YUV = [Y, U, V];
     LAB = [L_i,A_i,B_i];
-
-    % nombre_fichero = ['./Variables_Generadas/Datos_Color_',num2str(i)];
-    % save(nombre_fichero,"RGB","HSI","LAB","YUV");
 
 
     % 3. Genera la matriz ValoresColores, compuesta por los valores 

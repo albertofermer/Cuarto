@@ -51,10 +51,26 @@
     RGB = ValoresColores(:,1:3);
     Lab = ValoresColores(:,10:12);
 
-    comb3descr = ValoresColores(:,cell2mat(espacios_ccas(1)));
+    RSL = ValoresColores(:,cell2mat(espacios_ccas(1))); % RSL
+    indices3descr = cell2mat(espacios_ccas(1));
     [~,pos] = max(separabilidad_i(2:end)); pos = pos + 1;
     %descriptores = cell2mat(espacios_ccas(pos));
-    combinacion_mas_de_tres_descriptores = ValoresColores(:,cell2mat(espacios_ccas(pos)));
-
+    HSIUab = ValoresColores(:,cell2mat(espacios_ccas(pos)));
+    %HSIUab
      save('./Variables Generadas/espacioccasYseparabilidad',"espacios_ccas","separabilidad_i");
-     save('./Variables Generadas/variablesGeneradas',"RGB","Lab","comb3descr","combinacion_mas_de_tres_descriptores");
+     save('./Variables Generadas/variablesGeneradas',"RGB","Lab","RSL","HSIUab");
+
+     % Representacion RSL. La mejor de 3 descriptores.
+
+        valor1 = ValoresColores(:,indices3descr(1));
+        valor2 = ValoresColores(:,indices3descr(2));
+        valor3 = ValoresColores(:,indices3descr(3));
+
+    plot3(valor1(CodifValoresColores == 255), ...
+        valor2(CodifValoresColores == 255), ...
+        valor3(CodifValoresColores == 255),'.r'), hold on
+
+
+    plot3(valor1(CodifValoresColores ~= 255), ...
+        valor2(CodifValoresColores ~= 255), ...
+        valor3(CodifValoresColores ~= 255),'.g')
