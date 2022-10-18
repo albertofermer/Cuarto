@@ -1,0 +1,9 @@
+[fil,col] = find(ROI)
+fmin = min(fil);
+cmin = min(col);
+
+Ibreducida = I(fmin:fmax,cmin:cmax);
+
+imwrite -> se guarda
+
+Hacer una función que dado un histograma calcule el brillo y el contraste del histograma.

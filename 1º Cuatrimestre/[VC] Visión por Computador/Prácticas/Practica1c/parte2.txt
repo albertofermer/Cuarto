@@ -1,0 +1,35 @@
+padarray -> amplía la matriz 'zeros' , 'replicate' y 'symmetric'
+
+EF = floor(NH/2)
+EC = floor(MH/2)
+
+Funcion de Convolución
+imfilter(Imagen, Mascara, 'opcion')
+
+
+    1 1 1
+H = 1 1 1 -> difumina la imagen
+    1 1 1
+
+    -1 -1 -1
+H = -1  8 -1  -> Resalta los bordes
+    -1 -1 -1
+
+
+---- funcion_imfilter() ----
+
+1 -  Sacar dimensiones de Imagen y Mascara.
+2 -  Genero una imagen ampliada
+	2.1 - Con strcmp detecto la 'opcion'
+		2.1.1. Zeros -> se le añaden HM/2 redondeado por debajo filas y columnas
+		2.1.2. Replicate -> padarray
+		2.1.3. Symmetric -> padarray
+	for i=1+EF:N+EF
+		for j=1+EC:M+EC
+			ROI = Iamp(i-EF:i+EF,j-EC:j+EC);
+			multiplicar elemento a elemento por la máscara
+			ImagenNueva(i-EF,j-EC) -- Pasar a la imagen restandole EF y EC.			
+
+3. Convertir la imagen en el mismo tipo que el parámetro (isinteger(Imagen))
+		
+Utilizar comparaMatrices para comprobar que de lo mismo que imfilter de matlab.	
