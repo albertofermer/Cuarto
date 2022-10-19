@@ -27,15 +27,9 @@ for i = 1:numImagenes
     % R,G,B,H,S,I,Y,U,V,L,a y b
 
     % MODELO RGB:
-    R_i = I_color(:,:,1);
-    G_i = I_color(:,:,2);
-    Bl_i = I_color(:,:,3);
-    
-        % Normalización:
-
-        R_i = double(R_i) / 255;
-        G_i = double(G_i) / 255;
-        Bl_i = double(Bl_i) / 255;
+    R_i = double(I_color(:,:,1))/255;
+    G_i = double(I_color(:,:,2))/255;
+    Bl_i = double(I_color(:,:,3))/255;
 
     I_gris = uint8(mean(I_color,3));
     % MODELO HSI:

@@ -31,14 +31,9 @@ for i = 1:numImagenes
     % R,G,B,H,S,I,Y,U,V,L,a y b
 
     % MODELO RGB:
-    R_i = I_reducida(:,:,1);
-    G_i = I_reducida(:,:,2);
-    Bl_i = I_reducida(:,:,3);
-    
-        % Normalización:
-        R_i = double(R_i) / 255;
-        G_i = double(G_i) / 255;
-        Bl_i = double(Bl_i) / 255;
+    R_i = double(I_reducida(:,:,1))/255;
+    G_i = double(I_reducida(:,:,2))/255;
+    Bl_i = double(I_reducida(:,:,3))/255;
 
     I_gris = uint8(mean(I_reducida,3));
     % MODELO HSI:
@@ -160,6 +155,6 @@ for i=1:2:size(metricas,1)
 end
 %% Guardar las métricas.
 save('Variables Generadas\metricasNN.mat',"metricas_media_NN")
-clear all
+clear
 rmpath('./Funciones Necesarias/')
 rmpath('../../Material_Imagenes\02_MuestrasRojo\');
