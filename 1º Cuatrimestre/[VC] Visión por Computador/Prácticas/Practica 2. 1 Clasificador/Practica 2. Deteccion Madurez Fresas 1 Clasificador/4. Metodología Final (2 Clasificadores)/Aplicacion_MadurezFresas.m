@@ -121,8 +121,7 @@ for i = 1:numImagenes
         % Mostramos la madurez como título de la imagen
         title(['Madurez: ', num2str(madurez), '%' ]);
     end 
-
-
+    
     pause;
     close all
 end
