@@ -17,8 +17,8 @@ if(criterio == 1)
 % transformación para cada píxel.
 for i=1:N % Para cada fila
     for j=1:M % Para cada columna
-        g = I(i,j); % Saco el nivel de gris del píxel
-        g_prima =  256/(M*N) * H(g+1)-1; % Le aplico la función de transformación
+        g = double(I(i,j)); % Saco el nivel de gris del píxel
+        g_prima =  256/(M*N) * double(H(g+1))-1; % Le aplico la función de transformación
         F = max(0,round(g_prima)); % Si es menor que 0, lo dejo en 0.
         Ieq(i,j) = F; % Le aplico el nivel de gris a la nueva imagen.
     end
@@ -27,12 +27,11 @@ end
 elseif (criterio == 2)
 % Realiza la función de transformación para cada nivel de gris, antes del
 % bucle.
-g_prima = 256/(M*N) * H - 1; % Calculo g' para todos los niveles del histograma acumulado
+g_prima = (256/(M*N) * double(H)) - 1; % Calculo g' para todos los niveles del histograma acumulado
 F = max(0,round(g_prima)); % Calculo la función de transformacion
-
     for i=1:N % Para cada fila
         for j=1:M % Para cada columna
-            Ieq(i,j) = F( I(i,j) + 1 ); % Aplico la función de transformación para el nivel de gris del píxel (i,j)
+            Ieq(i,j) = F( double(I(i,j)) + 1 ); % Aplico la función de transformación para el nivel de gris del píxel (i,j)
         end
     end
 
@@ -40,7 +39,7 @@ elseif (criterio == 3)
 % Realiza el cálculo de la función de transformación para cada nivel de
 % gris posible. Haciendo un barrido de 1 a 256 se aplica a la imagen de
 % salida.
-g_prima = 256/(M*N) * H - 1; % Calculo g' para todos los niveles del histograma acumulado
+g_prima = (256/(M*N) * double(H)) - 1; % Calculo g' para todos los niveles del histograma acumulado
 F = max(0,round(g_prima)); % Calculo la función de transformacion
     for g=1:256 % para cada nivel de gris
         Ieq(I == (g-1)) = F(g);  % Actualizo en la nueva imagen donde los píxeles con nivel de gris g-1 en la imagen original, sean F(g)

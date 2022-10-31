@@ -1,0 +1,2 @@
+ordfilter2(Imagen,1,Vecindad, padding)
+retina -> filtro de maximos

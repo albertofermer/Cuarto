@@ -13,15 +13,18 @@ end
 
 if(strcmp('zeros',opcion))
     % Amplía la imagen con ceros
-    Iamp = zeros(NH+N,MH+M);
+    Iamp = zeros(2*EF+N,2*EC+M);
     Iamp = uint8(Iamp);
     % Incrustamos la imagen en la imagen ampliada.
-    Iamp(1+EC:(N+EC), 1+EF:(M+EF)) = Imagen;
+    Iamp(1+EF:(N+EF), 1+EC:(M+EC)) = Imagen;
     ImagenNueva = zeros(size(Imagen));
+
 elseif (strcmp('replicate',opcion))
     Iamp = padarray(Imagen,[EF,EC],'replicate');
+
 elseif (strcmp('symmetric',opcion))
     Iamp = padarray(Imagen,[EF,EC],'symmetric');
+    
 end
 
 for k=(1+EF):(N+EF)

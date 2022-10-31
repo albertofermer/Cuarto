@@ -1,12 +1,22 @@
 function [brillo,contraste] = brillo_contraste(ImagenBinaria)
 h = imhist(ImagenBinaria);
-brillo = 0;
-contraste = 0;
-[N,M] = size(ImagenBinaria(:,:,1));
 % Brillo:  Nivel de gris medio en una imagen
-brillo = sum(ImagenBinaria(:))/(N*M);
+P = zeros(256,1);
 
-% Contraste: 
-contraste = sqrt(sum(( ImagenBinaria(:) - brillo ).^2)/(N*M) );
+for g = 1:256
+    P(g) = h(g)/sum(h);
+end
+
+brillo = 0;
+for g = 1:256
+    brillo = brillo + (g - 1)*P(g);
+end
+
+suma = 0;
+for g=1:256
+    suma = suma + (  ((g-1)-brillo)^2 )*P(g); % nivel de gris menos la media por el porcentaje.
+end
+
+contraste = sqrt(suma);
 end
 
