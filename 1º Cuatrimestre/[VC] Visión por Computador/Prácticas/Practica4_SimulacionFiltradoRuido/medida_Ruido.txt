@@ -1,0 +1,7 @@
+(I - G)^2 --> Representa el ruido de cada píxel al cuadrado.
+(I - Ie)^2 --> Ruido residual que no ha conseguido filtrar.
+
+
+Cuanto menor sea (I - Ie)^2 , mejor filtrado.
+
+(I - Ie)^2 debe ser menor que (I - G)^2 para considerar que es un buen filtro.
