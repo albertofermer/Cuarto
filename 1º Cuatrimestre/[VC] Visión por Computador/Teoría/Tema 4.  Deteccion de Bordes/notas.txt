@@ -1,0 +1,27 @@
+La primera derivada aporta más de un píxel de variación. No es preciso detectando bordes.
+
+VECTOR GRADIENTE
+-------------------
+Tiene una componente X y otra Y
+Sentido del máximo crecimiento
+Dirección Perpendicuar al borde
+
+La magnitud del vector decide si es un píxel de borde o no. Si el valor supera cierto umbral, se considerará un borde.
+
+
+Estas máscaras siempre suman 0.
+
+G_x se aplica sobre bordes verticales.
+G_y se aplica sobre bordes horizontales.
+
+Tienen resultados negativos y positivos.
+abs(g_x) -> magnitud
+mat2gray -> transforma la imagen de 0 a 1.
+
+
+MASCARAS DE KIRSCH
+-------------------
+Realiza 8 convoluciones y se queda con la magnitud mayor.
+
+
+La segunda derivada detecta los cambios de signo y da el cruce por cero de los píxeles de borde. Es muy preciso detectando el borde, da un solo píxel de borde. Sin embargo, es muy sensible al ruido.

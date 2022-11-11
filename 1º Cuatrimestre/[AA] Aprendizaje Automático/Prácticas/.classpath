@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="AA_Practica_ReinforcementLearning/champ2011client-java/champ2011client-java/src"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
