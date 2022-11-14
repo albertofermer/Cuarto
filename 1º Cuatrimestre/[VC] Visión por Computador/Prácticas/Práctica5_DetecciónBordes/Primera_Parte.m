@@ -13,7 +13,7 @@ addpath('./Funciones_Necesarias\')
 %                           IMAGEN DE INTENSIDAD                          %
 %-------------------------------------------------------------------------%
 P5 = imread("P5.tif");
-I = uint8(mean(P5,3));
+I = uint8(rgb2gray(P5));
 figure,
 imshow(uint8(I));
 
@@ -22,8 +22,34 @@ imshow(uint8(I));
 %-------------------------------------------------------------------------%
 W = 5;
 sigma = W/5;
-Igauss = imfilter(I,funcion_calcula_mascara_gaussiana_eficiente(W,sigma,false));
+Igauss = imfilter(I,fspecial('gaussian',W,sigma));
 
 figure,
-imshow(Igauss)
+imshow(Igauss), title('Imagen suavizada')
+
+[N,M] = size(I);
+imagenes = cat(3,I,Igauss);
+text = ["Imagen Original","Imagen suavizada"];
+cortes = [0.25,0.5,0.75];
+colores = ["red","green","blue"];
+for i=1:size(imagenes,3)
+        perfil = [];
+        I_aux = imagenes(:,:,i);
+        % Visualiza la imagen con la línea del perfil.
+        figure,
+        subplot(2,1,1), imshow(I_aux), title(text(i));
+    
+        for j=1:length(cortes)
+            perfil = [perfil;I_aux(round(cortes(j)*N),:)];
+            line([1,M],[round(cortes(j)*N),round(cortes(j)*N)],'Color',colores(j)),
+        end
+       
+        subplot(2,1,2),
+        for j=1:size(perfil,1)
+            plot(perfil(j,:),colores(j)), hold on
+        end
+        legend("25%","50%","75%")
+        axis([0,M,0,250])
+end
+
 

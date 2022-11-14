@@ -1,4 +1,23 @@
 function [Ifiltrada] = funcion_filtroMediana(I,matriz_vecindad,opcion_padding)
+%-------------------------------------------------------------------------%
+% Es un filtro de orden no lineal. Ordena los píxeles de la ventana de cada
+% píxel de la imagen en orden secuencial basándose en el nivel de gris.
+%
+% Ventajas: Preserva mejor los bordes que los filtros lineales y es eficaz
+% para eliminar ruido tipo "sal y pimienta" ya que los valores ruidosos
+% estarán situados al principio o al final del vector ordenado.
+%
+% Desventajas: Sin embargo, puede perder detalles como líneas delgadas, puntos aislados
+% y tiende a redondear las esquinas. Además tiene un coste computacional
+% alto.
+%
+% Reemplaza el píxel central de la ventana por la mediana del entorno de
+% vecindad del píxel (el valor central).
+%
+% El resultado es que se homogenizan los píxeles con intensidad diferente a
+% la de sus vecinos, de esta forma se eliminan los picos de intensidad
+% aislados.
+%-------------------------------------------------------------------------%
 
 % opcion = 'zeros', 'replicate', 'symmetric'
 [N, M] = size(I);

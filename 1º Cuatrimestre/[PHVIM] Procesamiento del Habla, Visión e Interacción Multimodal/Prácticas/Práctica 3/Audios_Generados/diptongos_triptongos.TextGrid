@@ -1,0 +1,82 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 9.99891156462585 
+tiers? <exists> 
+size = 1 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "intervalos" 
+        xmin = 0 
+        xmax = 9.99891156462585 
+        intervals: size = 17 
+        intervals [1]:
+            xmin = 0 
+            xmax = 0.6145236729182414 
+            text = "" 
+        intervals [2]:
+            xmin = 0.6145236729182414 
+            xmax = 1.1105778923374905 
+            text = "ai" 
+        intervals [3]:
+            xmin = 1.1105778923374905 
+            xmax = 1.7189462746441166 
+            text = "" 
+        intervals [4]:
+            xmin = 1.7189462746441166 
+            xmax = 2.299236116228899 
+            text = "au" 
+        intervals [5]:
+            xmin = 2.299236116228899 
+            xmax = 2.916964012109473 
+            text = "" 
+        intervals [6]:
+            xmin = 2.916964012109473 
+            xmax = 3.291344555067397 
+            text = "ia" 
+        intervals [7]:
+            xmin = 3.291344555067397 
+            xmax = 4.058824668131141 
+            text = "" 
+        intervals [8]:
+            xmin = 4.058824668131141 
+            xmax = 4.620395482568027 
+            text = "ua" 
+        intervals [9]:
+            xmin = 4.620395482568027 
+            xmax = 5.219404351300705 
+            text = "" 
+        intervals [10]:
+            xmin = 5.219404351300705 
+            xmax = 5.799694192885488 
+            text = "ui" 
+        intervals [11]:
+            xmin = 5.799694192885488 
+            xmax = 6.520376738079491 
+            text = "" 
+        intervals [12]:
+            xmin = 6.520376738079491 
+            xmax = 6.978992903202948 
+            text = "iu" 
+        intervals [13]:
+            xmin = 6.978992903202948 
+            xmax = 7.690315934823003 
+            text = "" 
+        intervals [14]:
+            xmin = 7.690315934823003 
+            xmax = 8.429717507164902 
+            text = "uai" 
+        intervals [15]:
+            xmin = 8.429717507164902 
+            xmax = 9.056804916619425 
+            text = "" 
+        intervals [16]:
+            xmin = 9.056804916619425 
+            xmax = 9.646454271778156 
+            text = "uei" 
+        intervals [17]:
+            xmin = 9.646454271778156 
+            xmax = 9.99891156462585 
+            text = "" 

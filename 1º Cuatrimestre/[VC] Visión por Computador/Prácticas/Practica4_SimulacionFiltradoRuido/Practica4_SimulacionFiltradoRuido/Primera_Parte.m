@@ -66,7 +66,7 @@ gaussiana = G(round(N/2),:);    % Imagen con ruido gaussiano.
 figure,
 plot(original,'-r'), hold on
 plot(salpimienta,'.k'), hold on
-plot(gaussiana,'.b')
+plot(gaussiana,'-b')
 legend('Original','Ruido Sal y Pimienta', 'Ruido Gaussiano')
 
 %-------------------------------------------------------------------------%

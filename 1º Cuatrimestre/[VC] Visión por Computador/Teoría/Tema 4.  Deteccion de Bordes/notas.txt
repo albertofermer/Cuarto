@@ -6,8 +6,10 @@ Tiene una componente X y otra Y
 Sentido del máximo crecimiento
 Dirección Perpendicuar al borde
 
-La magnitud del vector decide si es un píxel de borde o no. Si el valor supera cierto umbral, se considerará un borde.
 
+--------------------------------------------------------------------------------
+La magnitud del vector decide si es un píxel de borde o no. Si el valor supera cierto umbral, se considerará un borde.
+--------------------------------------------------------------------------------
 
 Estas máscaras siempre suman 0.
 
@@ -25,3 +27,17 @@ Realiza 8 convoluciones y se queda con la magnitud mayor.
 
 
 La segunda derivada detecta los cambios de signo y da el cruce por cero de los píxeles de borde. Es muy preciso detectando el borde, da un solo píxel de borde. Sin embargo, es muy sensible al ruido.
+
+
+
+
+Detector de Canny
+-----------------------
+El ángulo del vector gradiente da la información sobre el grosor del borde.
+Si la magnitud del pixel es menor que la de los vecinos en el vector gradiente, se pone a 0, ya que uno de sus vecinos es más representativo del borde.
+
+
+
+
+
+

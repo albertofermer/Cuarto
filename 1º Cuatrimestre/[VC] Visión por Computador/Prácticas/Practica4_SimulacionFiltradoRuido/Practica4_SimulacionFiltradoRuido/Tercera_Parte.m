@@ -44,7 +44,7 @@ for i=1:size(desv,2)   % Para cada sigma
 
         % Aplico el filtro adaptativo con tamaño de ventana WxW.
         VarRuido = var( double(Imagen_Ruidosa)  -  double(Ioriginal));
-        filtro_adaptativo = funcion_filtadapt_matricial(Imagen_Ruidosa,ones(W(j)),VarRuido,'symmetric');
+        filtro_adaptativo = funcion_filtadapt_matricial(Imagen_Ruidosa,ones(W(j)),VarRuido);
 
         %-----------------------------------------------------------------%
         %                          CÁLCULO DE ISNR                        %
@@ -93,7 +93,7 @@ for i=1:size(desv,2)   % Para cada sigma
         subplot(2,2,4), imshow(filtro_adaptativo), title(['Filtro Adaptativo ( W = ',num2str(W(j)), ')  ISNR = ', num2str(ISNR_adaptativo)])
         
         
-        pause;
+        %pause;
         close all
         
         tabla = [tabla;desv(i),W(j),ISNR_gaussiana, ISNR_mediana, ISNR_adaptativo];

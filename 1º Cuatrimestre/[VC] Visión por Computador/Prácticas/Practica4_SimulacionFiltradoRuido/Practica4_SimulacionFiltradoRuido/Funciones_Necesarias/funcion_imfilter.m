@@ -24,7 +24,7 @@ function ImagenNueva = funcion_imfilter(Imagen,H,opcion)
 
 [N, M] = size(Imagen);
 [NH, MH] = size(H);
-
+H
 % EF y EC son el número de filas y de columnas, respectivamente, que se
 % añadirán con la opción de padding.
 
