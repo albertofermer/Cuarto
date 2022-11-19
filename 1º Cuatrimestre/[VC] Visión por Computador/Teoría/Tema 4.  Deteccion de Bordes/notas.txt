@@ -29,12 +29,44 @@ Realiza 8 convoluciones y se queda con la magnitud mayor.
 La segunda derivada detecta los cambios de signo y da el cruce por cero de los píxeles de borde. Es muy preciso detectando el borde, da un solo píxel de borde. Sin embargo, es muy sensible al ruido.
 
 
-
-
 Detector de Canny
 -----------------------
 El ángulo del vector gradiente da la información sobre el grosor del borde.
 Si la magnitud del pixel es menor que la de los vecinos en el vector gradiente, se pone a 0, ya que uno de sus vecinos es más representativo del borde.
+
+
+
+=================================================
+Deteccion de bordes basada en segunda derivada
+=================================================
+
+
+LaPlaciana: f''(x,y) = Gx(x,y)-Gx(x-1,y) = f(x,y) - f(x-1,y) -( f(x-1,y) - f(x-2,y) )= f(x,y) - 2f(x-1,y) + f(x-2,y)
+
+Da igual el signo de la máscara porque lo que se trata de encontrar son cambios de signo. Da lo mismo encontrar de -4 a 6 que de 4 a -6 porque escogeremos el que sea más próximo a 0.
+
+
+Los valores grisáceos son los valores de la laplaciana próximoa  0, porque el mínimo, que es negativo se convierte en 0 y el máximo en 255. El grisáceo cae en 128.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -43,7 +43,7 @@ public class FindS {
 		
 		
 		// Si alguna de las hipótesis satisface el atributo entonces devuelve verdadero.
-		for (String hipotesis : patron.getAllHypothesis()) {
+		for (String hipotesis : patron.getHypothesisList()) {
 			if(hipotesis.equals(atributo)) return true;
 		}
 		
@@ -71,7 +71,7 @@ public class FindS {
 
 			for (int j = 0; j < d.getSize() - 1; j++) {
 				// System.out.println(h);
-				if (satisface(h.get(j), d.getDato(j))) {
+				if (satisface(h.get(j), d.getAtributo(j))) {
 
 					// No hago nada
 
@@ -79,7 +79,7 @@ public class FindS {
 
 					ArrayList<String> gen = new ArrayList<>();
 					// Suponemos que solo hay una hipótesis en la sublista de hipótesis.
-					gen.add(generaliza(h.get(j).getPatron(0), d.getDato(j)));
+					gen.add(generaliza(h.get(j).getPatron(0), d.getAtributo(j)));
 					Hipotesis generalizacion = new Hipotesis(gen);
 					h.set(j, generalizacion);
 

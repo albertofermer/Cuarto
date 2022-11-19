@@ -21,11 +21,6 @@ W = 5;
 sigma = W/5;
 Igauss = imfilter(I,fspecial('gaussian',W,sigma));
 
-
-
-Hx = [0 0 0; -1 1 0; 0 0 0];
-Hy = [0 -1 0 ; 0 1 0; 0 0 0];
-
 Hx_sobel = [ -1 0 1; -2 0 2; -1 0 1];
 Hy_sobel = [ -1 -2 -1; 0 0 0; 1 2 1];
 [Gx_original,Gy_original,modG_original] = funcion_calcula_gradiente(I,Hx_sobel,Hy_sobel);
