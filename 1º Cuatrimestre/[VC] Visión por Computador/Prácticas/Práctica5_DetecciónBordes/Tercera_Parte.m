@@ -68,6 +68,9 @@ figure, imshow(Icanny), title(["Detector de bordes de Canny", "umbrales: [" + nu
 % imprescindible utilizar un filtrado gaussiano:
 I_filt = imfilter(I,fspecial('gaussian'),'replicate');
 
-[ILoG, ~] = edge(mat2gray(I_filt),'log');
-figure, imshow(ILoG), title("Detector de bordes Laplaciana de la Gaussiana")
+[ILoG, umbral] = edge(I_filt,'log');
+figure, imshow(ILoG), title(["Detector de bordes Laplaciana de la Gaussiana. Umbral:",num2str(umbral)])
+
+[ILoG, umbral] = edge(I_filt,'log',5*umbral);
+figure, imshow(ILoG), title(["Detector de bordes Laplaciana de la Gaussiana. Umbral:",num2str(umbral)])
 
