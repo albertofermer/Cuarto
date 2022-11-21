@@ -1,4 +1,4 @@
-%=========================================================================%
+    %=========================================================================%
 %                          SEGUNDA PARTE                                  %
 %         IMPLEMENTACIÓN DE ALGORITMO DE DETECCIÓN DE BORDES              %
 %                   BASADO EN SEGUNDA DERIVADA                            %
