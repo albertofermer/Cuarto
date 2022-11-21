@@ -71,7 +71,7 @@ public class candidateElimination {
 
 	}
 
-	public ArrayList<Hipotesis> algorithm() {
+	public void algorithm() {
 
 		Set<Hipotesis> G = createSet(TODO);
 		Set<Hipotesis> S = createSet(VACIO);
@@ -156,9 +156,6 @@ public class candidateElimination {
 		
 		System.out.println("S: " + S);
 		System.out.println("G: " + G);
-
-		return null;
-
 	}
 
 	private boolean masGeneral(Set<Hipotesis> G, Hipotesis h2) {
