@@ -48,7 +48,7 @@ while (t0+h*k) < tf
     %valores de los parámetros de control
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-velocidad_derecha=2.1;
+velocidad_derecha=1.5;
 velocidad_izquierda=1.5;
 
 R=10;
