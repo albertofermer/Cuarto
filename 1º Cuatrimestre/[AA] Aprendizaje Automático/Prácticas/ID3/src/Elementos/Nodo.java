@@ -16,5 +16,9 @@ public class Nodo {
 		ramas.add(r);
 	}
 	
+	@Override
+	public String toString() {
+		return "< " + atributo + " >";
+	}
 
 }
