@@ -2,7 +2,10 @@
 %%                      PRIMERA PARTE                                    %%
 %-------------------------------------------------------------------------%
 addpath('Funciones Necesarias\')
-Imagen = imread('ImagenesPractica\PrimeraParte\P6_1.tif');
+nombre = "ImagenesPractica\PrimeraParte\";
+for imagenes=1:3
+nombre_imagen = [nombre + "P6_" + imagenes + ".tif"];
+Imagen = imread(nombre_imagen);
 
 % Genera la imagen de intensidad de P6_1.tif
 I = rgb2gray(Imagen);
@@ -15,7 +18,8 @@ Hy_sobel = [-1, 2 -1; 0 0 0; 1 2 1];
 
 magnitud_Gx = abs(Gx);
 Ib = uint8(magnitud_Gx) > 0.3*max(magnitud_Gx(:));
-imshow(Ib)
+%figure,
+%imshow(Ib)
 
 
 % Aplica a Ib la transformada de Hough
@@ -47,8 +51,9 @@ theta_recta = theta(columna);
 
 Y = (rho_recta - X*cosd(theta_recta) ) / sind(theta_recta);
 
-imshow(Ib), hold on
-plot(X,Y,'.r');
+%
+%imshow(Ib), hold on
+%plot(X,Y,'.r');
 
 
 % Aplica la funcion de matlab houghpeaks para encontrar las 5 rectas ás
@@ -59,6 +64,7 @@ P = houghpeaks(H,NumRectas,'threshold', Umbral);
 
 rho_rectas = rho(P(:,1));
 theta_rectas = theta(P(:,2));
+figure,
 imshow(Ib), hold on
 for j=1:length(rho_rectas)
     Y = (rho_rectas(j) - X*cosd(theta_rectas(j)) ) ./ sind(theta_rectas(j));
@@ -113,18 +119,34 @@ plot(xy_long(:,1),xy_long(:,2),'LineWidth',2,'Color','red');
 % 'MinLength':  Merged line segments shorter than 'MinLength'
 %                are discarded.
 
+% 6. Segmentar la imagen
+
 Ibinaria = ones(N,M);
 % rho_rectas = rho(P(:,1));
 % theta_rectas = theta(P(:,2));
-figure,
-imshow(Ibinaria), hold on
 
 for j=1:length(P)
     Y = (rho_rectas(j) - X*cosd(theta_rectas(j)) ) / sind(theta_rectas(j));
-    YoI = Y(Y>0 & Y<M);
-    XoI = X(Y>0 & Y<M);
-    Ibinaria(unique(YoI),unique(XoI)) = 0;
+    YoI = Y(Y>0 & Y<=N);
+    XoI = X(Y>0 & Y<=N);
+    for i=1:length(XoI)
+        Ibinaria(ceil(YoI(i)),ceil(XoI(i))) = 0;
+    end
 end
 
+
+% Aplicar filtro de minimos
+Ibinaria_filt = ordfilt2(Ibinaria,1,ones(3));
+figure,
+imshow(Ibinaria_filt)
+
+% Etiquetar imagen y nos quedamos con 
+Ietiq = bwlabel(Ibinaria_filt);
+etiq = Ietiq(round(N/2),round(M/2));
+IOI = (Ietiq == etiq);
+figure,
+imshow(Imagen .* uint8(cat(3,IOI,IOI,IOI)))
+
+end
 
 rmpath('Funciones Necesarias\')

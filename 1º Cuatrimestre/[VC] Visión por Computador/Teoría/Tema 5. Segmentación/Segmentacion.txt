@@ -10,3 +10,14 @@ a y b: se discretizan con los píxeles de la imagen a = [1:N] b = [1:M]
 r : se discretiza [rmin:rmax]
 
 por cada valor (a,b) calcula r. (Barrido de píxeles)
+
+--------------------------
+
+Encontrar el máximo
+
+para cada los radios
+	encontrar la circunferencia mas probable
+	sacar una matriz que te devuelve el centro de la circunferencia mas probable
+	matriz de num_radiosx 4 (indice, a, b, numVotos)
+
+buscar el maximo de la ultima columna.
