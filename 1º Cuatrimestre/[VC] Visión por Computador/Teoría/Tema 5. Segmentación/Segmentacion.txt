@@ -1,0 +1,12 @@
+-----
+Detección de circunferencias
+-----
+
+r^2 = (x-a)^2 + (y-b)^2
+
+(espacio de parámetros tridimensional (a,b,r))
+
+a y b: se discretizan con los píxeles de la imagen a = [1:N] b = [1:M]
+r : se discretiza [rmin:rmax]
+
+por cada valor (a,b) calcula r. (Barrido de píxeles)

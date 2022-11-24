@@ -32,7 +32,8 @@ imshow(Ib)
 
 % ¿Cómo es la discretización que se realiza del espacio de parámetros en
 % esta configuración por defecto?
-%  
+%   Angulo desde -90 hasta 89
+%   La distancia: desde -taumax hasta +taumax
 
 
 % Escribe la ecuacion de la recta que pasa por más puntos en la imagen
