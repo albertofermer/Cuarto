@@ -21,7 +21,24 @@ public class Nodo {
 	@Override
 	public String toString() { // Convertir a reglas if-else
 		
-		return "< " + atributo + " >";
+		String regla_if = "if (" + atributo + " == ";
+		String str = ".";
+		
+		System.out.println(ramas);
+		
+		if (ramas != null) {
+			for (Rama r : ramas) {
+				str = regla_if + r + ")\n";
+				System.out.println(r.getHijo());
+				str += r.getHijo();
+				
+			}
+			
+		}
+		
+		
+		return str;
+		
 	}
 	
 	

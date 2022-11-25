@@ -43,8 +43,11 @@ public class ID3 {
 			for (String valor : dataset.getListaCabecera_Valores().get(atributo)) {
 
 				Rama branch = new Rama(valor);
+				raiz.addRama(branch);
 				branch.addPadre(raiz);
+				
 				Dataset dataset_reducido = dataset.filtrarDatasetPorAtributoValor(dataset, atributo, valor);
+				
 				branch.addHijo(algoritmo(dataset_reducido));
 
 			}

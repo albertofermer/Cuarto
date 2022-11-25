@@ -22,4 +22,11 @@ public class Rama {
 		return hijo;
 	}
 	
+	@Override
+	public String toString() {
+		String str = valor;
+		
+		return str;
+	}
+	
 }
