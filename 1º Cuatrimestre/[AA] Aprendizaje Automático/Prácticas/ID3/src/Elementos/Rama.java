@@ -18,4 +18,8 @@ public class Rama {
 		this.padre = p;
 	}
 	
+	public Nodo getHijo() {
+		return hijo;
+	}
+	
 }

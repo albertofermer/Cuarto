@@ -4,6 +4,7 @@ import static Algoritmo.Constantes.NEGATIVO;
 import static Algoritmo.Constantes.POSITIVO;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,60 +13,38 @@ import Elementos.*;
 
 public class ID3 {
 
-	private ArrayList<Dato> dataset = null;
+	private Dataset dataset = null;
 	public Nodo raiz = null;
-	ArrayList<Set<String>> lista_atributos = null;
-	Set<String> lista_clases = null;
 
-	public ID3(ArrayList<Dato> dataset) {
+	public ID3(Dataset dataset) {
 
-		this.dataset = dataset;
-		generarListaAtributosyClases();
+		this.dataset = (dataset);
 
 	}
 
-	private void generarListaAtributosyClases() {
+	public Nodo algoritmo(Dataset dataset) {
 
-		lista_atributos = new ArrayList<>(); // Para almacenar los tipos de atributos que hay
-		lista_clases = new HashSet<>();
-		if (!dataset.isEmpty()) {
+		if (!dataset.getInstancias().isEmpty() && mismaClase(dataset)) { // Si todas las instancias son de la misma
+																			// clase
+			return new Nodo(dataset.getInstancias().get(0).getClase());
 
-			for (int i = 0; i < dataset.get(0).getSize(); i++) {
-				Set<String> a = new HashSet<>();
-				lista_atributos.add(a);
-			}
-
-			for (Dato d : dataset) {
-				lista_clases.add(d.getClase());
-				for (int i = 0; i < d.getSize(); i++) {
-					lista_atributos.get(i).add(d.getAtributo(i));
-				}
-			}
-		}
-
-	}
-
-	public Nodo algoritmo(ArrayList<Dato> dataset) {
-
-		if (!dataset.isEmpty() && mismaClase(dataset)) {
-			System.out.println(new Nodo(dataset.get(0).getClase()));
-			return new Nodo(dataset.get(0).getClase());
-		} else if (dataset.size() == 0) {
-			System.out.println(new Nodo("Por Defecto"));
+		} else if (dataset.getInstancias().size() == 0) { // Si no quedan más instancias para estudiar.
 			return new Nodo("Por Defecto");
-		} else if (dataset.get(0).getSize() == 0) {
-			System.out.println(claseMayoritaria(dataset));
+
+		} else if (dataset.getInstancias().get(0).getSize() == 0) { // Si no quedan atributos por estudiar.
+
 			return claseMayoritaria(dataset);
+
 		} else {
 
-			int id_atributo = calculaMayorGanancia(dataset);
-			Nodo raiz = new Nodo(Integer.toString(id_atributo));
+			String atributo = calculaMayorGanancia(dataset);
+			Nodo raiz = new Nodo(atributo);
 
-			for (String valor : lista_atributos.get(id_atributo)) {
+			for (String valor : dataset.getListaCabecera_Valores().get(atributo)) {
 
 				Rama branch = new Rama(valor);
 				branch.addPadre(raiz);
-				ArrayList<Dato> dataset_reducido = reducirDataset(dataset, id_atributo, valor);
+				Dataset dataset_reducido = dataset.filtrarDatasetPorAtributoValor(dataset, atributo, valor);
 				branch.addHijo(algoritmo(dataset_reducido));
 
 			}
@@ -74,36 +53,86 @@ public class ID3 {
 
 	}
 
-	private ArrayList<Dato> reducirDataset(ArrayList<Dato> dataset2, int id_atributo, String valor) {
+	private String calculaMayorGanancia(Dataset dataset) {
+		// Debemos devolver el atributo que menor ganancia de información aporte.
+		ArrayList<String> atributos = new ArrayList<>();
+		ArrayList<Double> informacion = new ArrayList<>();
+		atributos.addAll(dataset.getNombreAtributos());
 		
-		ArrayList<Dato> dataset_reducido = new ArrayList<>();
-		for (Dato d : dataset2) {
-			
+		System.out.println(dataset.getNombreAtributos());
+
+		for (String atributo : atributos) {
+			informacion.add(calculaInformacionAtributo(dataset, atributo));
+		}
+
+		// Suponemos que el máximo es el primer valor
+		double min = informacion.get(0);
+		String atributo_max = atributos.get(0);
+
+		for (int i = 1; i < informacion.size(); i++) {
+			if (informacion.get(i) < min) {
+				min = informacion.get(i);
+				atributo_max = atributos.get(i);
+			}
+
 		}
 		
-		return null;
+		System.out.println("Atr_Min: " + atributo_max);
+		return atributo_max;
 	}
 
-	private int calculaMayorGanancia(ArrayList<Dato> dataset2) {
-		// TODO Auto-generated method stub
-		return -1;
+	private Double calculaInformacionAtributo(Dataset dataset, String atributo) {
+		double suma = 0;
+		// para cada valor del atributo pasado por parámetro, se suma sus
+		// contribuciones.
+		for (String valor : dataset.getListaCabecera_Valores().get(atributo)) {
+
+			int nij = dataset.filtrarDatasetPorAtributoValor(dataset, atributo, valor).getInstancias().size();
+
+			int n = dataset.getInstancias().size();
+			suma += ((double)nij / (double)n) * calculaInformacionValor(dataset, atributo, valor);
+		}
+		
+		System.out.println("I(" + atributo + ") = " + suma);
+		return suma;
 	}
 
-	private Nodo claseMayoritaria(ArrayList<Dato> dataset2) {
+	private double calculaInformacionValor(Dataset dataset, String atributo, String valor) {
+
+		double suma = 0;
+		int nij = dataset.filtrarDatasetPorAtributoValor(dataset, atributo, valor).getInstancias().size();
+		for (String clase : dataset.getLista_clases()) {
+			
+			int nijc = dataset.filtrarDatasetPorAtributoValorClase(dataset, atributo, valor, clase).getInstancias()
+					.size();
+			suma += ( ( (double) nijc / (double) nij)) * log(( ( (double) nijc / (double) nij)), 2);
+		}
+		
+		return -suma;
+	}
+
+	private static Double log(double num, int base) {
+		if (num == 0) {
+			return (double) 0;
+		}
+		return (Math.log10(num) / Math.log10(base));
+	}
+
+	private Nodo claseMayoritaria(Dataset dataset) {
 
 		// Hacer un diccionario que relacione cada clase del conjunto lista_clases con
 		// un valor.
 		HashMap<String, Integer> contador = new HashMap<String, Integer>();
 		// Inicializamos el contador de cada clase.
-		for (String clase : lista_clases) {
+		for (String clase : dataset.getLista_clases()) {
 			contador.put(clase, 0);
 		}
 
 		// Elegimos como clase mayoritaria la primera que aparezca.
-		String clase_mayoritaria = dataset2.get(0).getClase();
+		String clase_mayoritaria = dataset.getInstancias().get(0).getClase();
 
 		// Calcula cual es la clase mayoritaria
-		for (Dato d : dataset2) {
+		for (Dato d : dataset.getInstancias()) {
 
 			// Aumenta el contador de la clase de d.
 			contador.put(d.getClase(), contador.get(d.getClase()) + 1);
@@ -118,10 +147,13 @@ public class ID3 {
 		return new Nodo(clase_mayoritaria);
 	}
 
-	private boolean mismaClase(ArrayList<Dato> dataset2) {
-		String clase_aux = dataset2.get(0).getClase();
-		for (Dato d : dataset2) {
-			if (!clase_aux.equals(d.getClase())) {
+	private boolean mismaClase(Dataset dataset2) {
+		// Comparamos con la clase de la primera instancia
+		String clase_aux = dataset2.getInstancias().get(0).getClase();
+		for (Dato d : dataset2.getInstancias()) {
+
+			if (!clase_aux.equals(d.getClase())) { // En el caso de que sea distintas, entonces no son todas de la misma
+													// clase.
 				return false;
 			}
 		}
@@ -130,33 +162,47 @@ public class ID3 {
 
 	public static void main(String[] args) {
 		ArrayList<Dato> dataset = new ArrayList<>();
-		ArrayList<Dato> dataset_empty = new ArrayList<>();
-		ArrayList<Dato> dataset_no_atributos = new ArrayList<>();
 		/* DATASET */
-		String [] cabecera = {"TIEMPO", "TEMPERATURA", "VIENTO", "TIPO", "PARTIDO", "CLASE"};
-		String [] x1 = {"SUNNY","WARM","NORMAL","STRONG","WARM", "SAME", POSITIVO};
-		String [] x2 = {"SUNNY","WARM","HIGH","STRONG","WARM", "SAME", POSITIVO};
-		String [] x3 = {"RAINY","COLD","HIGH","STRONG","WARM", "CHANGE", NEGATIVO};
-		String [] x4 = {"SUNNY","WARM","HIGH","STRONG","COOL", "CHANGE", POSITIVO};
-		
-		dataset.add(new Dato(cabecera));
+		String[] c = { "Antenas", "Colas", "Nucleos", "Cuerpo", "Clase" };
+		String[] x1 = { "1", "0", "2", "Rayado", NEGATIVO };
+		String[] x2 = { "1", "0", "1", "Blanco", POSITIVO };
+		String[] x3 = { "1", "2", "0", "Rayado", NEGATIVO };
+		String[] x4 = { "0", "2", "1", "Rayado", NEGATIVO };
+		String[] x5 = { "1", "1", "1", "Rayado", POSITIVO };
+		String[] x6 = { "2", "2", "1", "Rayado", POSITIVO };
+
+		dataset.add(new Dato(c));
 		dataset.add(new Dato(x1));
 		dataset.add(new Dato(x2));
 		dataset.add(new Dato(x3));
 		dataset.add(new Dato(x4));
+		dataset.add(new Dato(x5));
+		dataset.add(new Dato(x6));
 
-		/* DATASET */
-		String[] a1 = { POSITIVO };
-		String[] a2 = { NEGATIVO };
-		String[] a3 = { NEGATIVO };
-		String[] a4 = { NEGATIVO };
+		Dataset d = new Dataset(dataset);
 
-		dataset_no_atributos.add(new Dato(a1));
-		dataset_no_atributos.add(new Dato(a2));
-		dataset_no_atributos.add(new Dato(a3));
-		dataset_no_atributos.add(new Dato(a4));
+		System.out.println(d.getAtributos_cabecera());
+		System.out.println(d.getInstancias());
+//		System.out.println(d.getIdentificador_atributo_cabecera());
+//		System.out.println(d.getLista_clases());
+//		System.out.println(d.getLista_valores_atributos());
+//		System.out.println(d.getListaCabecera_Valores());
 
-		ID3 id3 = new ID3(dataset);
-		id3.algoritmo(dataset);
+//		
+		System.out.println("===============================================");
+//		Dataset dr = d.filtrarDatasetPorAtributoValor(d, "Cuerpo", "Blanco");
+//		System.out.println(dr.getInstancias());
+//		System.out.println("===============================================");
+
+		// System.out.println(log(2,2));
+
+		ID3 id3 = new ID3(d);
+		Nodo raiz = id3.algoritmo(d);
+
+		System.out.println("===============================================");
+		
+		System.out.println(raiz);
+		
+
 	}
 }

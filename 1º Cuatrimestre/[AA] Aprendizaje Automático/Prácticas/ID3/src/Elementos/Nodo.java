@@ -16,9 +16,14 @@ public class Nodo {
 		ramas.add(r);
 	}
 	
+	
+	
 	@Override
-	public String toString() {
+	public String toString() { // Convertir a reglas if-else
+		
 		return "< " + atributo + " >";
 	}
+	
+	
 
 }
