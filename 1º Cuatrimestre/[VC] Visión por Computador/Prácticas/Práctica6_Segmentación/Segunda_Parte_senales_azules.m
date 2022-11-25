@@ -5,9 +5,6 @@
 addpath('Funciones Necesarias\')
 addpath('Funciones_THCircular\')
 nombre = "ImagenesPractica\SegundaParte\Signal4";
-
-
-
 numImagenes = 2;
 
 for imagenes=1:numImagenes

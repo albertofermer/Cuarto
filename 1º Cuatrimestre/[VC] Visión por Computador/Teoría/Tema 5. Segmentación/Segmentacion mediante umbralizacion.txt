@@ -4,9 +4,9 @@ Con defecto de iluminación no se utiliza umbralización global.
 
 Se debe:
 
-stdfilt -> mat2gray -> otsu -> binarizar
-Roipoly -> stdfilt(ROI) -> max -> binarizar
-Obtener el fondo y hacer la diferencia de las imágenes.
+1. stdfilt -> mat2gray -> otsu -> binarizar
+2. Roipoly -> stdfilt(ROI) -> max -> binarizar
+3. Obtener el fondo y hacer la diferencia de las imágenes.
 
 
 multiplicar (and) la imagen binarizada con la imagen ruidosa.
