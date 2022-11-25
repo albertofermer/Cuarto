@@ -1,0 +1,12 @@
+En ventanas bimodales se puede establecer la condición de media. Pero en las zonas constantes no (histograma uniforme).
+
+Con defecto de iluminación no se utiliza umbralización global.
+
+Se debe:
+
+stdfilt -> mat2gray -> otsu -> binarizar
+Roipoly -> stdfilt(ROI) -> max -> binarizar
+Obtener el fondo y hacer la diferencia de las imágenes.
+
+
+multiplicar (and) la imagen binarizada con la imagen ruidosa.
