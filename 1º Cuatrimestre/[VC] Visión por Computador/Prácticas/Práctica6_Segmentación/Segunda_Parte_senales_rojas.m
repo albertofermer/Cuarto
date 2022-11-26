@@ -4,16 +4,18 @@
 %-------------------------------------------------------------------------%
 addpath('Funciones Necesarias\')
 addpath('Funciones_THCircular\')
-nombre = "ImagenesPractica\SegundaParte\Signal";
 
+nombre = "ImagenesPractica\SegundaParte\Signal";
 
 signals = 3;
 for s = 1:signals
     nombre_signal = nombre + num2str(s);
     numImagenes = 2;
+
     if (s == 1) 
         numImagenes = 4;
     end
+
     for imagenes=1:numImagenes
 
         nombre_imagen = nombre_signal + "_" + num2str(imagenes) + ".tif";
