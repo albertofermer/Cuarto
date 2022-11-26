@@ -1,9 +1,16 @@
 %-------------------------------------------------------------------------%
 %%                      SEGUNDA  PARTE                                   %%
-%               Segmentación de señales de tráfico (rojas)
+%               Segmentación de señales de tráfico (rojas)                %
 %-------------------------------------------------------------------------%
 addpath('Funciones Necesarias\')
 addpath('Funciones_THCircular\')
+
+%-------------------------------------------------------------------------%
+% 1. Lee la imagen, genera y visualiza una imagen binaria (Ib) de puntos
+% "rojos" de la imagen en color candidatos a pertenecer al contorno de la
+% región que se pretende segmentar. Para ello utiliza un metodo de
+% umbralización global.
+%-------------------------------------------------------------------------%
 
 nombre = "ImagenesPractica\SegundaParte\Signal";
 

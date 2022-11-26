@@ -1,6 +1,6 @@
 %-------------------------------------------------------------------------%
 %%                      SEGUNDA  PARTE                                   %%
-%               Segmentación de señales de tráfico (azules)
+%               Segmentación de señales de tráfico (azules)               %
 %-------------------------------------------------------------------------%
 addpath('Funciones Necesarias\')
 addpath('Funciones_THCircular\')
