@@ -36,8 +36,8 @@ for s = 1:signals
         UmbralAzul = factor*(Bmin+Bmax);
         
         Rbin = R>UmbralRojo;
-        Gbin = G<UmbralVerde;
-        Bbin = B<UmbralAzul;
+        Gbin = G>UmbralVerde;
+        Bbin = B>UmbralAzul;
         
         Ib = and(Rbin,and(Gbin,Bbin)); % Multiplicamos las tres imagenes para segmentar las tres componentes.
         figure,
