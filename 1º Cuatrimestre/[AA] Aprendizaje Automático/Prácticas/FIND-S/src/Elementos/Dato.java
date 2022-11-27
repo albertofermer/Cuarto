@@ -42,7 +42,7 @@ public class Dato {
 	}
 	
 	public boolean esPositivo() {
-		return clase == POSITIVO;
+		return clase.equals(POSITIVO);
 	}
 	
 	@Override

@@ -1,56 +1,45 @@
 package Principal;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
-import Algoritmo.FindS;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
+
+import Algoritmo.candidateElimination;
 import Elementos.*;
-import static Algoritmo.Constantes.*;
 
 public class Main {
-
-	private static ArrayList<Dato> dataset = new ArrayList<>();
-	
-	public Main() {	}
+	public Main() {
+	}
 
 	public static void main(String[] args) throws Exception {
+
+		lectorCSV lector = new lectorCSV();
+		ArrayList<Dato> d = new ArrayList<>();
+		try {
+
+			ArrayList<List<String>> dataset = lector.leerCSV(args[0].toString());
+			for (List<String> e : dataset) {
+				String[] dato = e.toArray(new String[0]);
+				d.add(new Dato(dato));
+			}
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		ArrayList<Dato> instancias = new ArrayList<>(d);
+		instancias.remove(0);
+
+		candidateElimination ce = new candidateElimination(instancias);
 		
-		/*	DATASET	 */
-		String [] cabecera = {"TIEMPO", "TEMPERATURA", "VIENTO", "TIPO", "PARTIDO", "CLASE"};
-		String [] x1 = {"SUNNY","WARM","NORMAL","STRONG","WARM", "SAME", POSITIVO};
-		String [] x2 = {"SUNNY","WARM","HIGH","STRONG","WARM", "SAME", POSITIVO};
-		String [] x3 = {"RAINY","COLD","HIGH","STRONG","WARM", "CHANGE", NEGATIVO};
-		String [] x4 = {"SUNNY","WARM","HIGH","STRONG","COOL", "CHANGE", POSITIVO};
-		
-		dataset.add(new Dato(cabecera));
-		dataset.add(new Dato(x1));
-		dataset.add(new Dato(x2));
-		dataset.add(new Dato(x3));
-		dataset.add(new Dato(x4));
 		
 		
-		FindS algorithm_findS = new FindS(dataset);
-		System.out.println(algorithm_findS.algoritmo());
+		ce.constantes.setClasePositiva(instancias.get(0).getClase(),ce.getListaClases());
+		if (args.length == 2) ce.constantes.setClasePositiva(args[1].toString(),ce.getListaClases());
 		
+		
+		ce.algorithm();
 
 	}
-	
-	public static ArrayList<Set<String>> listaAtributos(ArrayList<Dato> dataset) {
-		
-		ArrayList<Set<String>> lista_atributos = new ArrayList<>(); // Para almacenar los tipos de atributos que hay
-		
-		for (int i=0; i< dataset.get(0).getSize(); i++) {
-			Set<String>	a = new HashSet<>();
-			lista_atributos.add(a);
-		}
-		
-		for (Dato d: dataset) {
-			for (int i = 0; i < d.getSize(); i++) {
-				lista_atributos.get(i).add(d.getAtributo(i));
-			}
-		}
-		
-		return lista_atributos;
-	}
-	
+
 }

@@ -12,10 +12,12 @@ public class Rama {
 	
 	public void addHijo(Nodo h) {
 		this.hijo = h;
+		
 	}
 	
 	public void addPadre(Nodo p) {
 		this.padre = p;
+		p.addRama(this);
 	}
 	
 	public Nodo getHijo() {

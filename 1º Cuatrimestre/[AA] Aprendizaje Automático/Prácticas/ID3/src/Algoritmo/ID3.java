@@ -43,14 +43,12 @@ public class ID3 {
 			for (String valor : dataset.getListaCabecera_Valores().get(atributo)) {
 
 				Rama branch = new Rama(valor);
-				raiz.addRama(branch);
 				branch.addPadre(raiz);
-				
 				Dataset dataset_reducido = dataset.filtrarDatasetPorAtributoValor(dataset, atributo, valor);
-				
 				branch.addHijo(algoritmo(dataset_reducido));
 
 			}
+
 			return raiz;
 		}
 
@@ -165,6 +163,7 @@ public class ID3 {
 
 	public static void main(String[] args) {
 		ArrayList<Dato> dataset = new ArrayList<>();
+		
 		/* DATASET */
 		String[] c = { "Antenas", "Colas", "Nucleos", "Cuerpo", "Clase" };
 		String[] x1 = { "1", "0", "2", "Rayado", NEGATIVO };
@@ -186,18 +185,8 @@ public class ID3 {
 
 		System.out.println(d.getAtributos_cabecera());
 		System.out.println(d.getInstancias());
-//		System.out.println(d.getIdentificador_atributo_cabecera());
-//		System.out.println(d.getLista_clases());
-//		System.out.println(d.getLista_valores_atributos());
-//		System.out.println(d.getListaCabecera_Valores());
-
-//		
+	
 		System.out.println("===============================================");
-//		Dataset dr = d.filtrarDatasetPorAtributoValor(d, "Cuerpo", "Blanco");
-//		System.out.println(dr.getInstancias());
-//		System.out.println("===============================================");
-
-		// System.out.println(log(2,2));
 
 		ID3 id3 = new ID3(d);
 		Nodo raiz = id3.algoritmo(d);
