@@ -2,35 +2,34 @@ package Algoritmo;
 
 import static Algoritmo.Constantes.*;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Scanner;
 import java.util.Set;
 
 import Elementos.Dato;
 import Elementos.Hipotesis;
 
+/**
+ *  -- Algoritmo de Eliminación de Candidatos --
+ * 
+ * Establece dos cotas (G y S) de manera que sus hipótesis
+ * pertenezcan al espacio de versiones.
+ * 
+ * @author Alberto Fernández
+ *
+ */
 public class candidateElimination {
 	private ArrayList<Hipotesis> h = null;
 	private ArrayList<Dato> dataset = null;
 	private Set<String> lista_clases = null;
 	public Constantes constantes = new Constantes();
-
 	private ArrayList<Set<String>> lista_atributos = null;
 
 	public candidateElimination(ArrayList<Dato> dataset) {
-
 		this.dataset = dataset;
 		h = createHypothesis();
 		lista_clases = new HashSet<>();
 		lista_atributos = listaAtributos();
-		
-		
 	}
 
 	/**
@@ -89,20 +88,19 @@ public class candidateElimination {
 
 	public void algorithm() {
 
+		int numero_ejemplo = 0;
 		Set<Hipotesis> G = createSet(TODO); // Sea G el conjunto de elementos de maxima generalidad de H.
 		Set<Hipotesis> S = createSet(VACIO); // Sea H el conjunto de elementos de máxima especificidad de H.
 
 		// Para cada ejemplo d del conjunto de entrenamiento D:
 		for (Dato dato : dataset) {
-
+			
 			Set<Hipotesis> S_copia = new HashSet<>(S); // Realizamos una copia del conjunto
 			Set<Hipotesis> G_copia = new HashSet<>(G);
-			//System.out.println("===========================================================");
-			//System.out.println("S: " + S);
-			//System.out.println("G: " + G);
-			//System.out.println("===========================================================\n");
+			
+			System.out.println("G:" + G);
 
-			System.out.println("Instancia: " + dato);
+			System.out.println("Instancia " + ++numero_ejemplo + ":" + dato);
 
 			// Si d es un ejemplo positivo, entonces
 			if (dato.esPositivo()) {
@@ -174,6 +172,7 @@ public class candidateElimination {
 
 		}
 
+		S.retainAll(S); G.retainAll(G);
 		System.out.println("===========================================================");
 		System.out.println("S: " + S);
 		System.out.println("G: " + G);
@@ -183,42 +182,29 @@ public class candidateElimination {
 	private Set<Hipotesis> EliminarDeGTalqueExistaOtraMasEspecifica(Set<Hipotesis> g_copia) {
 		
 		Set<Hipotesis> gCopia = new HashSet<>(g_copia); // hacemos una copia para no perder la información.
-		
 		ArrayList<Hipotesis> hipotesisG = new ArrayList<>(g_copia);
 		for (int i = 0; i < g_copia.size(); i++) {
-			
 			Hipotesis h = hipotesisG.get(i); // Escojo el elemento i
-			
-			for (int j = 0; j < g_copia.size(); j++) {
-				if (!h.equals(hipotesisG.get(j))) { // Por cada hipotesis diferente:
-					
-					if(hipotesisG.get(j).esMasEspecifica(h)) { // Si hay una hipotesis más especifica que h, se elimina h.
+			for (int j = 0; j < g_copia.size(); j++) 
+				if (!h.equals(hipotesisG.get(j)) && 			// Por cada hipotesis diferente:
+						hipotesisG.get(j).esMasEspecifica(h)) // Si hay una hipotesis más especifica que h, se elimina h.
 						gCopia.remove(h);
-					}
-				}
-			}
 		}
-		
 		return gCopia;
-		
 	}
 
 	private Set<Hipotesis> EliminarDeSTalqueExistaOtraMasGeneral(Set<Hipotesis> s_copia) {
 		
 		Set<Hipotesis> sCopia = new HashSet<>(s_copia); // hacemos una copia para no perder la información.
-		
 		ArrayList<Hipotesis> hipotesisG = new ArrayList<>(s_copia);
 		for (int i = 0; i < s_copia.size(); i++) {
 			
 			Hipotesis h = hipotesisG.get(i); // Escojo el elemento i
 			
 			for (int j = 0; j < s_copia.size(); j++) {
-				if (!h.equals(hipotesisG.get(j))) { // Por cada hipotesis diferente:
-					
-					if(hipotesisG.get(j).esMasGeneral(h)) { // Si hay una hipotesis más general que h, se elimina h.
+				if (!h.equals(hipotesisG.get(j)) &&	// Por cada hipotesis diferente:
+						hipotesisG.get(j).esMasGeneral(h)) // Si hay una hipotesis más general que h, se elimina h.
 						sCopia.remove(h);
-					}
-				}
 			}
 		}
 		
@@ -234,11 +220,9 @@ public class candidateElimination {
 	 * @return
 	 */
 	private boolean masGeneral(Set<Hipotesis> G, Hipotesis h2) {
-		for (Hipotesis hipo : G) {
-			if (hipo.esMasGeneral(h2)) {
-				return true;
-			}
-		}
+		for (Hipotesis hipo : G)
+			if (hipo.esMasGeneral(h2)) return true;
+		
 		return false;
 	}
 
@@ -250,11 +234,11 @@ public class candidateElimination {
 	 * @return
 	 */
 	private boolean masEspecifica(Set<Hipotesis> S, Hipotesis h2) {
-		for (Hipotesis hipo : S) {
-			if (hipo.esMasEspecifica(h2)) {
+		
+		for (Hipotesis hipo : S)
+			if (hipo.esMasEspecifica(h2))
 				return true;
-			}
-		}
+		
 		return false;
 	}
 
@@ -264,29 +248,24 @@ public class candidateElimination {
 		// si es inconsistente, se elimina.
 
 		Set<Hipotesis> G_copia = new HashSet<>(G); // hacemos una copia del conjunto G
-		for (Hipotesis h : G) {
-			if (!esConsistente(h, dato)) {
+		for (Hipotesis h : G)
+			if (!esConsistente(h, dato))
 				G_copia.remove(h);
-				//System.out.println("Hipotesis No Consistente: " + h);
-			}
-
-		}
-
+		
 		return G_copia;
 
 	}
 
 	public boolean esConsistente(Hipotesis h, Dato d) {
 
-		if (!satisface(h, d) && d.esPositivo()) {
+		if (!satisface(h, d) && d.esPositivo())
 			// Si algún atributo de un ejemplo positivo no satisface la hipótesis, el
 			// ejemplo no es consistente.
 			return false;
-		} else if (!satisface(h, d) && !d.esPositivo()) {
+		else if (!satisface(h, d) && !d.esPositivo())
 			// Si algún atributo de un ejemplo negativo no satisface la hipótesis, el
 			// ejemplo es consistente.
 			return true;
-		}
 		// Si satisface todos los patrones de la hipotesis y es positivo, entonces es
 		// consistente.
 		// Si satisface todos los patrones de la hipótesis y es negativo, entonces no es

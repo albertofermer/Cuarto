@@ -28,7 +28,7 @@ public class Hipotesis {
 			return false;
 
 		for (int i = 0; i < this.patrones.size(); i++) {
-			if (!this.patrones.get(i).equals(h2.getHypothesisList().get(i)))
+			if (!this.patrones.get(i).equals(h2.getPatron(i)))
 				return false;
 		}
 
@@ -79,8 +79,6 @@ public class Hipotesis {
 				// En otro caso, la hipótesis no será más general que h2.
 				return false;
 			}
-			
-			
 		}
 		return true;
 	}
@@ -100,6 +98,7 @@ public class Hipotesis {
 				// El patrón de h es más específico que el de h2 si:
 				//	1. El patrón h es VACIO
 				//	2. El patrón h es igual al de h2
+				//  3. El patrón de h2 es TODO.
 				continue;
 			}
 			else {
@@ -111,12 +110,17 @@ public class Hipotesis {
 		}
 		return true;
 	}
-
-//	public static void main(String[] args) {
-//		ArrayList<String> h1 = new ArrayList<>();
-//		h1.add("W"); h1.add("X");
-//		Hipotesis h = new Hipotesis(h1);
-//		
-//		System.out.println(h.equals("O"));
-//	}
+	
+	public static void main(String[] args) {
+		ArrayList<String> h1 = new ArrayList<>();
+		h1.add(TODO);
+		h1.add("FRIA");
+		ArrayList<String> h2 = new ArrayList<>();
+		h2.add(TODO);
+		h2.add("FRIA");
+		Hipotesis H1 = new Hipotesis(h1);
+		Hipotesis H2 = new Hipotesis(h2);
+		
+		System.out.println(H1.equals(H2));
+	}
 }
