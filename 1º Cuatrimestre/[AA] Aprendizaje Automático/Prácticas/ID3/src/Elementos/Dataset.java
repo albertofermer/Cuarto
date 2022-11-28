@@ -1,8 +1,5 @@
 package Elementos;
 
-import static Algoritmo.Constantes.NEGATIVO;
-import static Algoritmo.Constantes.POSITIVO;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -224,45 +221,13 @@ public class Dataset {
 		return new Dataset(dataset_reducido);
 	}
 	
-	
-	public static void main(String[] args) {
-		ArrayList<Dato> dataset = new ArrayList<>();
-		/*	DATASET	 */
-		String [] c = {"Antenas","Colas","Nucleos","Cuerpo","Clase"};
-		String [] x1 = {"1","0","2","Rayado", NEGATIVO};
-		String [] x2 = {"1","0","1","Blanco", POSITIVO};
-		String [] x3 = {"1","2","0","Rayado", NEGATIVO};
-		String [] x4 = {"0","2","1","Rayado", NEGATIVO};
-		String [] x5 = {"1","1","1","Rayado", POSITIVO};
-		String [] x6 = {"2","2","1","Rayado", POSITIVO};
+	@Override
+	public String toString() {
+		String str = atributos_cabecera.toString() + "\n";
+		for (Dato d : instancias)
+			str += d.toString() + "\n";
 		
-		dataset.add(new Dato(c));
-		dataset.add(new Dato(x1));
-		dataset.add(new Dato(x2));
-		dataset.add(new Dato(x3));
-		dataset.add(new Dato(x4));
-		dataset.add(new Dato(x5));
-		dataset.add(new Dato(x6));
-		
-		Dataset d = new Dataset(dataset);
-		
-		System.out.println(d.getAtributos_cabecera());
-		System.out.println(d.getInstancias());
-		System.out.println(d.getIdentificador_atributo_cabecera());
-		System.out.println(d.getLista_clases());
-		System.out.println(d.getLista_valores_atributos());
-		System.out.println(d.getListaCabecera_Valores());
-		
-		
-		System.out.println("===============================================");
-		Dataset dr = d.filtrarDatasetPorAtributoValor(d, "Colas", "0");
-		System.out.println(dr.getInstancias());
-		System.out.println("===============================================");
-		
-		
-		
-		
-		
+		return str;
 	}
 
 }

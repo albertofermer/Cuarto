@@ -1,57 +1,44 @@
 package Principal;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import Algoritmo.ID3;
 import Elementos.*;
-import static Algoritmo.Constantes.*;
 
 public class Main {
 
-	private static ArrayList<Dato> dataset = new ArrayList<>();
 	
 	public Main() {	}
 
 	public static void main(String[] args) throws Exception {
 		
-		/*	DATASET	 */
-		String [] x1 = {"1","0","2","Rayado", NEGATIVO};
-		String [] x2 = {"1","0","1","Blanco", POSITIVO};
-		String [] x3 = {"1","2","0","Rayado", NEGATIVO};
-		String [] x4 = {"0","2","1","Rayado", NEGATIVO};
-		String [] x5 = {"1","1","1","Rayado", POSITIVO};
-		String [] x6 = {"2","2","1","Rayado", POSITIVO};
+		lectorCSV lector = new lectorCSV();
+		ArrayList<Dato> d = new ArrayList<>();
+		try {
+			
+			ArrayList<List<String>> dataset = lector.leerCSV(args[0].toString());
+			
+			// Creación del tipo de dato "Dato" para crear el dataset.
+			for (List<String> e : dataset) {
+				String[] dato = e.toArray(new String[0]);
+				d.add(new Dato(dato));
+			}
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 		
-		dataset.add(new Dato(x1));
-		dataset.add(new Dato(x2));
-		dataset.add(new Dato(x3));
-		dataset.add(new Dato(x4));
+		ID3 id3 = new ID3();
 		
-		ArrayList<Set<String>> lista_atributos = listaAtributos(dataset);
-		
-		//ID3 algorithm_findS = new ID3(dataset);
-		//System.out.println(algorithm_findS.algoritmo());
+		Nodo n = id3.algoritmo(new Dataset(d));
+		System.out.println("---------------- DATASET ----------------");
+		System.out.println(new Dataset(d));
+		System.out.println("-----------------------------------------");
+		System.out.println("----------------- Reglas del ID3 -----------------");
+		System.out.println(n);
 		
 
-	}
-	
-	public static ArrayList<Set<String>> listaAtributos(ArrayList<Dato> dataset) {
-		
-		ArrayList<Set<String>> lista_atributos = new ArrayList<>(); // Para almacenar los tipos de atributos que hay
-		
-		for (int i=0; i< dataset.get(0).getSize(); i++) {
-			Set<String>	a = new HashSet<>();
-			lista_atributos.add(a);
-		}
-		
-		for (Dato d: dataset) {
-			for (int i = 0; i < d.getSize(); i++) {
-				lista_atributos.get(i).add(d.getAtributo(i));
-			}
-		}
-		
-		return lista_atributos;
 	}
 	
 }

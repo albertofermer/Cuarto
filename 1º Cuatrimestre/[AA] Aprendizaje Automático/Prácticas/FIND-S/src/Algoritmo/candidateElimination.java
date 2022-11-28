@@ -86,9 +86,10 @@ public class candidateElimination {
 
 	}
 
-	public void algorithm() {
+	public ArrayList<Set<Hipotesis>> algorithm() {
 
 		int numero_ejemplo = 0;
+		ArrayList<Set<Hipotesis>> solucion = new ArrayList<>();
 		Set<Hipotesis> G = createSet(TODO); // Sea G el conjunto de elementos de maxima generalidad de H.
 		Set<Hipotesis> S = createSet(VACIO); // Sea H el conjunto de elementos de máxima especificidad de H.
 
@@ -98,9 +99,10 @@ public class candidateElimination {
 			Set<Hipotesis> S_copia = new HashSet<>(S); // Realizamos una copia del conjunto
 			Set<Hipotesis> G_copia = new HashSet<>(G);
 			
-			System.out.println("G:" + G);
+			//System.out.println("G:" + G);
 
-			System.out.println("Instancia " + ++numero_ejemplo + ":" + dato);
+			System.out.print("Instancia " + ++numero_ejemplo + ":" + dato + " -- ");
+			System.out.println("Clase: " + dato.esPositivo());
 
 			// Si d es un ejemplo positivo, entonces
 			if (dato.esPositivo()) {
@@ -172,11 +174,10 @@ public class candidateElimination {
 
 		}
 
-		S.retainAll(S); G.retainAll(G);
-		System.out.println("===========================================================");
-		System.out.println("S: " + S);
-		System.out.println("G: " + G);
-		System.out.println("===========================================================\n");
+		solucion.add(G);
+		solucion.add(S);
+		
+		return solucion;
 	}
 
 	private Set<Hipotesis> EliminarDeGTalqueExistaOtraMasEspecifica(Set<Hipotesis> g_copia) {

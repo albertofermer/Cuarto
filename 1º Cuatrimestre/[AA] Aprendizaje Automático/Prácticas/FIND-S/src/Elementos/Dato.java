@@ -1,8 +1,6 @@
 package Elementos;
 import static Algoritmo.Constantes.*;
 
-import java.util.ArrayList;
-import java.util.Set;
 public class Dato {
 
 	private String [] atributos;

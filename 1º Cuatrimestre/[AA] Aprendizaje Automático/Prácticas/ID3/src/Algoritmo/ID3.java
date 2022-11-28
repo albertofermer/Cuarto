@@ -1,24 +1,15 @@
 package Algoritmo;
 
-import static Algoritmo.Constantes.NEGATIVO;
-import static Algoritmo.Constantes.POSITIVO;
-
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 
 import Elementos.*;
 
 public class ID3 {
 
-	private Dataset dataset = null;
 	public Nodo raiz = null;
 
-	public ID3(Dataset dataset) {
-
-		this.dataset = (dataset);
+	public ID3() {
 
 	}
 
@@ -60,7 +51,7 @@ public class ID3 {
 		ArrayList<Double> informacion = new ArrayList<>();
 		atributos.addAll(dataset.getNombreAtributos());
 		
-		System.out.println(dataset.getNombreAtributos());
+		//System.out.println(dataset.getNombreAtributos());
 
 		for (String atributo : atributos) {
 			informacion.add(calculaInformacionAtributo(dataset, atributo));
@@ -159,42 +150,5 @@ public class ID3 {
 			}
 		}
 		return true;
-	}
-
-	public static void main(String[] args) {
-		ArrayList<Dato> dataset = new ArrayList<>();
-		
-		/* DATASET */
-		String[] c = { "Antenas", "Colas", "Nucleos", "Cuerpo", "Clase" };
-		String[] x1 = { "1", "0", "2", "Rayado", NEGATIVO };
-		String[] x2 = { "1", "0", "1", "Blanco", POSITIVO };
-		String[] x3 = { "1", "2", "0", "Rayado", NEGATIVO };
-		String[] x4 = { "0", "2", "1", "Rayado", NEGATIVO };
-		String[] x5 = { "1", "1", "1", "Rayado", POSITIVO };
-		String[] x6 = { "2", "2", "1", "Rayado", POSITIVO };
-
-		dataset.add(new Dato(c));
-		dataset.add(new Dato(x1));
-		dataset.add(new Dato(x2));
-		dataset.add(new Dato(x3));
-		dataset.add(new Dato(x4));
-		dataset.add(new Dato(x5));
-		dataset.add(new Dato(x6));
-
-		Dataset d = new Dataset(dataset);
-
-		System.out.println(d.getAtributos_cabecera());
-		System.out.println(d.getInstancias());
-	
-		System.out.println("===============================================");
-
-		ID3 id3 = new ID3(d);
-		Nodo raiz = id3.algoritmo(d);
-
-		System.out.println("===============================================");
-		
-		System.out.println(raiz);
-		
-
 	}
 }

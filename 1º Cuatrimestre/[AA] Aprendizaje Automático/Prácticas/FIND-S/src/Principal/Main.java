@@ -3,6 +3,7 @@ package Principal;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import Algoritmo.candidateElimination;
 import Elementos.*;
@@ -52,7 +53,11 @@ public class Main {
 		if (args.length == 2) ce.constantes.setClasePositiva(args[1].toString(),ce.getListaClases());
 		
 		// Se aplica el algoritmo.
-		ce.algorithm();
+		ArrayList<Set<Hipotesis>> solucion = ce.algorithm();
+		System.out.println("===========================================================");
+		System.out.println("S: " + solucion.get(1));
+		System.out.println("G: " + solucion.get(0));
+		System.out.println("===========================================================\n");
 
 	}
 

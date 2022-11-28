@@ -1,5 +1,4 @@
 package Elementos;
-import static Algoritmo.Constantes.*;
 
 import java.util.ArrayList;
 
@@ -42,10 +41,6 @@ public class Dato {
 	
 	public String getAtributo(int i) {
 		return atributos.get(i);
-	}
-	
-	public boolean esPositivo() {
-		return clase == POSITIVO;
 	}
 	
 	public void eliminarAtributo(int id) {

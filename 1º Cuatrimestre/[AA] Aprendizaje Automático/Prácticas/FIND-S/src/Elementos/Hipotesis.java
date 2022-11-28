@@ -12,6 +12,11 @@ public class Hipotesis {
 		this.patrones = h;
 
 	}
+	
+	@Override
+	public int hashCode() {
+		return 1;
+	}
 
 	@Override
 	public String toString() {

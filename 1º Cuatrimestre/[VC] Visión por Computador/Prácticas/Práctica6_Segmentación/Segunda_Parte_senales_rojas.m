@@ -82,9 +82,15 @@ for s = 1:signals % Por cada imagen que se llama signal
         %
         % Calcula manualmente H(180,90,6) e interpreta el resultado.
             H(180,90,6); % = 0
+
+            [x,y] = circlepoints(radii(6));
+            x = x+90;
+            y = y+180;
+            PoI = Ib(x,y);
+            sum(PoI(:))
         %
         % RESP:
-        % En el píxel (180,90) no hay una circunferencia de radio 6.
+        % En el píxel (180,90) no hay una circunferencia de radio radii(6).
         %
         % Ayudándote de la funcion find escribe la ecuacion de la circunferencia
         % que pasa por más puntos en Ib. Especificando su radio y coordenadas del
@@ -176,4 +182,4 @@ end
 
 rmpath('Funciones Necesarias\')
 rmpath('Funciones_THCircular\')
-clear all
+%clear all
