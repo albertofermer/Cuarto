@@ -2,23 +2,23 @@ package Algoritmo;
 
 import java.util.Set;
 /**
- * Valores que se mantendr·n constantes una vez iniciado el
+ * Valores que se mantendr√°n constantes una vez iniciado el
  * algoritmo.
  * 
- * @author Alberto Fern·ndez
+ * @author Alberto Fern√°ndez
  *
  */
 public class Constantes {
 
 	public Constantes() {}
 
-	public static final String VACIO = "0";
+	public static final String VACIO = "V";
 	public static final String TODO = "?";
 	public static  String POSITIVO = "+";
 	public static  String NEGATIVO = "-";
 	
 	/**
-	 * Toma como clase positiva la pasada por par·metro y como clase negativa
+	 * Toma como clase positiva la pasada por par√°metro y como clase negativa
 	 * la complementaria.
 	 * 
 	 * @param clasePositiva

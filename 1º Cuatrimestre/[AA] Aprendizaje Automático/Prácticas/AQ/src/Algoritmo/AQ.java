@@ -30,9 +30,6 @@ public class AQ {
 		LEF = new ArrayList<>();
 		
 		this.dataset = dataset;
-		
-		
-
 	}
 
 	public Recubrimiento algoritmo() {
@@ -50,16 +47,31 @@ public class AQ {
 			Dato semilla = P.iterator().next();
 			
 			// Generar complejos que cubran la semilla y excluyan a los ejemplos de N.
-			
+			Set<Complejo> complejos = algoritmo_star();
 			// Elegir de entre todos los complejos el que optimice el criterio de selección (LEF)
-			
+			Complejo complejo_optimo = elegirComplejos(complejos,LEF);
 			// Eliminar de P los ejemplos cubiertos por la nueva regla
-			
+			P = eliminarEjemplosCubiertos(P);
 			// Añadir el complejo al recubrimiento.
-		
+			conjunto_reglas.add(complejo_optimo);
 		}
 		
 		return conjunto_reglas;
+	}
+
+	private Set<Dato> eliminarEjemplosCubiertos(Set<Dato> p) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private Complejo elegirComplejos(Set<Complejo> complejos, ArrayList<Regla> lEF2) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private Set<Complejo> algoritmo_star() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	public static void main(String[] args) {

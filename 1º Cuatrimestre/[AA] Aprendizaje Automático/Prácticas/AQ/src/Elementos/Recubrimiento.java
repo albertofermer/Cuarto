@@ -28,6 +28,10 @@ public class Recubrimiento {
 		return str;
 	}
 	
+	public void add(Complejo c) {
+		disyuncion_complejos.add(c);
+	}
+	
 	public static void main(String[] args) {
 		
 		Selector s = new Selector("Atributo", "==", "7");
