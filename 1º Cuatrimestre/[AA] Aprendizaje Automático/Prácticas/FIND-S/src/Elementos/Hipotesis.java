@@ -48,16 +48,6 @@ public class Hipotesis {
 		return patrones.size();
 	}
 
-	public int generalidad() {
-		int count = 0;
-		for (String patron : patrones) {
-			if (patron.equals(TODO))
-				count++;
-		}
-
-		return count;
-	}
-
 	public String getPatron(int j) {
 
 		return patrones.get(j);
