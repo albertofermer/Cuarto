@@ -53,6 +53,19 @@ public class Dato {
 	}
 	
 	@Override
+	public boolean equals(Object o) {
+		Dato d = (Dato) o;
+		
+		if (d.getClase().equals(this.getClase()) && this.atributos.equals(d.getAtributos())) return true;
+		else return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return 1;
+	}
+	
+	@Override
 	public String toString() {
 		
 		String str = "[";

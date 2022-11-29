@@ -10,10 +10,10 @@ import Elementos.Dato;
 import Elementos.Hipotesis;
 
 /**
- *  -- Algoritmo de Eliminación de Candidatos --
+ * -- Algoritmo de Eliminación de Candidatos --
  * 
- * Establece dos cotas (G y S) de manera que sus hipótesis
- * pertenezcan al espacio de versiones.
+ * Establece dos cotas (G y S) de manera que sus hipótesis pertenezcan al
+ * espacio de versiones.
  * 
  * @author Alberto Fernández
  *
@@ -47,11 +47,11 @@ public class candidateElimination {
 
 		return hypothesis;
 	}
-	
-	public Set<String> getListaClases(){
+
+	public Set<String> getListaClases() {
 		return lista_clases;
 	}
-	
+
 	private ArrayList<Set<String>> listaAtributos() {
 
 		ArrayList<Set<String>> lista_atributos = new ArrayList<>(); // Para almacenar los tipos de atributos que hay
@@ -95,11 +95,11 @@ public class candidateElimination {
 
 		// Para cada ejemplo d del conjunto de entrenamiento D:
 		for (Dato dato : dataset) {
-			
+
 			Set<Hipotesis> S_copia = new HashSet<>(S); // Realizamos una copia del conjunto
 			Set<Hipotesis> G_copia = new HashSet<>(G);
-			
-			//System.out.println("G:" + G);
+
+			// System.out.println("G:" + G);
 
 			System.out.print("Instancia " + ++numero_ejemplo + ":" + dato + " -- ");
 			System.out.println("Clase: " + dato.esPositivo());
@@ -129,7 +129,7 @@ public class candidateElimination {
 							S_copia.add(h);
 
 						// Eliminar de S las hipótesis tal que exista en S otra hipótesis más general.
-						
+
 						EliminarDeSTalqueExistaOtraMasGeneral(S_copia);
 
 					}
@@ -150,7 +150,7 @@ public class candidateElimination {
 
 						// incluir en G todas las especializaciones minimales h de g,
 						ArrayList<Hipotesis> hesp = especializa(g, dato);
-						//System.out.println("Esp: " + hesp);
+						// System.out.println("Esp: " + hesp);
 
 						// tal que h es consistente con d y existe una hipótesis en S mas especifica que
 						// h.
@@ -176,41 +176,42 @@ public class candidateElimination {
 
 		solucion.add(G);
 		solucion.add(S);
-		
+
 		return solucion;
 	}
 
 	private Set<Hipotesis> EliminarDeGTalqueExistaOtraMasEspecifica(Set<Hipotesis> g_copia) {
-		
+
 		Set<Hipotesis> gCopia = new HashSet<>(g_copia); // hacemos una copia para no perder la información.
 		ArrayList<Hipotesis> hipotesisG = new ArrayList<>(g_copia);
 		for (int i = 0; i < g_copia.size(); i++) {
 			Hipotesis h = hipotesisG.get(i); // Escojo el elemento i
-			for (int j = 0; j < g_copia.size(); j++) 
-				if (!h.equals(hipotesisG.get(j)) && 			// Por cada hipotesis diferente:
-						hipotesisG.get(j).esMasEspecifica(h)) // Si hay una hipotesis más especifica que h, se elimina h.
-						gCopia.remove(h);
+			for (int j = 0; j < g_copia.size(); j++)
+				if (!h.equals(hipotesisG.get(j)) && // Por cada hipotesis diferente:
+						hipotesisG.get(j).esMasEspecifica(h)) // Si hay una hipotesis más especifica que h, se elimina
+																// h.
+					gCopia.remove(h);
 		}
 		return gCopia;
 	}
 
 	private Set<Hipotesis> EliminarDeSTalqueExistaOtraMasGeneral(Set<Hipotesis> s_copia) {
-		
+
 		Set<Hipotesis> sCopia = new HashSet<>(s_copia); // hacemos una copia para no perder la información.
 		ArrayList<Hipotesis> hipotesisG = new ArrayList<>(s_copia);
 		for (int i = 0; i < s_copia.size(); i++) {
-			
+
 			Hipotesis h = hipotesisG.get(i); // Escojo el elemento i
-			
+
 			for (int j = 0; j < s_copia.size(); j++) {
-				if (!h.equals(hipotesisG.get(j)) &&	// Por cada hipotesis diferente:
+				if (!h.equals(hipotesisG.get(j)) && // Por cada hipotesis diferente:
 						hipotesisG.get(j).esMasGeneral(h)) // Si hay una hipotesis más general que h, se elimina h.
-						sCopia.remove(h);
+					sCopia.remove(h);
 			}
 		}
-		
+
 		return sCopia;
-		
+
 	}
 
 	/**
@@ -222,8 +223,9 @@ public class candidateElimination {
 	 */
 	private boolean masGeneral(Set<Hipotesis> G, Hipotesis h2) {
 		for (Hipotesis hipo : G)
-			if (hipo.esMasGeneral(h2)) return true;
-		
+			if (hipo.esMasGeneral(h2))
+				return true;
+
 		return false;
 	}
 
@@ -235,11 +237,11 @@ public class candidateElimination {
 	 * @return
 	 */
 	private boolean masEspecifica(Set<Hipotesis> S, Hipotesis h2) {
-		
+
 		for (Hipotesis hipo : S)
 			if (hipo.esMasEspecifica(h2))
 				return true;
-		
+
 		return false;
 	}
 
@@ -252,7 +254,7 @@ public class candidateElimination {
 		for (Hipotesis h : G)
 			if (!esConsistente(h, dato))
 				G_copia.remove(h);
-		
+
 		return G_copia;
 
 	}
@@ -312,46 +314,87 @@ public class candidateElimination {
 	}
 
 	public ArrayList<Hipotesis> especializa(Hipotesis s, Dato dato) {
-
 		ArrayList<Hipotesis> hipotesis_retorno = new ArrayList<>();
 		ArrayList<String> patrones = s.getHypothesisList();
-
 		for (int i = 0; i < patrones.size(); i++) {
-
 			// Si h_i es ? y el atributo es e_i, entonces genera una hipotesis por cada g_i
 			// != e_i
 			if (patrones.get(i).equals(TODO)) {
+				String valor = dato.getAtributo(i);
+				if (lista_atributos.get(i).size() == 1) {
+					ArrayList<String> patrones_aux = new ArrayList<>(patrones);
+					patrones_aux.set(i, VACIO);
+					Hipotesis h = new Hipotesis(patrones_aux);
+					hipotesis_retorno.add(h);
+				} else {
+					for (String ejemplo : lista_atributos.get(i)) {
+						if(ejemplo.equals(valor)) {
+							
+						} else {
+							ArrayList<String> patrones_aux = new ArrayList<>(patrones);
+							patrones_aux.set(i, ejemplo);
+							Hipotesis h = new Hipotesis(patrones_aux);
+							hipotesis_retorno.add(h);
 
-				for (String ejemplo : lista_atributos.get(i)) {
-					ArrayList<String> hipotesis_lista = new ArrayList<>();
-					for (int j = 0; j < patrones.size(); j++) {
-						
-						if (j == i) hipotesis_lista.add(ejemplo);
-						else hipotesis_lista.add(TODO);
-
+						}
 					}
-					Hipotesis hipotesis = new Hipotesis(hipotesis_lista);
-					hipotesis_retorno.add(hipotesis);
 				}
-
-			} else if ((!patrones.get(i).equals(dato.getAtributo(i)) && !patrones.get(i).equals(TODO))
-					|| patrones.get(i).equals(dato.getAtributo(i))) {
-
-				// No genera ninguna hipótesis
-				// Si h_i != e_i != ?. entonces no se hace nada (no se genera hipotesis)
-				// Si h_i = e_i entonces g_i = VACIO (no se genera hipotesis)
-
 			} else if (patrones.get(i).equals(VACIO)) {
-				// Si h_i = empty entonces no se genera hipotesis.
-				// no tiene sentido seguir.
-				break;
+				
+			} else if (patrones.get(i).equals(dato.getAtributo(i))) {
+				ArrayList<String> patrones_aux = new ArrayList<>(patrones);
+				patrones_aux.set(i, VACIO);
+				Hipotesis h = new Hipotesis(patrones_aux);
+				hipotesis_retorno.add(h);
+			} else if (!patrones.get(i).equals(dato.getAtributo(i))) {
+				
 			}
-
+			
 		}
 
 		return hipotesis_retorno;
-
 	}
+//	public ArrayList<Hipotesis> especializa(Hipotesis s, Dato dato) {
+//
+//		ArrayList<Hipotesis> hipotesis_retorno = new ArrayList<>();
+//		ArrayList<String> patrones = s.getHypothesisList();
+//
+//		for (int i = 0; i < patrones.size(); i++) {
+//
+//			// Si h_i es ? y el atributo es e_i, entonces genera una hipotesis por cada g_i
+//			// != e_i
+//			if (patrones.get(i).equals(TODO)) {
+//
+//				for (String ejemplo : lista_atributos.get(i)) {
+//					ArrayList<String> hipotesis_lista = new ArrayList<>();
+//					for (int j = 0; j < patrones.size(); j++) {
+//						
+//						if (j == i) hipotesis_lista.add(ejemplo);
+//						else hipotesis_lista.add(TODO);
+//
+//					}
+//					Hipotesis hipotesis = new Hipotesis(hipotesis_lista);
+//					hipotesis_retorno.add(hipotesis);
+//				}
+//
+//			} else if ((!patrones.get(i).equals(dato.getAtributo(i)) && !patrones.get(i).equals(TODO))
+//					|| patrones.get(i).equals(dato.getAtributo(i))) {
+//
+//				// No genera ninguna hipótesis
+//				// Si h_i != e_i != ?. entonces no se hace nada (no se genera hipotesis)
+//				// Si h_i = e_i entonces g_i = VACIO (no se genera hipotesis)
+//
+//			} else if (patrones.get(i).equals(VACIO)) {
+//				// Si h_i = empty entonces no se genera hipotesis.
+//				// no tiene sentido seguir.
+//				break;
+//			}
+//
+//		}
+//
+//		return hipotesis_retorno;
+//
+//	}
 
 	public ArrayList<Hipotesis> getH() {
 		return h;

@@ -3,7 +3,6 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-import Algoritmo.ID3;
 import Elementos.*;
 
 public class Main {
