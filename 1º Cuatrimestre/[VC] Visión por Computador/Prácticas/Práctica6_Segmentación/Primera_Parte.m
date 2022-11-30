@@ -83,7 +83,7 @@ for imagenes=1:numImagenes
     % Discretizamos el espacio de coordenadas para representar la recta.
     [N,M] = size(I);
     % Utilizamos M porque como mucho la recta llegará a esa posición
-    [X,~] = meshgrid(1:M);
+    X = 1:M;
 
     % Calculamos la Y correspondiente a cada X
     Y = (rho_recta - X*cosd(theta_recta) ) / sind(theta_recta);

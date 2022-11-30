@@ -19,15 +19,15 @@ camino=load('camino.dat');
 l=3.5; %distancia entre rudas delanteras y traseras, tambien definido en modelo
 %Condiciones iniciales 
 
-pose0=[0; 0; pi/2];
+pose0=[30; 30; pi/2];
 
 t0=0;
 
 %final de la simulación
-tf=30;
+tf=100;
 
 %paso de integracion
-h=0.1;
+h=0.5;
 %vector tiempo
 t=0:h:tf;
 %indice de la matriz
@@ -48,12 +48,12 @@ while (t0+h*k) < tf
     
 
  volante=-0.1416;
-  velocidad=2;
+ velocidad=2;
  conduccion=[velocidad volante];
  
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  
- %para representar el punto onjetivo sobre la trayectoria
+ %para representar el punto objetivo sobre la trayectoria
  
  punto=[30 30];
 
