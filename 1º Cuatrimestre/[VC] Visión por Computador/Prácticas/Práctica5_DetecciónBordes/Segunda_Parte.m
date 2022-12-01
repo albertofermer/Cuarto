@@ -44,7 +44,7 @@ for k=1:length(umbrales) % 4 umbrales
     sgtitle(['Umbral_',num2str(k),': ', num2str(umbrales(k))])
     z = 1;
     for j = 1:3 % 3 filas (Gx, Gy y modG)
-        subplot(3,2,(z)), imshow(mat2gray(magnitudes_original(:,:,j),[minimo_modG,maximo_modG])),
+        subplot(3,2,(z)), imshow(mat2gray(abs(magnitudes_original(:,:,j)),[minimo_modG,maximo_modG])),
         title(magnitudes_original_title(j))
         subplot(3,2,(z+1)), imshow(abs(magnitudes_original(:,:,j))>umbrales(k)),
         title([magnitudes_original_title(j), "binarizada"])
@@ -58,16 +58,13 @@ for k=1:length(umbrales) % 4 umbrales
     sgtitle(['Umbral_',num2str(k),': ', num2str(umbrales(k))])
     z = 1;
     for j = 1:3 % 3 filas (Gx, Gy y modG)
-        subplot(3,2,(z)), imshow(mat2gray(magnitudes_gauss(:,:,j),[minimo_modG,maximo_modG])),
+        subplot(3,2,(z)), imshow(mat2gray(abs(magnitudes_gauss(:,:,j)),[minimo_modG,maximo_modG])),
         title(magnitudes_gauss_title(j))
         subplot(3,2,(z+1)), imshow(abs(magnitudes_gauss(:,:,j))>umbrales(k)),
         title([magnitudes_gauss_title(j), "binarizada"])
         z = z + 2;
     end
 end
-
-% Si pongo el mismo umbral no se ve en la imagen suavizada con el umbral
-% máximo. --------------------------------------------------------------
 
 imshow(abs(Gx_gauss)>max(abs(Gx_original(:))*0.1))
 

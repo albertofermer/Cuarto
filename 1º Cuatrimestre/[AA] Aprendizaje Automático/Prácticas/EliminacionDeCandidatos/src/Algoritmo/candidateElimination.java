@@ -93,8 +93,9 @@ public class candidateElimination {
 		Set<Hipotesis> G = createSet(TODO); // Sea G el conjunto de elementos de maxima generalidad de H.
 		Set<Hipotesis> S = createSet(VACIO); // Sea H el conjunto de elementos de máxima especificidad de H.
 
-		System.out.println("G:" + G);
-		System.out.println("S:" + S);
+		//System.out.println("G:" + G);
+		//System.out.println("S:" + S);
+		
 		// Para cada ejemplo d del conjunto de entrenamiento D:
 		for (Dato dato : dataset) {
 
@@ -120,7 +121,7 @@ public class candidateElimination {
 
 						// Incluir en S las generalizaciones minimales h de s, tal que h es consistente
 						// con d y existe una hipótesis en G más general que h.
-						System.out.println("s:" + s);
+						//System.out.println("s:" + s);
 						Hipotesis h = generaliza(s, dato);
 
 						// tal que h es consistente con d y
@@ -151,7 +152,7 @@ public class candidateElimination {
 
 						// incluir en G todas las especializaciones minimales h de g,
 						ArrayList<Hipotesis> hesp = especializa(g, dato);
-						System.out.println("Esp: " + hesp);
+						//System.out.println("Esp: " + hesp);
 
 						// tal que h es consistente con d y existe una hipótesis en S mas especifica que
 						// h.
@@ -160,7 +161,7 @@ public class candidateElimination {
 							
 							if (esConsistente(hg, dato) && masEspecifica(S_copia, hg)) {
 								G_copia.add(hg);
-								System.out.println("añade: " + hg);
+								//System.out.println("añade: " + hg);
 							}
 								
 						}
@@ -177,8 +178,8 @@ public class candidateElimination {
 			S = S_copia;
 			G = G_copia;
 
-			System.out.println("G:" + G);
-			System.out.println("S:" + S);
+			//System.out.println("G:" + G);
+			//System.out.println("S:" + S);
 
 		}
 
@@ -195,7 +196,7 @@ public class candidateElimination {
 		
 		for (int i = 0; i < g_copia.size(); i++) {
 			Hipotesis h = hipotesisG.get(i); // Escojo el elemento i
-			for (int j = 0; j < g_copia.size(); j++)
+			for (int j = i; j < g_copia.size(); j++)
 				if (!h.equals(hipotesisG.get(j)) && // Por cada hipotesis diferente:
 						hipotesisG.get(j).esMasEspecifica(h)) // Si hay una hipotesis más especifica que h, se elimina
 																// h.
@@ -212,7 +213,7 @@ public class candidateElimination {
 
 			Hipotesis h = hipotesisG.get(i); // Escojo el elemento i
 
-			for (int j = 0; j < s_copia.size(); j++) {
+			for (int j = i; j < s_copia.size(); j++) {
 				if (!h.equals(hipotesisG.get(j)) && // Por cada hipotesis diferente:
 						hipotesisG.get(j).esMasGeneral(h)) // Si hay una hipotesis más general que h, se elimina h.
 					sCopia.remove(h);
@@ -306,21 +307,21 @@ public class candidateElimination {
 
 		ArrayList<String> hipotesis_retorno = new ArrayList<>();
 		ArrayList<String> hipotesis_s = s.getHypothesisList();
-		System.out.println("hipotesis_generaliza: " + hipotesis_s);
+		//System.out.println("hipotesis_generaliza: " + hipotesis_s);
 		for (int i = 0; i < hipotesis_s.size(); i++) {
 
 			if (hipotesis_s.get(i).equals(VACIO) || hipotesis_s.get(i).equals(dato.getAtributo(i))) {
-				 System.out.println("1 - " + hipotesis_s.get(i) + " + " + dato.getAtributo(i));
+				 //System.out.println("1 - " + hipotesis_s.get(i) + " + " + dato.getAtributo(i));
 
 				hipotesis_retorno.add(dato.getAtributo(i));
 
 			} else {
-				 System.out.println("2 - " + hipotesis_s.get(i) + " + " + dato.getAtributo(i));
+				 //System.out.println("2 - " + hipotesis_s.get(i) + " + " + dato.getAtributo(i));
 				hipotesis_retorno.add(TODO);
 			}
 
 		}
-		System.out.println("Retorno: " + hipotesis_retorno);
+		//System.out.println("Retorno: " + hipotesis_retorno);
 		return new Hipotesis(hipotesis_retorno);
 
 	}

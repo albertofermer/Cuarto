@@ -11,10 +11,10 @@ T = imread('ImagenesPractica\PrimeraParte\Plantilla.tif'); % (250,250)
 subplot(1,2,1), imshow(I), title('Imagen')
 subplot(1,2,2), imshow(T), title('Plantilla')
 
-NormCrossCorr = funcion_normcorr2(I,T);
+NormCrossCorr = funcion_normcorr2(double(I),double(T));
 [fila,columna] = find(NormCrossCorr == max(NormCrossCorr(:)));
 
-imshow(uint8(mat2gray(NormCrossCorr))), hold on
+imshow(mat2gray(NormCrossCorr)), hold on
 plot(columna,fila,'*r')
 [NI,MI] = size(I);
 [NT,MT] = size(T);
@@ -28,6 +28,10 @@ ncc(1:floor(NT/2),:)=0;
 ncc(NI-floor(NT/2)+1:NI,:)=0;
 ncc(:,1:floor(MT/2))=0;
 ncc(:,MI-floor(MT/2)+1:MI)=0;
+
+error = NormCrossCorr-ncc;
+error = sum(error(:))
+
 
 rmpath('./Funciones_Necesarias\')
 
