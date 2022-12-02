@@ -361,7 +361,7 @@ public class candidateElimination {
 				Hipotesis h = new Hipotesis(patrones_aux);
 				hipotesis_retorno.add(h);
 			} else if (!patrones.get(i).equals(dato.getAtributo(i)) || patrones.get(i).equals(VACIO)) {
-				
+				// no hace nada
 			}
 			
 		}

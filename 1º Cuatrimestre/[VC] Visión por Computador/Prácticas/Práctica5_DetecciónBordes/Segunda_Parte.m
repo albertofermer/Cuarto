@@ -66,7 +66,8 @@ for k=1:length(umbrales) % 4 umbrales
     end
 end
 
-imshow(abs(Gx_gauss)>max(abs(Gx_original(:))*0.1))
+figure,
+imshow(abs(Gx_gauss)>max(abs(Gx_original(:))*0.1)), title("Sin línea horizontal")
 
 
 rmpath('./Funciones_Necesarias\')

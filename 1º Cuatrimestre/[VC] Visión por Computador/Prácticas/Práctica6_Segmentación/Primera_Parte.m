@@ -188,7 +188,7 @@ for imagenes=1:numImagenes
     % ('FillGap',5,'MinLength',7)
 
     % 'FillGap',5 : Cuando encuentra dos líneas asociadas a la misma
-    % transoformada de Hough separadas por menos de 5 píxeles, las considera la
+    % transformada de Hough separadas por menos de 5 píxeles, las considera la
     % misma línea y las fusiona en un solo segmento.
     %
     % 'MinLength', 7:  Los segmentos fusionados menores de 7 píxeles se

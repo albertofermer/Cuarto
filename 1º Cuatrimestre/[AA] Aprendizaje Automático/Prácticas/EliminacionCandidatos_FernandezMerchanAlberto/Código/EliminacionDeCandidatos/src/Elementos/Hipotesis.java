@@ -64,10 +64,13 @@ public class Hipotesis {
 		
 		for (int i = 0; i < patrones.size(); i++) {
 			
-			if (patrones.get(i).equals(TODO) || patrones.get(i).equals(h2.getPatron(i))) {
+			if (patrones.get(i).equals(TODO) ||
+					patrones.get(i).equals(h2.getPatron(i)) || 
+					h2.getPatron(i).equals(VACIO)) {
 				// El patrón de h es más general que el de h2 si:
 				//	1. El patrón h es ?
 				//	2. El patrón h es igual al de h2
+				//  3. El patrón de h2 es vacío.
 				continue;
 			}
 			else {
