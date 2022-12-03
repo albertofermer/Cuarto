@@ -11,6 +11,7 @@ public class AQ {
 
 	 private Set<String> conjunto_atributos = null; // done
 	 private HashMap<String, Set<String>> conjunto_valores_atributo = null; // done
+	 private HashMap<String, Integer> atributo_identificador = null;
 	 private Set<String> conjunto_clases = null; // done
 	 private Set<Dato> conjunto_ejemplos_entrenamiento = null; // done
 	 private Recubrimiento conjunto_reglas = null;
@@ -23,6 +24,7 @@ public class AQ {
 		// Inicialización de los elementos del AQ
 		conjunto_atributos = new HashSet<>(dataset.getNombreAtributos());
 		conjunto_valores_atributo = dataset.getLista_Atributos_Valores();
+		atributo_identificador = dataset.getIdentificador_atributo_cabecera();
 		conjunto_clases = dataset.getLista_clases();
 		conjunto_ejemplos_entrenamiento = new HashSet<>(dataset.getInstancias());
 		
@@ -45,13 +47,15 @@ public class AQ {
 		while(!P.isEmpty()) {
 			// Elegir un ejemplo de P que será la semilla de la proxima regla
 			Dato semilla = P.iterator().next();
+			Complejo complejo_semilla = Complejo.generarComplejo(semilla,atributo_identificador);
+			
 			
 			// Generar complejos que cubran la semilla y excluyan a los ejemplos de N.
-			Set<Complejo> complejos = algoritmo_star();
+			Set<Complejo> complejos = algoritmo_star(complejo_semilla.getSelectores());
 			// Elegir de entre todos los complejos el que optimice el criterio de selección (LEF)
 			Complejo complejo_optimo = elegirComplejos(complejos,LEF);
 			// Eliminar de P los ejemplos cubiertos por la nueva regla
-			P = eliminarEjemplosCubiertos(P);
+			P = eliminarEjemplosCubiertos(complejo_optimo,P);
 			// Añadir el complejo al recubrimiento.
 			conjunto_reglas.add(complejo_optimo);
 		}
@@ -59,19 +63,43 @@ public class AQ {
 		return conjunto_reglas;
 	}
 
-	private Set<Dato> eliminarEjemplosCubiertos(Set<Dato> p) {
+	private Set<Dato> eliminarEjemplosCubiertos(Complejo complejo_optimo, Set<Dato> positivos) {
+		
+		Set<Dato> positivos_copia = new HashSet<>(positivos);
+		for (Dato p : positivos) {
+			if(complejo_optimo.cubre(p)) {
+				positivos_copia.remove(p);
+			}
+		}
+		
+		return positivos_copia;
+	}
+
+	private Complejo elegirComplejos(Set<Complejo> complejos, ArrayList<Regla> LEF) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	private Complejo elegirComplejos(Set<Complejo> complejos, ArrayList<Regla> lEF2) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private Set<Complejo> algoritmo_star() {
-		// TODO Auto-generated method stub
-		return null;
+	private Set<Complejo> algoritmo_star(ArrayList<Selector> S) {
+		Set<Complejo> E = new HashSet<>();
+		Set<Complejo> L = new HashSet<>();
+			L.add(new Complejo());
+		while(!L.isEmpty()) {
+			// Crear un conjunto E' con complejos creados por conjuncion de un elemento de L y un selector de S.
+			Set<Complejo> E_prima = Complejo.combinar(L,S);
+			// Eliminar de E' los elementos ya incluidos en E
+			
+			// Para cada complejo de E', si no cubre ningún ejemplo negativo, entonces:
+			
+				// Añadir el complejo a E
+				// Eliminar el complejo de E'
+			
+			// Actualizar la lista L a los elementos de E'
+		}
+		
+		
+		 	
+		return E;
 	}
 
 	public static void main(String[] args) {
