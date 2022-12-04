@@ -28,6 +28,7 @@ public class Dataset {
 	private ArrayList<Set<String>> valores_atributos = null; // done
 	private HashMap<String, Set<String>> lista_cabecera_valores = null; // done
 	private HashMap<String, Integer> identificador_atributo_cabecera = null; // done
+	private HashMap<Integer, String> atributo_identificador = null; // done
 	
 	private ArrayList<Dato> dataset_ArrayList = null;
 	/**
@@ -59,9 +60,11 @@ public class Dataset {
 		}
 
 		// Asociamos cada atributo de la cabecera con un identificador.
-		identificador_atributo_cabecera = new HashMap<String, Integer>();
+		identificador_atributo_cabecera = new HashMap<>();
+		atributo_identificador = new HashMap<>();
 		for (int id = 0; id < atributos_cabecera.size(); id++) {
 			identificador_atributo_cabecera.put(atributos_cabecera.get(id), id);
+			atributo_identificador.put(id, atributos_cabecera.get(id));
 		}
 		
 		dataset_ArrayList = dataset;
@@ -146,6 +149,10 @@ public class Dataset {
 
 	public HashMap<String, Integer> getIdentificador_atributo_cabecera() {
 		return identificador_atributo_cabecera;
+	}
+	
+	public HashMap<Integer, String> get_Atributos_Identificador() {
+		return atributo_identificador;
 	}
 
 	public HashMap<String, Set<String>> getLista_Atributos_Valores() {

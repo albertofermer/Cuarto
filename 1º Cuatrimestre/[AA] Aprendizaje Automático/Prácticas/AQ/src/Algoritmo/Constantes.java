@@ -8,8 +8,8 @@ public final class Constantes {
 
 	public static final String VACIO = "0";
 	public static final String TODO = "?";
-	public static final String POSITIVO = "+";
-	public static final String NEGATIVO = "-";
+	public static final String POSITIVO = "Normal";
+	public static final String NEGATIVO = "Cancerigena";
 
 	
 }

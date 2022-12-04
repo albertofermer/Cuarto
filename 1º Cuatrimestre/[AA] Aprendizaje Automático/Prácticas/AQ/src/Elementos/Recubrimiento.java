@@ -1,22 +1,26 @@
 package Elementos;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Recubrimiento {
 	
-	ArrayList<Complejo> disyuncion_complejos = null;
+	Set<Complejo> disyuncion_complejos = null;
 	
 	public Recubrimiento() {
-		disyuncion_complejos = new ArrayList<>();
+		disyuncion_complejos = new HashSet<>();
 	}
 	
-	public Recubrimiento(ArrayList<Complejo> disyuncion_complejos) {
+	public Recubrimiento(Set<Complejo> disyuncion_complejos) {
 		this.disyuncion_complejos = disyuncion_complejos;
 	}
 	
 	@Override
 	public String toString() {
 		String str = "";
+		ArrayList<Complejo> disyuncion_complejos = new ArrayList<>();
+		disyuncion_complejos.addAll(this.disyuncion_complejos);
 		
 		if(disyuncion_complejos.size()>1)
 		for (int i = 0; i < disyuncion_complejos.size() - 1 ; i++) {
@@ -34,17 +38,18 @@ public class Recubrimiento {
 	
 	public static void main(String[] args) {
 		
-		Selector s = new Selector("Atributo", "==", "7");
+		Selector s = new Selector("Atributo", "==", "7",null);
 		
-		ArrayList<Selector> selectores = new ArrayList<>();
+		Set<Selector> selectores = new HashSet<>();
 		selectores.add(s);
 		selectores.add(s);
 		Complejo c = new Complejo(selectores);
-		ArrayList<Complejo> complejos = new ArrayList<>();
+		Complejo c2 = new Complejo(selectores);
+		Set<Complejo> complejos = new HashSet<>();
 		complejos.add(c);
-		complejos.add(c);
+		complejos.add(c2);
 		
-		
+		System.out.println(c.equals(c2));
 		
 		Recubrimiento r = new Recubrimiento(complejos);
 		
