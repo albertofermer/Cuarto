@@ -73,7 +73,7 @@ public class Selector {
 	}	
 	
 	public boolean cubre(Dato p) {
-		return (p.getAtributo(atributo_identificador.get(this.atributo)) == this.valor);
+		return (p.getAtributo(atributo_identificador.get(this.atributo)).equals(this.valor));
 	}
 
 

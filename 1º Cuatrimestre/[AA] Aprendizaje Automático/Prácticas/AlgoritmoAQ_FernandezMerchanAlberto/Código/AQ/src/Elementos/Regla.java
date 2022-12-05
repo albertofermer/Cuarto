@@ -21,8 +21,8 @@ public class Regla {
 	 * @param conjunto_complejos
 	 * @return
 	 */
-	public Complejo aplicar(Set<Complejo> conjunto_complejos) {
-		Complejo complejo_seleccionado = new Complejo();
+	public Set<Complejo> aplicar(Set<Complejo> conjunto_complejos) {
+		Set<Complejo> complejo_seleccionado = new HashSet<>();
 
 		switch (indicador) {
 		case ">":
@@ -32,8 +32,13 @@ public class Regla {
 				int cobertura_max = 0;
 				for (Complejo c : conjunto_complejos) {
 					if (c.getCobertura() > cobertura_max) {
-						complejo_seleccionado = c;
 						cobertura_max = c.getCobertura();
+					}
+				}
+				
+				for (Complejo c : conjunto_complejos) {
+					if (c.getCobertura() == cobertura_max) {
+						complejo_seleccionado.add(c);
 					}
 				}
 				break;
@@ -41,8 +46,12 @@ public class Regla {
 				float simplicidad_max = 0;
 				for (Complejo c : conjunto_complejos) {
 					if (c.getSimplicidad() > simplicidad_max) {
-						complejo_seleccionado = c;
 						simplicidad_max = c.getSimplicidad();
+					}
+				}
+				for (Complejo c : conjunto_complejos) {
+					if (c.getSimplicidad() == simplicidad_max) {
+						complejo_seleccionado.add(c);
 					}
 				}
 				break;
@@ -50,8 +59,12 @@ public class Regla {
 				int coste_max = 0;
 				for (Complejo c : conjunto_complejos) {
 					if (c.getCoste() > coste_max) {
-						complejo_seleccionado = c;
 						coste_max = c.getCoste();
+					}
+				}
+				for (Complejo c : conjunto_complejos) {
+					if (c.getCoste() == coste_max) {
+						complejo_seleccionado.add(c);
 					}
 				}
 				break;
@@ -59,8 +72,13 @@ public class Regla {
 				float generalidad_max = 0;
 				for (Complejo c : conjunto_complejos) {
 					if (c.getGeneralidad() > generalidad_max) {
-						complejo_seleccionado = c;
 						generalidad_max = c.getGeneralidad();
+					}
+				}
+				
+				for (Complejo c : conjunto_complejos) {
+					if (c.getGeneralidad() == generalidad_max) {
+						complejo_seleccionado.add(c);
 					}
 				}
 				break;
@@ -76,35 +94,51 @@ public class Regla {
 				int cobertura_min = Integer.MAX_VALUE;
 				for (Complejo c : conjunto_complejos) {
 					if (c.getCobertura() < cobertura_min) {
-						complejo_seleccionado = c;
 						cobertura_min = c.getCobertura();
+					}
+				}
+				for (Complejo c : conjunto_complejos) {
+					if (c.getCobertura() == cobertura_min) {
+						complejo_seleccionado.add(c);
 					}
 				}
 				break;
 			case "simplicidad":
-				float simplicidad_min = Integer.MAX_VALUE;
+				float simplicidad_min = Float.MAX_VALUE;
 				for (Complejo c : conjunto_complejos) {
 					if (c.getSimplicidad() < simplicidad_min) {
-						complejo_seleccionado = c;
 						simplicidad_min = c.getSimplicidad();
+					}
+				}
+				for (Complejo c : conjunto_complejos) {
+					if (c.getSimplicidad() == simplicidad_min) {
+						complejo_seleccionado.add(c);
 					}
 				}
 				break;
 			case "coste":
 				int coste_min = Integer.MAX_VALUE;
 				for (Complejo c : conjunto_complejos) {
-					if (c.getCobertura() < coste_min) {
-						complejo_seleccionado = c;
+					if (c.getCoste() < coste_min) {
 						coste_min = c.getCoste();
+					}
+				}
+				for (Complejo c : conjunto_complejos) {
+					if (c.getCoste() == coste_min) {
+						complejo_seleccionado.add(c);
 					}
 				}
 				break;
 			case "generalidad":
-				float generalidad_min = 1;
+				float generalidad_min = 1; // Como mucho tendrá cociente 1 porque será totalmente general.
 				for (Complejo c : conjunto_complejos) {
 					if (c.getGeneralidad() < generalidad_min) {
-						complejo_seleccionado = c;
 						generalidad_min = c.getGeneralidad();
+					}
+				}
+				for (Complejo c : conjunto_complejos) {
+					if (c.getGeneralidad() == generalidad_min) {
+						complejo_seleccionado.add(c);
 					}
 				}
 				break;

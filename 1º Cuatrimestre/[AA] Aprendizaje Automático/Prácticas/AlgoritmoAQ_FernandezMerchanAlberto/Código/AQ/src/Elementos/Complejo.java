@@ -187,7 +187,7 @@ public class Complejo {
 		// Numero de atributos diferentes
 		// Como son conjunciones, un atributo no podrá aparecer dos veces en ella.
 		// Por lo tanto, será lo mismo que calcular el numero de atributos.
-		simplicidad = this.getSelectores().size();
+		simplicidad = 1/(float)this.getSelectores().size();
 
 		// Coste
 		// Como solo utilizamos un operador (=) asumimos coste 1 para cada selector.

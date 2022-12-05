@@ -1,8 +1,9 @@
 package Elementos;
-
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import Algoritmo.Constantes;
 
 public class Recubrimiento {
 	
@@ -19,21 +20,22 @@ public class Recubrimiento {
 	@Override
 	public String toString() {
 		String str = "";
-		ArrayList<Complejo> disyuncion_complejos = new ArrayList<>();
-		disyuncion_complejos.addAll(this.disyuncion_complejos);
 		
-		if(disyuncion_complejos.size()>1)
-		for (int i = 0; i < disyuncion_complejos.size() - 1 ; i++) {
-			str += disyuncion_complejos.get(i).toString() + "V";
+		for (Complejo c : disyuncion_complejos) {
+			str += "SI " + c + " ENTONCES " + Constantes.POSITIVO + "\n";
 		}
-				
-		str += disyuncion_complejos.get(disyuncion_complejos.size()-1).toString();
 		
 		return str;
 	}
 	
 	public void add(Complejo c) {
 		disyuncion_complejos.add(c);
+	}
+	
+	public void addAll(Collection<Complejo> c) {
+		for (Complejo comp : c) {
+			disyuncion_complejos.add(comp);
+		}
 	}
 	
 	public static void main(String[] args) {

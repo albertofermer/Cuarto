@@ -265,6 +265,12 @@ public class Dataset {
 		return datasets_positivos_y_negativos;
 
 	}
+	
+	public Dato get(int pos) {
+		
+		return this.getInstancias().get(pos);
+
+	}
 
 	@Override
 	public String toString() {
