@@ -21,7 +21,7 @@ public class AQ {
 	private Set<Dato> P = null;
 	private Set<Dato> N = null;
 
-	private Dataset dataset = null;
+	public static Dataset dataset = null;
 
 	public AQ(Dataset dataset) {
 
@@ -35,8 +35,9 @@ public class AQ {
 
 		// Inicialización de LEF
 		LEF = new ArrayList<>();
-
-		this.dataset = dataset;
+		LEF.add(new Regla(">","cobertura"));
+		LEF.add(new Regla(">","simplicidad"));
+		AQ.dataset = dataset;
 	}
 
 	public Recubrimiento algoritmo() {
@@ -60,7 +61,13 @@ public class AQ {
 			// Elegir de entre todos los complejos el que optimice el criterio de selección
 			// (LEF)
 			System.out.println("Fin: " + complejos);
-			Complejo complejo_optimo = elegirComplejos(complejos, LEF);
+//			
+//			ArrayList<Complejo> ctest = new ArrayList<>(complejos);
+//			System.out.println(ctest.get(0).getGeneralidad());
+			
+			
+			
+			Complejo complejo_optimo = elegirComplejo(complejos, LEF);
 			// Eliminar de P los ejemplos cubiertos por la nueva regla
 			P = eliminarEjemplosCubiertos(complejo_optimo, P);
 			// Añadir el complejo al recubrimiento.
@@ -82,8 +89,25 @@ public class AQ {
 		return positivos_copia;
 	}
 
-	private Complejo elegirComplejos(Set<Complejo> complejos, ArrayList<Regla> LEF) {
-		// TODO Auto-generated method stub
+	private Complejo elegirComplejo(Set<Complejo> complejos, ArrayList<Regla> LEF) {
+
+		ArrayList<Complejo> copia_complejos = new ArrayList<>(complejos);
+		for (Regla r : LEF) {
+			
+			// aplicar la regla a la copia_complejos
+			// añadir el resultado a una lista nueva (complejos_reducidos)
+			
+			/**
+			 * Cambiar el metodo aplicar regla para que devuelva un conjunto
+			 * de complejos porque, en caso de igualdad, deberá devolver todos.
+			 * 
+			 * 
+			 */
+			
+			// aplicar la siguiente regla sobre el resultado de la lista complejos_reducidos
+			
+		}
+		
 		return null;
 	}
 
@@ -93,7 +117,7 @@ public class AQ {
 		int iteracion = 0;
 		L.add(new Complejo());
 		while (!L.isEmpty()) {
-			System.out.println("Iteracion: " + ++iteracion);
+			System.out.println("\nIteracion: " + ++iteracion);
 			// Crear un conjunto E' con complejos creados por conjuncion de un elemento de L
 			// y un selector de S.
 			System.out.println("L: " + L);
@@ -114,10 +138,13 @@ public class AQ {
 					E_prima_copia.remove(c);
 				}
 			}
+			
 			E_prima = E_prima_copia;
+			System.out.println("E: " + E);
 			// Actualizar la lista L a los elementos de E'
 			System.out.println("E_prima nueva = " + E_prima);
 			L = E_prima;
+			
 		}
 	
 		return E;
