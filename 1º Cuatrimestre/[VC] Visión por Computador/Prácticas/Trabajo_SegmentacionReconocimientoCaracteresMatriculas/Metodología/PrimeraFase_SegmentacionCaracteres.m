@@ -97,13 +97,13 @@ for imagen=1:numImagenes
 
     % Eliminamos las agrupaciones de píxeles menores al umbral.
     IbFinal = bwareaopen(Ib,num_pix);
-    figure('Name',"Imagen Segmentada - " + imagen),imshow(Ib), title("Imagen Segmentada - " + imagen), hold on
-
+    figure('Name',"Imagen Segmentada - " + imagen),imshow(IbFinal), title("Imagen Segmentada - " + imagen), hold on
+    [IetiqFinal, numFiguras] = bwlabel(IbFinal);
     %% Detección de Bounding Boxes
     LineWidth = 2;
     Color = 'red';
     for k = 1 : length(LoI)
-        I_k = (Ietiq == LoI(k));
+        I_k = (IetiqFinal == LoI(k));
         [filas,columnas] = find(I_k);
         fila_min = min(filas); columna_min = min(columnas);
         fila_max = max(filas); columna_max = max(columnas);
@@ -113,7 +113,13 @@ for imagen=1:numImagenes
         line([medidas(2,1),medidas(4,1)],[medidas(2,2),medidas(4,2)], 'Color', Color, 'LineWidth', LineWidth)
         line([medidas(3,1),medidas(4,1)],[medidas(3,2),medidas(4,2)], 'Color', Color, 'LineWidth', LineWidth)
         line([medidas(1,1),medidas(3,1)],[medidas(1,2),medidas(3,2)], 'Color', Color, 'LineWidth', LineWidth)
-
+        
+        centroides = regionprops(IetiqFinal,'Centroid');
+        centroides = cat(1,centroides.Centroid);
+        for c = 1:length(centroides)
+            plot(centroides(c,1),centroides(c,2),'*r')
+        end
+        
     end
     hold off
     pause; close all;
