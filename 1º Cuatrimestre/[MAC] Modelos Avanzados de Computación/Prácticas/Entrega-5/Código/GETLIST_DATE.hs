@@ -30,4 +30,4 @@ getListDate fecha criterio  = case criterio of
 				"antes"   -> [x| x<-listapersonas, esMenorFecha (nacimiento x) fecha]
 				"despues" -> [x| x<-listapersonas, esMayorFecha (nacimiento x) fecha]
 				"misma"   -> [x| x<-listapersonas, (nacimiento x) == fecha]
-				otherwise -> []
+				otherwise -> error "Criterio no reconocido"

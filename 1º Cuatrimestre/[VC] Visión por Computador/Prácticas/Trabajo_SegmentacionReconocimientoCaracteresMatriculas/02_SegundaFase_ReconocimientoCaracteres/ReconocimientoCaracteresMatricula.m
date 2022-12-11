@@ -15,7 +15,7 @@ addpath('../Funciones_Necesarias/')
 % mostrará la imagen de entrada y la imagen segmentada.
 % ------------------------------------------------------------------------%
 
-training = true;
+training = false;
 
 if (training)
     ruta = "../Material_Imagenes_Plantillas/01_Training/Training_";

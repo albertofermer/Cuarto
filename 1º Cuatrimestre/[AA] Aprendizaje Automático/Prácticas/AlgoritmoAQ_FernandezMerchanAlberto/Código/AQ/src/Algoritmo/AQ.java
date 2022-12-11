@@ -96,20 +96,20 @@ public class AQ {
 	private Set<Complejo> algoritmo_star(Set<Selector> S) {
 		Set<Complejo> E = new HashSet<>();
 		Set<Complejo> L = new HashSet<>();
-		//int iteracion = 0;
+		int iteracion = 0;
 		L.add(new Complejo());
 		while (!L.isEmpty()) {
-			//System.out.println("\nIteracion: " + ++iteracion);
+			System.out.println("\nIteracion: " + ++iteracion);
 			// Crear un conjunto E' con complejos creados por conjuncion de un elemento de L
 			// y un selector de S.
-			//System.out.println("L: " + L);
-			//System.out.println("S: " + S);
+			System.out.println("L: " + L);
+			System.out.println("S: " + S);
 			Set<Complejo> E_prima = Complejo.combinar(L, S);
-			//System.out.println("E_prima: " + E_prima);
+			System.out.println("E_prima: " + E_prima);
 
 			// Eliminar de E' los elementos ya incluidos en E
 			E_prima = eliminarElementosRepetidos(E_prima, E);
-			//System.out.println("E_prima sin repetidos: " + E_prima);
+			System.out.println("E_prima sin repetidos: " + E_prima);
 			Set<Complejo> E_prima_copia = new HashSet<>(E_prima);
 			// Para cada complejo de E', si no cubre ningún ejemplo negativo, entonces:
 			for (Complejo c : E_prima) {
