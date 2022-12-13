@@ -1,4 +1,4 @@
-function funcion_reconoce_matricula(rutaImagen)
+function Matricula=funcion_reconoce_matricula(rutaImagen)
 
 addpath('../Funciones_Necesarias\')
 load('../Material_Imagenes_Plantillas/00_Plantillas/Plantillas.mat')
@@ -6,7 +6,7 @@ load('../Variables_Generadas/num_pix_min_normalizado.mat')
 
 
 % Las plantillas están formadas por 26 caracteres rotados cada uno en
-% ángulos diferentes. 
+% ángulos diferentes.
 Objetos = 26;
 Angulos = 7;
 % Posibles Caracteres que puede tener la matrícula
@@ -31,6 +31,7 @@ for figura = 1:numFiguras
     % funcion_segmentaMatriculas.
     simbolo = Ietiq_figura(perimetro(1+(4*(figura-1) ),2):perimetro(3+(4*(figura-1) ),2),perimetro(1+(4*(figura-1) ),1):perimetro(2+(4*(figura-1) ),1));
     % Rellenamos la matriz de correlación:
+    figure('Name',"Tabla de Correlacion"),
     for indC=1:Objetos
         for indA=1:Angulos
             sentencia = "plantilla = Objeto" + num2str(indC,'%02d') + "Angulo" + num2str(indA,'%02d') + ";";
@@ -41,17 +42,22 @@ for figura = 1:numFiguras
             simbolo_resize =  imresize(simbolo,[N,M]);
             % Obtenemos el valor de correlación entre ambas imágenes.
             correlacion(indC,indA) = funcion_correlacionEntreMatrices(simbolo_resize,plantilla);
+            
+            
         end
     end
-    
+
+
     % El valor que nos interesa será la fila de la matriz de correlación
     % que tenga el valor máximo. La fila nos indica el caracter qué
     % corresponde con la figura que hemos estudiado.
     [f,~] = find(correlacion == max(correlacion(:)));
 
     % Añadimos el caracter f a la matricula.
+    imshow(correlacion), title(Caracteres(f))
+    pause;
     Matricula = Matricula + Caracteres(f);
-
+    
 end
 % Ponemos como título de la imagen segmentada la matrícula.
 title(Matricula)

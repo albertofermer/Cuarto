@@ -3,20 +3,33 @@ data ArbolBinario = Vacio | Hoja {valor::Int} | Nodo {valor::Int, izq::ArbolBina
 -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 --------------------------------------------------------------------- Declaración del arbol -----------------------------------------------------------------
-arbol = Nodo{valor=0, izq=(Nodo{valor=1,
-				izq=(Nodo{valor=3,
-					izq=(Hoja{valor=7}),
-					der=Vacio}),
-				der=(Nodo{valor=4,
-					izq=(Hoja{valor=8}),
-					der=Vacio})}),
-		      der=(Nodo{valor=2, 
-				izq=(Nodo{valor=5,
-					izq=(Hoja{valor=9}),
-					der=Vacio}), 
-				der=(Nodo{valor=6,
-					izq=(Hoja{valor=10}),
-					der=(Hoja{valor=11})})})}
+arbol = Nodo{valor=0,
+	izq=(Nodo{valor=1,
+		izq=(Nodo{valor=3,
+			izq=(Hoja{valor=7}),
+			der=Vacio}),
+		der=(Nodo{valor=4,
+			izq=(Hoja{valor=8}),
+			der=Vacio})}),
+	der=(Nodo{valor=2, 
+		izq=(Nodo{valor=5,
+			izq=(Hoja{valor=9}),
+			der=Vacio}), 
+		der=(Nodo{valor=6,
+			izq=(Hoja{valor=10}),
+			der=(Hoja{valor=11})})})}
+
+arbol2 = Nodo{valor=4,
+		izq = (Nodo{valor = 2,
+			izq = (Hoja{valor=1}),
+			der = (Nodo{valor=3,
+				izq = Vacio,
+				der = (Hoja{valor=10})})}),
+		der = (Nodo{valor=5,
+			izq = (Hoja{valor=6}),
+			der = (Nodo{valor=7,
+				izq = (Hoja{valor=8}),
+				der = (Hoja{valor=9})})})}
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -55,9 +68,14 @@ recorridoPreorden (Nodo valor izq der) =  [valor] ++ (recorridoPreorden izq) ++ 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 nivelArbol :: ArbolBinario -> Int -> [Int]
+-- Si el árbol es vacío devuelve una lista vacía
 nivelArbol Vacio _ = []
+-- Si el nivel del árbol es el nivel 0, devuelve el valor del nodo
 nivelArbol (Nodo valor izq der) 0 = [valor]
-nivelArbol (Hoja x) nivel = [x]
+nivelArbol (Hoja x) 0 = [x]
+-- En caso de que no sea nivel 0, devuelve una lista vacía si es una hoja
+nivelArbol (Hoja x) nivel = []
+-- y si no es una hoja, llama recursivamente con un nivel inferior.
 nivelArbol (Nodo valor izq der) nivel = (nivelArbol izq (nivel-1))++(nivelArbol der (nivel-1))
 -------------------------------------------------------------------------------------------------------------------------------------------------------------
 

@@ -45,7 +45,6 @@ end
 % Aplicamos esta técnica para eliminar posibles imperfecciones que
 % hayan quedado tras binarizar la imagen.
 
-
 Wclose = 7;
 Icierre = ordfilt2(Ib,Wclose*Wclose,ones(Wclose));
 Icierre = ordfilt2(Icierre,1,ones(Wclose));
@@ -56,6 +55,7 @@ Icierre = ordfilt2(Icierre,1,ones(Wclose));
 
 Iapertura = ordfilt2(Icierre,1,ones(Wclose));
 Iapertura = ordfilt2(Iapertura,Wclose*Wclose,ones(Wclose));
+
 if (mostrar)
     figure('Name',"Aplicación Cierre y Apertura Morfológica")
     subplot(3,1,1), imshow(Ib), title("Imagen antes de aplicar la técnica")

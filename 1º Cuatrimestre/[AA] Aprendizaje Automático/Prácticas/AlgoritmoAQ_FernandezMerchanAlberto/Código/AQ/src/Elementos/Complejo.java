@@ -23,6 +23,7 @@ public class Complejo {
 
 	public Complejo(Complejo c) {
 		conjuncion_selectores = new HashSet<>(c.getSelectores());
+		calculaCriterios();
 	}
 
 	public void add(Selector s) {

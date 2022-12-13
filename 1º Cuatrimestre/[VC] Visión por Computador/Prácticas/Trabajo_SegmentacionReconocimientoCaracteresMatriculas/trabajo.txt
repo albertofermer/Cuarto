@@ -10,3 +10,6 @@ sentencia = ["plantilla = Objeto" + num2str(indC,'%02d') + "Angulo" + num2str(in
 eval(sentencia); -> genera una variable plantilla
 
 matriz caracteres x angulos -> encontrar el máximo ->
+
+
+matriculas_gold <- estructura con las matrículas escritas.

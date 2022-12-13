@@ -15,7 +15,7 @@ addpath('../Funciones_Necesarias/')
 % mostrará la imagen de entrada y la imagen segmentada.
 % ------------------------------------------------------------------------%
 
-training = false;
+training = true;
 mostrar = true;
 
 if (training)

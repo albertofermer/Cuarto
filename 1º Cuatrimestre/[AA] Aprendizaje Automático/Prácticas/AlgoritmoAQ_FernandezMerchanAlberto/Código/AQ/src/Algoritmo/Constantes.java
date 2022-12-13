@@ -12,8 +12,8 @@ public class Constantes {
 
 	public Constantes() {}
 
-	public static String POSITIVO = "+";
-	public static String NEGATIVO = "-";
+	public static String POSITIVO = "NORMAL";
+	public static String NEGATIVO = "CANCERIGENA";
 	
 	/**
 	 * Toma como clase positiva la pasada por parámetro y como clase negativa
