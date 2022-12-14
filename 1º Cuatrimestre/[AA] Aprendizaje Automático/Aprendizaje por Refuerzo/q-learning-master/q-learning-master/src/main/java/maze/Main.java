@@ -10,11 +10,11 @@ import maze.view.MainFrame;
 public class Main {
 
 	private static Integer[][] map = { 
-			{ 1, 1, 1, 1, -100, 1, 1, 1, 1, 1, 1, -100 },
+			{ 1000, 1, 1, 1, -100, 1, 1, 1, 1, 1, 1, -100 },
 			{ 1, -100, 1, 1, 1, 1, 1, 1, 1, 1, 1, -100 }, 
 			{ -100, 1, -100, 1, 1, 1, -100, 1, -100, -100, 1, 1 },
 			{ 1, -100, 1, 1, 1, 1, 1, 1, -100, 1, 1, 1 }, 
-			{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1000 },
+			{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
 			{ 0, 0, 0, 0, 1, 1, -100, 1, 0, 0, 0, 0 }, 
 			{ 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0 },
 			{ 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0 }, 
@@ -29,11 +29,12 @@ public class Main {
 
 		// Set start and target Positions
 		Integer startState = 112;
-		Integer targetState = 59;
+		Integer targetState = 0;
 
 		// Make Episodes
 		MazeController mazeController = new MazeController(maze, qTable);
-		mazeController.explore(200, startState, targetState);
+		int numEpisodes = 200;
+		mazeController.explore(numEpisodes, startState, targetState);
 		
 		// Print out best path
 		List<Integer> path = mazeController.getPath(startState, targetState);

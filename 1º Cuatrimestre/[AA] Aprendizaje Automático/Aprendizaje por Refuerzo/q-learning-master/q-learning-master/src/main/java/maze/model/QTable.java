@@ -24,13 +24,28 @@ public class QTable {
 		return this.qTable[source].getReward(movement);
 	}
 
+	/**
+	 * Obtiene la posición con mayor recompensa a partir de la posición actual.
+	 * @param source
+	 * @param blackList
+	 * @return
+	 */
 	public MovePosition getBestRewardPosition(Integer source, List<MovePosition> blackList) {
+		// Escoge un movimiento aleatorio.
 		MovePosition bestPosition = MovePosition.values()[this.randomGenerator.nextInt(4)];
+		// Obtenemos la recompensa actual del mejor movimiento.
 		Double bestReward = this.getReward(source, bestPosition);
+		
+		// Por cada movimiento posible.
 		for (MovePosition move : MovePosition.values()) {
+			// Se obtiene la recompensa del estado siguiente
 			Double reward = getReward(source, move);
+			// Si la recompensa del movimiento es mejor que la del mejor movimiento calculado
+			// anteriormente y el movimiento no está contenido en la blacklist
 			if (reward > bestReward && !blackList.contains(move)) {
+				// Se actualiza la mejor posición
 				bestPosition = move;
+				// Se actualiza la recompensa
 				bestReward = reward;
 			}
 		}

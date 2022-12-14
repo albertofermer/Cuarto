@@ -17,7 +17,6 @@ public class MazeController {
 	private Random randomGenerator;
 	private MainFrame mf;
 	private QTableFrame qTableFrame;
-
 	private Integer[] startPositionCoordinates, endPositionCoordinates;
 
 	public MazeController(Maze maze, QTable qTable) {
@@ -31,38 +30,61 @@ public class MazeController {
 	public void explore(Integer nmEpisodes, Integer startState, Integer targetState) throws InterruptedException {
 		this.startPositionCoordinates = maze.getCoordinates(startState);
 		this.endPositionCoordinates = maze.getCoordinates(targetState);
+		// Inicializa la ventana del mapa.
 		this.mf.updateMap(this.maze.getMap(), startPositionCoordinates, startPositionCoordinates,
 				endPositionCoordinates);
 
-		for (Integer episodes = nmEpisodes; episodes > 0; episodes--) {
+		// Por cada episodio
+		for (Integer episodes = 0; episodes < nmEpisodes; episodes++) {
 			Integer currentState = startState;
+			// Mientras no se llegue al estado objetivo
 			while (!currentState.equals(targetState)) {
-
-				// Print out map
+				// Imprime el mapa.
 				this.mf.updateMap(this.maze.getMap(), maze.getCoordinates(currentState), startPositionCoordinates,
 						endPositionCoordinates);
 				Thread.sleep(1);
 
-				// Step 1 (Choose a Movement)
+				// Paso 1. Escoger un movimiento.
+				
+				// Elige la posición que obtenga una mayor recompensa a partir del estado actual.
 				MovePosition movePosition = qTable.getBestRewardPosition(currentState, new ArrayList<MovePosition>());
+				
+				// Calculamos el estado siguiente
 				Integer nextState = null;
 				do {
+					// 30% Explora nuevos estados
 					if (this.randomGenerator.nextDouble() >= 0.7) {
+						// Elige un movimiento aleatorio
 						MovePosition sorted = MovePosition.values()[this.randomGenerator.nextInt(4)];
+						
+						// El estado sorted debe ser diferente al mejor estado calculado anteriormente
 						while (sorted == movePosition) {
 							sorted = MovePosition.values()[this.randomGenerator.nextInt(4)];
 						}
+						
 						movePosition = sorted;
 					}
+					
 					nextState = maze.move(currentState, movePosition);
+					
+					// Si es un movimiento no válido, se repite el bucle.
 				} while (nextState == -1);
+				
+				// Obtiene las coordenadas del estado siguiente
 				Integer[] targetCoordinates = maze.getCoordinates(nextState);
+				
+				// Obtiene la recompensa del destino
 				Double targetReward = maze.getMap()[targetCoordinates[0]][targetCoordinates[1]] * 1.0;
 
-				// Step 2 (Sets Q-Table reward and move)
+				// Step 2 (Sets Q-Table reward and move
+				// Paso 2. Establece la recompensa y el movimiento en la Q-tabla
 				Double reward = qTable.setReward(currentState, nextState, movePosition, targetReward,
 						getBestMoveFromTarget(nextState));
+				
+				// Actualiza la ventana de la Q-Tabla
 				this.qTableFrame.setQTable(qTable);
+				
+				// Actualiza el estado actual.
 				currentState = nextState;
 			}
 		}

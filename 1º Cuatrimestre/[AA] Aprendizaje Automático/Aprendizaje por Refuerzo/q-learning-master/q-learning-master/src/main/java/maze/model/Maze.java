@@ -25,6 +25,11 @@ public class Maze {
 		}
 	}
 
+	/**
+	 * Obtiene las coordenadas de una posición del tablero.
+	 * @param position
+	 * @return
+	 */
 	public Integer[] getCoordinates(Integer position) {
 		Integer[] coordinates = { 0, 0 };
 		Integer columnSize = this.map[0].length;
