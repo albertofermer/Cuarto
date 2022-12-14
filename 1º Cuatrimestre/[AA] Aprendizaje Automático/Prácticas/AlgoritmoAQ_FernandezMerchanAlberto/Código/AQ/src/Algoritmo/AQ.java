@@ -42,7 +42,7 @@ public class AQ {
 		N = new HashSet<>(dataset.filtrarDatasetPorClase().get(1).toArrayList());
 
 		// Mientas queden ejemplos positivos en P:
-		while (!P.isEmpty()) {
+		while (P.iterator().hasNext()) {
 			// Elegir un ejemplo de P que será la semilla de la proxima regla
 			Dato semilla = P.iterator().next();
 			Complejo complejo_semilla = Complejo.generarComplejo(semilla, identificador_atributo,
@@ -171,7 +171,7 @@ public class AQ {
 		System.out.println(d);
 		
 		AQ alg = new AQ(d);
-		alg.algoritmo();
+		System.out.println(alg.algoritmo());
 
 	}
 
