@@ -34,7 +34,16 @@ public class Main {
 		// Make Episodes
 		MazeController mazeController = new MazeController(maze, qTable);
 		int numEpisodes = 200;
-		mazeController.explore(numEpisodes, startState, targetState);
+		
+		Double porcentaje = 0.7;
+		for(int t = 0; t<2; t++) {
+			long inicio = System.currentTimeMillis();
+			mazeController.explore(numEpisodes, startState, targetState,porcentaje);
+			long fin = System.currentTimeMillis();
+			System.out.println("Iteracion " + t + ":" + (double) ((fin - inicio)/1000));
+			porcentaje = 1.0;
+		}
+			
 		
 		// Print out best path
 		List<Integer> path = mazeController.getPath(startState, targetState);

@@ -27,7 +27,7 @@ public class MazeController {
 		this.qTableFrame = new QTableFrame(qTable);
 	}
 
-	public void explore(Integer nmEpisodes, Integer startState, Integer targetState) throws InterruptedException {
+	public void explore(Integer nmEpisodes, Integer startState, Integer targetState,  Double porcentaje) throws InterruptedException {
 		this.startPositionCoordinates = maze.getCoordinates(startState);
 		this.endPositionCoordinates = maze.getCoordinates(targetState);
 		// Inicializa la ventana del mapa.
@@ -53,7 +53,7 @@ public class MazeController {
 				Integer nextState = null;
 				do {
 					// 30% Explora nuevos estados
-					if (this.randomGenerator.nextDouble() >= 0.7) {
+					if (this.randomGenerator.nextDouble() >= porcentaje) {
 						// Elige un movimiento aleatorio
 						MovePosition sorted = MovePosition.values()[this.randomGenerator.nextInt(4)];
 						

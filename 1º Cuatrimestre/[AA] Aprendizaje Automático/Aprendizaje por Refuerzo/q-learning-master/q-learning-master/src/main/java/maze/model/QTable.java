@@ -52,12 +52,25 @@ public class QTable {
 		return bestPosition;
 	}
 
+	/**
+	 * Calcula el Q-valor
+	 * @param source
+	 * @param target
+	 * @param move
+	 * @param targetReward
+	 * @param targetBestMove
+	 * @return
+	 */
 	public Double setReward(Integer source, Integer target, MovePosition move, Double targetReward,
 			MovePosition targetBestMove) {
 		Double currentQ = this.getReward(source, move);
+		
 		Double maxFutureQ = this.getReward(target, targetBestMove);
+		
 		Double learningRate = 0.5;
+		
 		Double discountFactor = 0.1;
+		
 		currentQ = currentQ + learningRate * (targetReward + discountFactor * maxFutureQ - currentQ);
 
 		switch (move) {
