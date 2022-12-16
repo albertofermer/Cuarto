@@ -13,6 +13,25 @@ public class Regla {
 		this.indicador = indicador;
 		this.criterio = criterio;
 	}
+	
+	public String getIndicador() {
+		return indicador;
+	}
+	
+	public String getCriterio() {
+		return criterio;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		Regla r = (Regla) o;
+		return (this.indicador.equals(r.getIndicador()) && this.criterio.equals(r.getCriterio()) );
+	}
+	
+	@Override
+	public String toString() {
+		return "(" + indicador + "" + criterio + ")";
+	}
 
 	/**
 	 * Devuelve el subconjunto de complejos de conjunto_complejos que cumplen la

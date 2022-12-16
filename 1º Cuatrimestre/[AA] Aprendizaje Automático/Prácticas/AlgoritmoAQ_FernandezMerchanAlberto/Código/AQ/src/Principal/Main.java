@@ -44,6 +44,12 @@ public class Main {
 		if (args.length == 2) Constantes.setClasePositiva(args[1].toString(), d.getLista_clases());
 
 		AQ alg = new AQ(d);
+		
+		
+		alg.menuLEF();
+
+		
+		
 		Recubrimiento solucion = alg.algoritmo();
 		
 		System.out.println("=========================================");

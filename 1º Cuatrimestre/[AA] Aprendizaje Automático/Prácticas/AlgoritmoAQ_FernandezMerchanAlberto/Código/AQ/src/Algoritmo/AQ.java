@@ -3,6 +3,7 @@ package Algoritmo;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Scanner;
 import java.util.Set;
 
 import Elementos.*;
@@ -27,9 +28,29 @@ public class AQ {
 
 		// Inicialización de LEF
 		LEF = new ArrayList<>();
-		LEF.add(new Regla(">", "cobertura"));
-		LEF.add(new Regla(">", "simplicidad"));
+
 		AQ.dataset = dataset;
+	}
+	
+	public boolean addCriterio(Regla r) {
+		if(!LEF.contains(r)) {
+			LEF.add(r);
+			System.out.println("¡Criterio añadido!");
+			return true;
+		}
+		System.out.println("Ya existe ese criterio en LEF");
+		return false;
+			
+	}
+	
+	public boolean removeCriterio(Regla r) {
+		if (LEF.contains(r)) {
+			LEF.remove(r);
+			System.out.println("¡Criterio eliminado!");
+			return true;
+		}
+		System.out.println("Ese criterio no existe");
+		return false;
 	}
 
 	public Recubrimiento algoritmo() {
@@ -99,17 +120,17 @@ public class AQ {
 		int iteracion = 0;
 		L.add(new Complejo());
 		while (!L.isEmpty()) {
-			System.out.println("\nIteracion: " + ++iteracion);
+			//System.out.println("\nIteracion: " + ++iteracion);
 			// Crear un conjunto E' con complejos creados por conjuncion de un elemento de L
 			// y un selector de S.
-			System.out.println("L: " + L);
-			System.out.println("S: " + S);
+			//System.out.println("L: " + L);
+			//System.out.println("S: " + S);
 			Set<Complejo> E_prima = Complejo.combinar(L, S);
-			System.out.println("E_prima: " + E_prima);
+			//System.out.println("E_prima: " + E_prima);
 
 			// Eliminar de E' los elementos ya incluidos en E
 			E_prima = eliminarElementosRepetidos(E_prima, E);
-			System.out.println("E_prima sin repetidos: " + E_prima);
+			//System.out.println("E_prima sin repetidos: " + E_prima);
 			Set<Complejo> E_prima_copia = new HashSet<>(E_prima);
 			// Para cada complejo de E', si no cubre ningún ejemplo negativo, entonces:
 			for (Complejo c : E_prima) {
@@ -171,8 +192,135 @@ public class AQ {
 		System.out.println(d);
 		
 		AQ alg = new AQ(d);
+		
+		alg.menuLEF();
+		
 		System.out.println(alg.algoritmo());
 
+	}
+
+	public void menuLEF() {
+		Scanner sc = new Scanner(System.in);
+		int opc = 0;
+		do {
+			System.out.println("================ Menú LEF ========================");
+			
+			System.out.println("\t 1. Por defecto (>cobertura,>simplicidad).");
+			System.out.println("\t 2. Añadir criterio de selección.");
+			System.out.println("\t 3. Eliminar criterio de selección.");
+			System.out.println("\t 4. Ejecutar algoritmo");
+			System.out.println("LEF: " + LEF);
+			System.out.println("==================================================");
+			
+			opc = sc.nextInt();
+			
+			if (! (opc < 1 || opc > 3) ) {
+				switch (opc) {
+				case 1:
+					LEF.clear();
+					LEF.add(new Regla(">", "cobertura"));
+					LEF.add(new Regla(">", "simplicidad"));
+					break;
+				case 2:
+					LEF.add(menuaddCriterio());
+					break;
+				case 3:
+					int id = (menuremoveCriterio());
+					if (id != LEF.size()) {
+						LEF.remove(id);
+					}
+					break;
+				default:
+					throw new IllegalArgumentException("Unexpected value: " + opc);
+				}
+			}
+			
+			
+			
+		}while(opc != 4);
+		
+
+		
+	}
+
+	private int menuremoveCriterio() {
+		int id = -1;
+		Scanner sc = new Scanner(System.in);
+			do {
+				System.out.println("================ Eliminar Criterio =======================");
+				
+				for (int i = 1; i <= LEF.size(); i++) {
+					System.out.println("\t" + i + ". " + LEF.get(i-1).toString());
+				}
+				System.out.println("\t" + (LEF.size()+1) + ". Volver");
+				System.out.println("===================================================================");
+				
+				id = sc.nextInt();
+				
+			}while(id < 1 || id > (LEF.size()+1));
+		return (id-1);
+	}
+
+	private Regla menuaddCriterio() {
+		Scanner sc = new Scanner(System.in);
+		String indicador = "";
+		String criterio = "";
+		int opc_criterio = 0;
+		int opc_minmax = 0;
+		do {
+			
+			do {
+				System.out.println("================ Añadir Criterio (I) =======================");
+				System.out.println("\t 1. Máximo (>)");
+				System.out.println("\t 2. Mínimo (<)");
+				System.out.println("===================================================================");
+				
+				opc_minmax = sc.nextInt();
+				
+			}while(opc_minmax < 1 || opc_minmax > 2);
+					
+			System.out.println("================ Añadir Criterio (II) ======================");
+			System.out.println("\t 1. Cobertura");
+			System.out.println("\t 2. Simplicidad");
+			System.out.println("\t 3. Coste");
+			System.out.println("\t 4. Generalidad");
+			System.out.println("\t otro. Volver atrás");
+			System.out.println("===================================================================");		
+			
+			opc_criterio = sc.nextInt();
+			
+		}while(opc_criterio < 1 || opc_criterio > 4);
+
+		switch (opc_minmax) {
+		case 1:
+			indicador = ">";
+			break;
+		case 2:
+			indicador = "<";
+			break;
+		default:
+			throw new IllegalArgumentException("Unexpected value: " + opc_minmax);
+		}
+		
+		switch (opc_criterio) {
+		case 1:
+			criterio = "cobertura";
+			break;
+		case 2:
+			criterio = "simplicidad";
+			break;
+		case 3:
+			criterio = "coste";
+			break;
+		case 4:
+			criterio = "generalidad";
+			break;
+		default:
+			throw new IllegalArgumentException("Unexpected value: " + opc_criterio);
+		}
+		
+		return (new Regla(indicador,criterio));
+		
 	}
 
 }
