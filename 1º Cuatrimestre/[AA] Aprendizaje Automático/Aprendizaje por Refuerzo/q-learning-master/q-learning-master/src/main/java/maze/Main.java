@@ -36,13 +36,10 @@ public class Main {
 		int numEpisodes = 200;
 		
 		Double porcentaje = 0.7;
-		for(int t = 0; t<2; t++) {
 			long inicio = System.currentTimeMillis();
 			mazeController.explore(numEpisodes, startState, targetState,porcentaje);
 			long fin = System.currentTimeMillis();
-			System.out.println("Iteracion " + t + ":" + (double) ((fin - inicio)/1000));
-			porcentaje = 1.0;
-		}
+			System.out.println("Tiempo " + ":" + (double) ((fin - inicio)/1000));
 			
 		
 		// Print out best path

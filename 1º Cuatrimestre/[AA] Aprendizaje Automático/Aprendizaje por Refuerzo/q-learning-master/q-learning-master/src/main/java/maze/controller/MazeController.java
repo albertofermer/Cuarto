@@ -37,6 +37,7 @@ public class MazeController {
 		// Por cada episodio
 		for (Integer episodes = 0; episodes < nmEpisodes; episodes++) {
 			Integer currentState = startState;
+			
 			// Mientras no se llegue al estado objetivo
 			while (!currentState.equals(targetState)) {
 				// Imprime el mapa.

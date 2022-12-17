@@ -32,7 +32,7 @@ Para ejecutar el algoritmo deberá seguir los siguientes pasos:
 	<> :  Obligatorio
 	[] : Opcional
 
-4. Darle a intro.
+4. Una vez introduzca el comando, saldrá un menú para elegir las reglas lexicográficas que utilzará el algoritmo (LEF). Los criterios por defecto son las que se usan en las diapositivas de teoría.
 
 
 ***********************************************************************************	
