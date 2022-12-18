@@ -62,7 +62,7 @@ public class MapFrame extends JPanel {
 						mapColor = Color.RED;
 						break;
 					}
-					case -100: {
+					case -1000: {
 						mapColor = Color.DARK_GRAY;
 						break;
 					}

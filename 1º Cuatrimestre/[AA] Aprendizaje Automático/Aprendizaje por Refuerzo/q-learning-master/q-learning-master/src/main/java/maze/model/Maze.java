@@ -74,7 +74,7 @@ public class Maze {
 
 	public Boolean validateMovement(Integer x, Integer y) {
 		Boolean result = true;
-		if (x < 0 || y < 0 || x >= map.length || y >= map[0].length || this.map[x][y] == 0) {
+		if (x < 0 || y < 0 || x >= map.length || y >= map[0].length || this.map[x][y] == 0 ) {
 			result = false;
 		}
 		return result;
