@@ -4,4 +4,15 @@
   <artifactId>maze</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>MazeRunner</name>
+  <dependencies>
+  <dependency>
+    <groupId>com.github.sh0nk</groupId>
+    <artifactId>matplotlib4j</artifactId>
+    <version>0.5.0</version>
+	</dependency>
+  </dependencies>
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+</properties>
 </project>

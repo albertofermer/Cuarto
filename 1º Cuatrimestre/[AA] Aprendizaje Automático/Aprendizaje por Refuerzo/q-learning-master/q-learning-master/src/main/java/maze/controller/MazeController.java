@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import maze.model.Datos;
 import maze.model.Maze;
 import maze.model.MovePosition;
 import maze.model.QTable;
@@ -27,7 +28,8 @@ public class MazeController {
 		this.qTableFrame = new QTableFrame(qTable);
 	}
 
-	public void explore(Integer nmEpisodes, Integer startState, Integer targetState,  Double porcentaje) throws InterruptedException {
+	public Datos explore(Integer nmEpisodes, Integer startState, Integer targetState,  Double porcentaje) throws InterruptedException {
+		Datos datos = new Datos();
 		this.startPositionCoordinates = maze.getCoordinates(startState);
 		this.endPositionCoordinates = maze.getCoordinates(targetState);
 		// Inicializa la ventana del mapa.
@@ -37,12 +39,19 @@ public class MazeController {
 		// Por cada episodio
 		for (Integer episodes = 0; episodes < nmEpisodes; episodes++) {
 			
+			
+			double recompensa_acumulada = 0;
+			int long_camino = 0;
+			
 			Integer currentState = startState;
-			
-			long inicio = System.nanoTime();
-			
+	
+			long inicio = System.nanoTime();		
 			// Mientras no se llegue al estado objetivo
 			while (!currentState.equals(targetState)) {
+				
+				
+				
+				
 				// Imprime el mapa.
 				this.mf.updateMap(this.maze.getMap(), maze.getCoordinates(currentState), startPositionCoordinates,
 						endPositionCoordinates);
@@ -67,12 +76,13 @@ public class MazeController {
 						}
 						
 						movePosition = sorted;
-					}
-					
+					}					
 					nextState = maze.move(currentState, movePosition);
 					
 					// Si es un movimiento no válido, se repite el bucle.
 				} while (nextState == -1);
+				
+				
 				
 				// Obtiene las coordenadas del estado siguiente
 				Integer[] targetCoordinates = maze.getCoordinates(nextState);
@@ -85,19 +95,36 @@ public class MazeController {
 				Double reward = qTable.setReward(currentState, nextState, movePosition, targetReward,
 						getBestMoveFromTarget(nextState));
 				
+				
+				recompensa_acumulada += qTable.getReward(currentState, movePosition);
+				
+
+				
+				
 				// Actualiza la ventana de la Q-Tabla
 				this.qTableFrame.setQTable(qTable);
 				
 				// Actualiza el estado actual.
 				currentState = nextState;
+				long_camino ++;
 			}
+			
+			long fin = System.nanoTime();
 			//////////////////////////////////////
-			System.out.println("Iteracion " + episodes + ":" + (double) ((System.nanoTime() - inicio))/100000);
-
+			
+			System.out.println("Iteracion " + episodes + ":" + (double) ((fin - inicio))/100000);
+			System.out.println("Recompensa" +episodes + "=" + Math.log10(recompensa_acumulada));
+			System.out.println("Longitud Camino = " + long_camino);
+			System.out.println("-----------------------------");
+			datos.addLongitudCaminos(long_camino);
+			datos.addTiempo((long) ((fin - inicio))/10000000);
+			datos.addRecompensa((recompensa_acumulada));
 		}
+		
+		return datos;
 	}
-
-	public List<Integer> getPath(Integer currentState, Integer targetState) {
+	
+	public List<Integer> getPathFinal(Integer currentState, Integer targetState) {
 		Integer[][] finalMap = this.maze.getMap();
 		ArrayList<Integer> path = new ArrayList<Integer>();
 
@@ -107,7 +134,6 @@ public class MazeController {
 			currentState = maze.move(currentState, getBestMoveFromTarget(currentState));
 		}
 		path.add(currentState);
-
 		// Print out best path in the Map
 		for (Integer integer : path) {
 			Integer[] coordinates = this.maze.getCoordinates(integer);
@@ -126,7 +152,7 @@ public class MazeController {
 			invalidMovements.add(bestPosition);
 			bestPosition = qTable.getBestRewardPosition(currentPosition, invalidMovements);
 			coordinates = maze.getCoordinates(maze.move(currentPosition, bestPosition));
-			//System.out.println(coordinates[0] + " - " + coordinates[1] + " " + maze.validateMovement(coordinates[0], coordinates[1]));
+			//System.out.println(maze.getPosition(coordinates[0], coordinates[1]) + " " + maze.validateMovement(coordinates[0], coordinates[1]));
 		} while (maze.validateMovement(coordinates[0], coordinates[1]).equals(Boolean.FALSE));
 		return bestPosition;
 	}

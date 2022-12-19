@@ -49,7 +49,7 @@ radio_rueda=1;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Carga el fichero  BMP
-MAPA = imread('.\cuadro4.bmp');
+MAPA = imread('.\Mapa.bmp');
 
 %Transformación para colocar correctamente el origen del Sistema de
 %Referencia

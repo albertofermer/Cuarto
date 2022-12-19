@@ -40,6 +40,7 @@ public class QTable {
 		for (MovePosition move : MovePosition.values()) {
 			// Se obtiene la recompensa del estado siguiente
 			Double reward = getReward(source, move);
+			
 			// Si la recompensa del movimiento es mejor que la del mejor movimiento calculado
 			// anteriormente y el movimiento no está contenido en la blacklist
 			if (reward > bestReward && !blackList.contains(move)) {

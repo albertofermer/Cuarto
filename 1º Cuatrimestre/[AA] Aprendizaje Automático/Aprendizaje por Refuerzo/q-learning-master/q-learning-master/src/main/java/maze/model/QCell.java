@@ -5,10 +5,10 @@ public class QCell {
 	private Double belowReward, upReward, leftReward, rightReward;
 	
 	public QCell() {
-		this.belowReward = 0.0;
-		this.upReward = 0.0;
-		this.leftReward = 0.0;
-		this.rightReward = 0.0;
+		this.belowReward = Double.MIN_VALUE;
+		this.upReward = Double.MIN_VALUE;
+		this.leftReward = Double.MIN_VALUE;
+		this.rightReward = Double.MIN_VALUE;
 	}
 
 	public Double getBelowReward() {
