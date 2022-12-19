@@ -2,57 +2,53 @@ package maze;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.github.sh0nk.matplotlib4j.Plot;
-import com.github.sh0nk.matplotlib4j.PlotImpl;
 import com.github.sh0nk.matplotlib4j.PythonExecutionException;
-import com.github.sh0nk.matplotlib4j.builder.HistBuilder.Orientation;
 
 import maze.controller.MazeController;
 import maze.model.Datos;
 import maze.model.Maze;
 import maze.model.QTable;
-import maze.view.MainFrame;
+
+import java.io.FileWriter;
 
 public class Main {
 
-	
-    private static Integer[][] map = {
-            {1, 1, 1, 1},
-            {1, 1, Integer.MIN_VALUE, 1},
-            {1, Integer.MIN_VALUE,1, 1, 1},
-            {1, -10000, 1, 1, 1},
-            {Integer.MIN_VALUE ,1,  100000, 1}
-        };
-//	private static Integer[][] map = { 
-//			{ 1000, 1, 1, 1, -100, 1, 1, 1, 1, 1, 1, -100 },
-//			{ 1, -100, 1, 1, 1, 1, 1, 1, 1, 1, 1, -100 }, 
-//			{ -100, 1, -100, 1, 1, 1, -100, 1, -100, -100, 1, 1 },
-//			{ 1, -100, 1, 1, 1, 1, 1, 1, -100, 1, 1, 1 }, 
-//			{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-//			{ 0, 0, 0, 0, 1, 1, -100, 1, 0, 0, 0, 0 }, 
-//			{ 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0 },
-//			{ 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0 }, 
-//			{ 0, 0, 0, 0, 1, 1, -100, 1, 0, 0, 0, 0 },
-//			{ 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0 }
-//	};
-
+//	
+//    private static Integer[][] map = {
+//            {1, 1, 1, 1},
+//            {1, 1, Integer.MIN_VALUE, 1},
+//            {1, Integer.MIN_VALUE,1, 1, 1},
+//            {1, -10000, 1, 1, 1},
+//            {Integer.MIN_VALUE ,1,  100000, 1}
+//        };
+	private static Integer[][] map = { 
+			{ Integer.MAX_VALUE, 1, 1, 1, Integer.MIN_VALUE, 1, 1, 1, 1, 1, 1, Integer.MIN_VALUE },
+			{ 1, Integer.MIN_VALUE, 1, 1, 1, 1, 1, 1, 1, 1, 1, Integer.MIN_VALUE }, 
+			{ Integer.MIN_VALUE, 1, Integer.MIN_VALUE, 1, 1, 1, Integer.MIN_VALUE, 1, Integer.MIN_VALUE, Integer.MIN_VALUE, 1, 1 },
+			{ 1, Integer.MIN_VALUE, 1, 1, 1, 1, 1, 1, Integer.MIN_VALUE, 1, 1, 1 }, 
+			{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+			{ Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, 1, 1, Integer.MIN_VALUE, 1, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE }, 
+			{ Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, 1, 1, 1, 1, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE },
+			{ Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, 1, 1, 1, 1, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE }, 
+			{ Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, 1, 1, Integer.MIN_VALUE, 1, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE },
+			{ Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, 1, 1, 1, 1, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE }
+	};
 	public static void main(String[] args) throws InterruptedException {
 		// Create Maze and Q-Table
 		Maze maze = new Maze(map);
-		QTable qTable = new QTable(20);
-
+		QTable qTable = new QTable(map.length*map[0].length);
 		// Set start and target Positions
-		Integer startState = 0;
-		Integer targetState = 18;
+		Integer startState = 115;
+		Integer targetState = 0;
 
 		// Make Episodes
 		MazeController mazeController = new MazeController(maze, qTable);
-		int numEpisodes = 2500;
+		int numEpisodes = 200;
 		
-		Double porcentaje_explotacion = 0.99;
+		Double porcentaje_explotacion = 0.8;
 			long inicio = System.currentTimeMillis();
 			Datos datos = mazeController.explore(numEpisodes, startState, targetState,porcentaje_explotacion);
 			long fin = System.currentTimeMillis();
@@ -64,6 +60,14 @@ public class Main {
 		for (Integer integer : path) {
 			System.out.println(integer);
 		}
+		
+//		try {
+//			writeCSV(normalizar(datos.getRecompensa_acumulada()));
+//		} catch (IOException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+		
 		
 		
 //		Plot plt2 = Plot.create();
@@ -81,7 +85,7 @@ public class Main {
 		// Evolución del Camino //
 		Plot evolucion_camino = Plot.create();
 		evolucion_camino.plot()
-		    .add(datos.getLongitud_caminos())
+		    .add((datos.getLongitud_caminos()))
 		    .label("Longitud del camino")
 		    .linestyle("-")
 		    .color("red");
@@ -108,7 +112,7 @@ public class Main {
 		Plot tiempo = Plot.create();
 
 		tiempo.plot()
-			.add(datos.getTiempo())
+			.add((datos.getTiempo()))
 			.label("Tiempo")
 			.linestyle("-")
 			.color("blue");
@@ -130,7 +134,7 @@ public class Main {
 		Plot recompensa = Plot.create();
 
 		recompensa.plot()
-			.add(datos.getRecompensa_acumulada())
+			.add(normalizarDouble(datos.getRecompensa_acumulada()))
 			.label("Recompensa")
 			.linestyle("-")
 			.color("green");
@@ -163,12 +167,121 @@ public class Main {
 		
 		
 	}
+
+private static List<? extends Number> normalizarLong(List<Long> datos) {
+	double media = 0;
+	double std = 0;
+	List<Double> normalized_list = new ArrayList<>();
+
+	for (Long a : datos){
+		media += a;
+	}
+	
+	media = media/datos.size();
+	
+	//System.out.println("mean: " + media);
+	
+	for (Long a : datos){
+		std += Math.pow((a - media),2);
+	}
+	
+	std = Math.sqrt(std/datos.size());
+	
+	//System.out.println("std: " + std);
+	long min = Integer.MAX_VALUE;
+	for (Long a : datos){
+		if (a < min)
+			min = a;
+	}
+	
+	long max = Integer.MIN_VALUE;
+	for (Long a : datos){
+		if (a > max)
+			max = a;
+	}
+	
+	
+	
+	for (Long a : datos) {
+//		double normalized_data = (a - media);
+//		normalized_data = normalized_data/std;
+//		normalized_list.add(normalized_data);
+		
+		double normalized_data = (a - min)/(max-min);
+		normalized_list.add(normalized_data);
+	}
+	
+	return normalized_list;
+	
+	
+	
+}
+
+private static void writeCSV(List<Double> datos) throws IOException {
+
+	FileWriter writer = new FileWriter("C:\\Users\\afmhu\\Desktop\\output.txt"); 
+	for(Double d: datos) {
+	  writer.write(d.toString() + ",");
+	}
+	writer.close();
+}
 private static List<? extends Number> listEpisodes(int numEpisodes) {
 	List<Integer> eje = new ArrayList<>();
 	for (int i = 0; i < numEpisodes; i++) {
 		eje.add(i);
 	}
 	return eje;
+}
+
+private static List<Double> normalizarDouble(List<Double> datos){
+	
+	double media = 0;
+	double std = 0;
+	List<Double> normalized_list = new ArrayList<>();
+
+	for (Double a : datos){
+		media += a;
+	}
+	
+	media = media/datos.size();
+	
+	//System.out.println("mean: " + media);
+	
+	for (Double a : datos){
+		std += Math.pow((a - media),2);
+	}
+	
+	std = Math.sqrt(std/datos.size());
+	
+	//System.out.println("std: " + std);
+	double min = Double.MAX_VALUE;
+	for (Double a : datos){
+		if (a < min)
+			min = a;
+	}
+	
+	double max = Double.MIN_VALUE;
+	for (Double a : datos){
+		if (a > max)
+			max = a;
+	}
+	
+	
+	
+	for (Double a : datos) {
+//		double normalized_data = (a - media);
+//		normalized_data = normalized_data/std;
+//		normalized_list.add(normalized_data);
+		
+		double normalized_data = (a - min)/(max-min);
+		normalized_list.add(normalized_data);
+	}
+	
+	return normalized_list;
+	
+	
+	
+	
 }
 
 }

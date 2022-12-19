@@ -93,7 +93,7 @@ public class MazeController {
 				// Step 2 (Sets Q-Table reward and move
 				// Paso 2. Establece la recompensa y el movimiento en la Q-tabla
 				Double reward = qTable.setReward(currentState, nextState, movePosition, targetReward,
-						getBestMoveFromTarget(nextState));
+						getBestMoveFromTarget(nextState), episodes);
 				
 				
 				recompensa_acumulada += qTable.getReward(currentState, movePosition);
@@ -113,7 +113,7 @@ public class MazeController {
 			//////////////////////////////////////
 			
 			System.out.println("Iteracion " + episodes + ":" + (double) ((fin - inicio))/100000);
-			System.out.println("Recompensa" +episodes + "=" + Math.log10(recompensa_acumulada));
+			System.out.println("Recompensa" +episodes + "=" + (recompensa_acumulada));
 			System.out.println("Longitud Camino = " + long_camino);
 			System.out.println("-----------------------------");
 			datos.addLongitudCaminos(long_camino);
