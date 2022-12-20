@@ -36,10 +36,15 @@ public class MazeController {
 		this.mf.updateMap(this.maze.getMap(), startPositionCoordinates, startPositionCoordinates,
 				endPositionCoordinates);
 
+		double p = porcentaje;
 		// Por cada episodio
 		for (Integer episodes = 0; episodes < nmEpisodes; episodes++) {
 			
 			
+			porcentaje = p + (1-p)*(((double)episodes/(double)nmEpisodes));
+			
+			if(porcentaje > 1.0) porcentaje = 1.0;
+						
 			double recompensa_acumulada = 0;
 			int long_camino = 0;
 			

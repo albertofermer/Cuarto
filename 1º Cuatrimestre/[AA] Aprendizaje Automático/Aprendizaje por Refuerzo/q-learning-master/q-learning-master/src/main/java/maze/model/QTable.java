@@ -68,15 +68,12 @@ public class QTable {
 		
 		Double maxFutureQ = this.getReward(target, targetBestMove);
 		
-		Double learningRate = 0.1*episode;
-		
-		if(learningRate > 1.0)
-			learningRate = 1.0;
+		Double learningRate = 0.5;
 		
 		Double discountFactor = 0.1;
 		
-		currentQ = (1-learningRate)*currentQ + learningRate*(targetReward + discountFactor * maxFutureQ);
-		//currentQ = currentQ + learningRate * (targetReward + discountFactor * maxFutureQ - currentQ);
+		//currentQ = (1-learningRate)*currentQ + learningRate*(targetReward + discountFactor * maxFutureQ);
+		currentQ = currentQ + learningRate * (targetReward + discountFactor * maxFutureQ - currentQ);
 
 		switch (move) {
 		case UP: {
