@@ -16,13 +16,13 @@ import java.io.FileWriter;
 
 public class Main {
 
-//	
+	
 //    private static Integer[][] map = {
-//            {1, 1, 1, 1},
+//            {Integer.MAX_VALUE, 1, 1, 1},
 //            {1, 1, Integer.MIN_VALUE, 1},
 //            {1, Integer.MIN_VALUE,1, 1, 1},
-//            {1, -10000, 1, 1, 1},
-//            {Integer.MIN_VALUE ,1,  100000, 1}
+//            {1, Integer.MIN_VALUE, 1, 1, 1},
+//            {Integer.MIN_VALUE ,1,  1, 1}
 //        };
 	private static Integer[][] map = { 
 			{ Integer.MAX_VALUE, 1, 1, 1, Integer.MIN_VALUE, 1, 1, 1, 1, 1, 1, Integer.MIN_VALUE },
@@ -48,7 +48,7 @@ public class Main {
 		MazeController mazeController = new MazeController(maze, qTable);
 		int numEpisodes = 200;
 		
-		Double porcentaje_explotacion = 0.8;
+		Double porcentaje_explotacion = 0.7;
 			long inicio = System.currentTimeMillis();
 			Datos datos = mazeController.explore(numEpisodes, startState, targetState,porcentaje_explotacion);
 			long fin = System.currentTimeMillis();

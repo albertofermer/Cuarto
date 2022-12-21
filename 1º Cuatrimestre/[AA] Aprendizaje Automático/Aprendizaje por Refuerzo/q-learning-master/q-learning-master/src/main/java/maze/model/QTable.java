@@ -63,17 +63,14 @@ public class QTable {
 	 * @return
 	 */
 	public Double setReward(Integer source, Integer target, MovePosition move, Double targetReward,
-			MovePosition targetBestMove, Integer episode) {
+		MovePosition targetBestMove, Integer episode) {
+		
 		Double currentQ = this.getReward(source, move);
-		
 		Double maxFutureQ = this.getReward(target, targetBestMove);
-		
 		Double learningRate = 0.5;
-		
 		Double discountFactor = 0.1;
 		
-		//currentQ = (1-learningRate)*currentQ + learningRate*(targetReward + discountFactor * maxFutureQ);
-		currentQ = currentQ + learningRate * (targetReward + discountFactor * maxFutureQ - currentQ);
+		currentQ = (1-learningRate)*currentQ + learningRate*(targetReward + discountFactor * maxFutureQ);
 
 		switch (move) {
 		case UP: {

@@ -42,7 +42,7 @@ public class MazeController {
 			
 			
 			porcentaje = p + (1-p)*(((double)episodes/(double)nmEpisodes));
-			
+			System.out.println(porcentaje);
 			if(porcentaje > 1.0) porcentaje = 1.0;
 						
 			double recompensa_acumulada = 0;

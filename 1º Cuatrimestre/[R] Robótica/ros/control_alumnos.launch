@@ -1,0 +1,15 @@
+<launch>
+
+	<include file ="$(find turtlebot_gazebo)/launch/turtlebot_world.launch">
+	</include>
+	
+	<node pkg="control_turtlebot" type="add_path_vf.py" name="path_node">
+	</node>
+
+	<node pkg="control_turtlebot" type="spline_v4.py" name="generador_spline">
+	</node>
+
+	<node pkg="rviz" type="rviz" name="rviz" args=" -d $(find control_turtlebot)/rviz/control_alumnos.rviz">
+	</node>
+
+</launch>
