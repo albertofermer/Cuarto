@@ -1,5 +1,0 @@
-introducción al aprendizaje por refuerzo
-
-algoritmo q-learning
-
-implementar juego.
