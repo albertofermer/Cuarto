@@ -8,6 +8,7 @@ import maze.model.Datos;
 import maze.model.Maze;
 import maze.model.MovePosition;
 import maze.model.QTable;
+import maze.view.CaptionFrame;
 import maze.view.MainFrame;
 import maze.view.QTableFrame;
 
@@ -19,116 +20,145 @@ public class MazeController {
 	private MainFrame mf;
 	private QTableFrame qTableFrame;
 	private Integer[] startPositionCoordinates, endPositionCoordinates;
+	private boolean representa = false;
 
-	public MazeController(Maze maze, QTable qTable) {
+	public MazeController(Maze maze, QTable qTable, boolean representa) {
 		this.maze = maze;
 		this.qTable = qTable;
 		this.randomGenerator = new Random();
+		this.representa = representa;
 		this.mf = new MainFrame();
+		this.mf.getFrame().setVisible(representa);
 		this.qTableFrame = new QTableFrame(qTable);
+
 	}
 
-	public Datos explore(Integer nmEpisodes, Integer startState, Integer targetState,  Double porcentaje) throws InterruptedException {
+	public MainFrame getMainFrame() {
+		return mf;
+	}
+
+	public CaptionFrame getCaptionFrame() {
+		return mf.getCaptionFrame();
+	}
+
+	public QTableFrame getQTableFrame() {
+		return qTableFrame;
+	}
+
+	public void setMapVisible(boolean representa) {
+		this.mf.getFrame().setVisible(true);
+	}
+
+	public Datos train(Integer nmEpisodes, Integer startState, Integer targetState, Double porcentaje)
+			throws InterruptedException {
 		Datos datos = new Datos();
 		this.startPositionCoordinates = maze.getCoordinates(startState);
 		this.endPositionCoordinates = maze.getCoordinates(targetState);
 		// Inicializa la ventana del mapa.
-		this.mf.updateMap(this.maze.getMap(), startPositionCoordinates, startPositionCoordinates,
-				endPositionCoordinates);
+
+		if (representa)
+			this.mf.updateMap(this.maze.getMap(), startPositionCoordinates, startPositionCoordinates,
+					endPositionCoordinates);
 
 		double p = porcentaje;
 		// Por cada episodio
 		for (Integer episodes = 0; episodes < nmEpisodes; episodes++) {
+
+			porcentaje = p + (1 - p) * (((double) episodes / (double) (nmEpisodes-50)));
+			if (porcentaje > 1.0)
+				porcentaje = 1.0;
 			
-			
-			porcentaje = p + (1-p)*(((double)episodes/(double)nmEpisodes));
 			System.out.println(porcentaje);
-			if(porcentaje > 1.0) porcentaje = 1.0;
-						
 			double recompensa_acumulada = 0;
 			int long_camino = 0;
-			
+
 			Integer currentState = startState;
-	
-			long inicio = System.nanoTime();		
+
+			long inicio = System.nanoTime();
 			// Mientras no se llegue al estado objetivo
 			while (!currentState.equals(targetState)) {
-				
-				
-				
-				
+
 				// Imprime el mapa.
-				this.mf.updateMap(this.maze.getMap(), maze.getCoordinates(currentState), startPositionCoordinates,
-						endPositionCoordinates);
-				//Thread.sleep(1);
+				if (representa)
+					this.mf.updateMap(this.maze.getMap(), maze.getCoordinates(currentState), startPositionCoordinates,
+							endPositionCoordinates);
+				// Thread.sleep(1);
 
 				// Paso 1. Escoger un movimiento.
-				
-				// Elige la posición que obtenga una mayor recompensa a partir del estado actual. //EXPLOTA
+
+				// Elige la posición que obtenga una mayor recompensa a partir del estado
+				// actual. //EXPLOTA
 				MovePosition movePosition = qTable.getBestRewardPosition(currentState, new ArrayList<MovePosition>());
-				
+
 				// Calculamos el estado siguiente
 				Integer nextState = null;
-				do {
-					// 30% Explora nuevos estados
-					if (this.randomGenerator.nextDouble() >= porcentaje) { // EXPLORA
-						// Elige un movimiento aleatorio
-						MovePosition sorted = MovePosition.values()[this.randomGenerator.nextInt(4)];
-						
-						// El estado sorted debe ser diferente al mejor estado calculado anteriormente
-						while (sorted == movePosition) {
-							sorted = MovePosition.values()[this.randomGenerator.nextInt(4)];
-						}
-						
-						movePosition = sorted;
-					}					
-					nextState = maze.move(currentState, movePosition);
-					
-					// Si es un movimiento no válido, se repite el bucle.
-				} while (nextState == -1);
-				
-				
-				
-				// Obtiene las coordenadas del estado siguiente
-				Integer[] targetCoordinates = maze.getCoordinates(nextState);
-				
-				// Obtiene la recompensa del destino
-				Double targetReward = maze.getMap()[targetCoordinates[0]][targetCoordinates[1]] * 1.0;
+				// Explora nuevos estados
+				if (this.randomGenerator.nextDouble() >= porcentaje) { // EXPLORA
+					// Elige un movimiento aleatorio
+					MovePosition sorted = MovePosition.values()[this.randomGenerator.nextInt(4)];
+					movePosition = sorted;
+				}
+				nextState = maze.move(currentState, movePosition);
 
-				// Step 2 (Sets Q-Table reward and move
-				// Paso 2. Establece la recompensa y el movimiento en la Q-tabla
-				Double reward = qTable.setReward(currentState, nextState, movePosition, targetReward,
-						getBestMoveFromTarget(nextState), episodes);
+				// Si el estado siguiente se sale del mapa se le recompensa con una puntuación muy baja.
 				
-				
+				if (nextState == -1) {
+					nextState = currentState;
+					// Obtiene las coordenadas del estado siguiente
+					Integer[] targetCoordinates = maze.getCoordinates(nextState);
+
+					// Obtiene la recompensa del destino
+					Double targetReward = Double.MIN_VALUE;
+
+					// Step 2 (Sets Q-Table reward and move
+					// Paso 2. Establece la recompensa y el movimiento en la Q-tabla
+					Double reward = qTable.setReward(currentState, nextState, movePosition, targetReward,
+							getBestMoveFromTarget(nextState), episodes);
+
+					recompensa_acumulada += qTable.getReward(currentState, movePosition);
+
+				} else {
+
+					// Obtiene las coordenadas del estado siguiente
+					Integer[] targetCoordinates = maze.getCoordinates(nextState);
+
+					// Obtiene la recompensa del destino
+					Double targetReward = maze.getMap()[targetCoordinates[0]][targetCoordinates[1]] * 1.0;
+
+					// Step 2 (Sets Q-Table reward and move
+					// Paso 2. Establece la recompensa y el movimiento en la Q-tabla
+					Double reward = qTable.setReward(currentState, nextState, movePosition, targetReward,
+							getBestMoveFromTarget(nextState), episodes);
+
+				}
 				recompensa_acumulada += qTable.getReward(currentState, movePosition);
-				
 
-				
-				
 				// Actualiza la ventana de la Q-Tabla
+
 				this.qTableFrame.setQTable(qTable);
-				
+
 				// Actualiza el estado actual.
 				currentState = nextState;
-				long_camino ++;
+				long_camino++;
 			}
-			
+
 			long fin = System.nanoTime();
 			//////////////////////////////////////
-			
-			System.out.println("Iteracion " + episodes + ":" + (double) ((fin - inicio))/100000);
-			System.out.println("Recompensa" +episodes + "=" + (recompensa_acumulada));
+
+			System.out.println("% Explotación: " + porcentaje);
+			System.out.println("Iteracion " + episodes + ":" + (double) ((fin - inicio)) / 100000);
+			System.out.println("Recompensa" + episodes + "=" + (recompensa_acumulada));
 			System.out.println("Longitud Camino = " + long_camino);
 			System.out.println("-----------------------------");
 			datos.addLongitudCaminos(long_camino);
-			datos.addTiempo((long) ((fin - inicio))/10000000);
+			datos.addTiempo(((fin - inicio)));
 			datos.addRecompensa((recompensa_acumulada));
+			datos.addPorcentajeExploracion(1 - porcentaje);
 		}
-		
+
 		return datos;
 	}
-	
+
 	public List<Integer> getPathFinal(Integer currentState, Integer targetState) {
 		Integer[][] finalMap = this.maze.getMap();
 		ArrayList<Integer> path = new ArrayList<Integer>();
@@ -144,8 +174,10 @@ public class MazeController {
 			Integer[] coordinates = this.maze.getCoordinates(integer);
 			finalMap[coordinates[0]][coordinates[1]] = -1;
 		}
-		this.mf.updateMap(finalMap, maze.getCoordinates(currentState), startPositionCoordinates,
-				endPositionCoordinates);
+
+		if (true)
+			this.mf.updateMap(finalMap, maze.getCoordinates(currentState), startPositionCoordinates,
+					endPositionCoordinates);
 		return path;
 	}
 
@@ -157,7 +189,8 @@ public class MazeController {
 			invalidMovements.add(bestPosition);
 			bestPosition = qTable.getBestRewardPosition(currentPosition, invalidMovements);
 			coordinates = maze.getCoordinates(maze.move(currentPosition, bestPosition));
-			//System.out.println(maze.getPosition(coordinates[0], coordinates[1]) + " " + maze.validateMovement(coordinates[0], coordinates[1]));
+			// System.out.println(maze.getPosition(coordinates[0], coordinates[1]) + " " +
+			// maze.validateMovement(coordinates[0], coordinates[1]));
 		} while (maze.validateMovement(coordinates[0], coordinates[1]).equals(Boolean.FALSE));
 		return bestPosition;
 	}

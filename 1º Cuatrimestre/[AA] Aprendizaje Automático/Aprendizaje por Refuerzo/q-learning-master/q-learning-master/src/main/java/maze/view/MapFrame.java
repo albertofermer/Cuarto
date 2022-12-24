@@ -13,6 +13,7 @@ public class MapFrame extends JPanel {
 	private Color[][] mapColors;
 	private Integer[][] map;
 	private Integer[] currentPosition, startPosition, endPosition;
+	private CaptionFrame cf;
 
 	public MapFrame(Integer[][] map, Integer[] currentPosition,Integer[] startPosition, Integer[] endPosition) {
 		this.xSize = map.length;
@@ -22,9 +23,14 @@ public class MapFrame extends JPanel {
 		this.startPosition = startPosition;
 		this.endPosition = endPosition;
 		this.colorMap();
-		new CaptionFrame();
+		
+		cf = new CaptionFrame();
 	}
 
+	public CaptionFrame getCaptionFrame() {
+		return cf;
+		
+	}
 	private void colorMap() {
 		this.mapColors = new Color[xSize][ySize];
 		for (Integer i = 0; i < xSize; i++) {

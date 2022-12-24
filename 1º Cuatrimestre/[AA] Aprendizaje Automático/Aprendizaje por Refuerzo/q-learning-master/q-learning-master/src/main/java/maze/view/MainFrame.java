@@ -16,6 +16,13 @@ public class MainFrame {
 		this.frame.setVisible(true);
 	}
 
+	public JFrame getFrame() {
+		return frame;
+	}
+	
+	public CaptionFrame getCaptionFrame() {
+		return mp.getCaptionFrame();
+	}
 	public void updateMap(Integer[][] map, Integer[] currentPosition, Integer[] startPosition, Integer [] endPosition) {
 		if (this.mp == null) {
 			this.mp = new MapFrame(map, currentPosition, startPosition, endPosition);

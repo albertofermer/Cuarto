@@ -12,276 +12,236 @@ import maze.model.Datos;
 import maze.model.Maze;
 import maze.model.QTable;
 
-import java.io.FileWriter;
-
 public class Main {
 
-	
-//    private static Integer[][] map = {
-//            {Integer.MAX_VALUE, 1, 1, 1},
-//            {1, 1, Integer.MIN_VALUE, 1},
-//            {1, Integer.MIN_VALUE,1, 1, 1},
-//            {1, Integer.MIN_VALUE, 1, 1, 1},
-//            {Integer.MIN_VALUE ,1,  1, 1}
-//        };
-	private static Integer[][] map = { 
-			{ Integer.MAX_VALUE, 1, 1, 1, Integer.MIN_VALUE, 1, 1, 1, 1, 1, 1, Integer.MIN_VALUE },
-			{ 1, Integer.MIN_VALUE, 1, 1, 1, 1, 1, 1, 1, 1, 1, Integer.MIN_VALUE }, 
-			{ Integer.MIN_VALUE, 1, Integer.MIN_VALUE, 1, 1, 1, Integer.MIN_VALUE, 1, Integer.MIN_VALUE, Integer.MIN_VALUE, 1, 1 },
-			{ 1, Integer.MIN_VALUE, 1, 1, 1, 1, 1, 1, Integer.MIN_VALUE, 1, 1, 1 }, 
+	private static Integer[][] map = {
+			{ Integer.MAX_VALUE, 1, 1, 1, -10000, 1, 1, 1, 1, 1, 1, -10000 },
+			{ 1, -10000, 1, 1, 1, 1, 1, 1, 1, 1, 1, -10000 },
+			{ -10000, 1, -10000, 1, 1, 1, -10000, 1, -10000,
+					-10000, 1, 1 },
+			{ 1, -10000, 1, 1, 1, 1, 1, 1, -10000, 1, 1, 1 },
 			{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-			{ Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, 1, 1, Integer.MIN_VALUE, 1, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE }, 
-			{ Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, 1, 1, 1, 1, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE },
-			{ Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, 1, 1, 1, 1, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE }, 
-			{ Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, 1, 1, Integer.MIN_VALUE, 1, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE },
-			{ Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, 1, 1, 1, 1, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE }
-	};
+			{ -10000, -10000, -10000, -10000, 1, 1, -10000, 1,
+					-10000, -10000, -10000, -10000 },
+			{ -10000, -10000, -10000, -10000, 1, 1, 1, 1, -10000,
+					-10000, -10000, -10000 },
+			{ -10000, -10000, -10000, -10000, 1, 1, 1, 1, -10000,
+					-10000, -10000, -10000 },
+			{ -10000, -10000, -10000, -10000, 1, 1, -10000, 1,
+					-10000, -10000, -10000, -10000 },
+			{ -10000, -10000, -10000, -10000, 1, 1, 1, 1, -10000,
+					-10000, -10000, -10000 } };
+
 	public static void main(String[] args) throws InterruptedException {
 		// Create Maze and Q-Table
 		Maze maze = new Maze(map);
-		QTable qTable = new QTable(map.length*map[0].length);
 		// Set start and target Positions
 		Integer startState = 115;
 		Integer targetState = 0;
 
-		// Make Episodes
-		MazeController mazeController = new MazeController(maze, qTable);
-		int numEpisodes = 200;
+		// Número de Épocas de Entrenamiento
+		int numEpisodes = 500;
 		
-		Double porcentaje_explotacion = 0.7;
-			long inicio = System.currentTimeMillis();
-			Datos datos = mazeController.explore(numEpisodes, startState, targetState,porcentaje_explotacion);
-			long fin = System.currentTimeMillis();
-			System.out.println("Tiempo " + ":" + (double) ((fin - inicio)));
+		// Número de Repeticiones del algoritmo para sacar resultados representativos
+		int numRepeticiones = 1;
+		
+		// Porcentaje de explotación de comienzo del algoritmo
+		Double porcentaje_explotacion = 0.0;
+		
+		ArrayList<Datos> lista_datos = new ArrayList<>();
+		Datos datos = new Datos();
+		MazeController mazeController = null;
+		QTable qTable = null;
+
+		// Algoritmo Q-Learning //
+		for(int i = 0; i < numRepeticiones-1; i++) {
+			System.out.println("=================> Repetición " + i + " <=================");
+			// Inicialización de la Q-Table
+			qTable = new QTable(map.length * map[0].length);
 			
+			// Entrenamiento del algoritmo
+			mazeController = new MazeController(maze, qTable, true);
+			datos = mazeController.train(numEpisodes, startState, targetState, porcentaje_explotacion);
+			
+			// Obtención de datos para graficar
+			lista_datos.add(datos);
+			mazeController.getMainFrame().getFrame().dispose();
+			mazeController.getQTableFrame().dispose();
+			mazeController.getCaptionFrame().dispose();
+		
+		}
+		
+		System.out.println("=================> Repetición " + (numRepeticiones-1) + " <=================");
+		qTable = new QTable(map.length * map[0].length);
+		mazeController = new MazeController(maze, qTable, true);
+		datos = mazeController.train(numEpisodes, startState, targetState, porcentaje_explotacion);
+		lista_datos.add(datos);
+		
+		mazeController.setMapVisible(true);
+		
+		// Mostramos la Política estado->acción //
+		for (int estado = 0 ; estado < (map.length * map[0].length) ; estado++) {
+			System.out.println(estado + " -> " + qTable.getBestRewardPosition(estado, new ArrayList<>()));
+		}
+		
+		
+		
 		
 		// Print out best path
-		List<Integer> path = mazeController.getPathFinal(startState, targetState);
-		for (Integer integer : path) {
-			System.out.println(integer);
-		}
-		
-//		try {
-//			writeCSV(normalizar(datos.getRecompensa_acumulada()));
-//		} catch (IOException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
+		mazeController.getPathFinal(startState, targetState);
+
+
+		// Calculamos las medias de los datos //
+		List<List<Double>> datos_media = media(lista_datos);
 		
 		
-		
-//		Plot plt2 = Plot.create();
-//		plt2.plot().add(listEpisodes(numEpisodes), datos.getLongitud_caminos(), ".r").label("sin");
-//		plt2.legend().loc("upper right");
-//		plt2.title("scatter");
-//		try {
-//			plt2.show();
-//		} catch (IOException | PythonExecutionException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		
-		
-		// Evolución del Camino //
-		Plot evolucion_camino = Plot.create();
-		evolucion_camino.plot()
-		    .add((datos.getLongitud_caminos()))
-		    .label("Longitud del camino")
-		    .linestyle("-")
-		    .color("red");
-		
-//		evolucion_camino.plot()
-//			.add(datos.getRecompensa_acumulada())
-//			.label("Recompensa Acumulada")
-//			.linestyle("-")
-//			.color("green");
-		
-		evolucion_camino.xlabel("Epochs");
-		evolucion_camino.ylabel("Longitud del Camino");
-		evolucion_camino.title("Evolución de la Longitud del Camino");
-		evolucion_camino.legend();
-		
-		
+		Plot valores_medios = Plot.create();
+		valores_medios.plot().add(logaritmoDouble(datos_media.get(0))).label("Longitud del camino media").linestyle("-")
+				.color("red");
+		valores_medios.plot().add(escalarDoubleDouble(logaritmoDouble(datos_media.get(0)),datos.getPorcentaje_explotacion())).label("% Exploración").linestyle("-").color("blue");
+		valores_medios.plot().add(escalarDoubleDouble(logaritmoDouble(datos_media.get(0)),normalizarDouble(datos_media.get(2)))).label("Recompensa Media").linestyle("-")
+		.color("green");
+
+		valores_medios.xlabel("Epochs");
+		valores_medios.ylabel("log(Longitud del Camino)");
+		valores_medios.title("Evolución de la Longitud media del camino y Recompensa media");
+		valores_medios.legend();
+
 		try {
-			evolucion_camino.show();
+			valores_medios.show();
 		} catch (IOException | PythonExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}		
 		
-		Plot tiempo = Plot.create();
+		
 
-		tiempo.plot()
-			.add((datos.getTiempo()))
-			.label("Tiempo")
-			.linestyle("-")
-			.color("blue");
+
+	}
+
+	private static List<List<Double>> media(ArrayList<Datos> lista_datos) {
 		
-		tiempo.xlabel("Epochs");
-		tiempo.ylabel("Tiempo");
-		tiempo.title("Evolución del tiempo en encontrar la salida");
-		tiempo.legend();
+		List<List<Double>> datos_media  = new ArrayList<>();
+		List<Double> longCamino_media = new ArrayList<>();
+		List<Double> tiempo_media = new ArrayList<>();
+		List<Double> recompensa_media = new ArrayList<>();
 		
-		
-		try {
-			tiempo.show();
-		} catch (IOException | PythonExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		for (int i = 0; i < lista_datos.get(0).getLongitud_caminos().size(); i++) {
+			longCamino_media.add(0.0);
+			tiempo_media.add(0.0);
+			recompensa_media.add(0.0);
 		}
 		
 		
-		Plot recompensa = Plot.create();
-
-		recompensa.plot()
-			.add(normalizarDouble(datos.getRecompensa_acumulada()))
-			.label("Recompensa")
-			.linestyle("-")
-			.color("green");
-		
-		recompensa.xlabel("Epochs");
-		recompensa.ylabel("Recompensa");
-		recompensa.title("Recompensa acumulada en cada epoch");
-		recompensa.legend();
-		
-		
-		try {
-			recompensa.show();
-		} catch (IOException | PythonExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		for (Datos d : lista_datos) {
+			
+			List<Integer> longCamino_i = d.getLongitud_caminos();
+			List<Long> tiempo_i = d.getTiempo();
+			List<Double> recompensa_i = d.getRecompensa_acumulada();
+			
+			for (int i = 0; i < d.getLongitud_caminos().size(); i++) {
+				longCamino_media.set(i, longCamino_i.get(i) + longCamino_media.get(i));
+				tiempo_media.set(i, tiempo_i.get(i) + tiempo_media.get(i));
+				recompensa_media.set(i,recompensa_i.get(i) + recompensa_media.get(i));
+			}
+			
 		}
 		
 		
+		for (int i = 0; i < longCamino_media.size(); i++) {
+			
+			longCamino_media.set(i, longCamino_media.get(i)/lista_datos.size());
+			tiempo_media.set(i, tiempo_media.get(i)/lista_datos.size());
+			recompensa_media.set(i,recompensa_media.get(i)/lista_datos.size());
+			
+		}
 		
-//		Plot plt = Plot.create();
-//		plt.hist().add(datos.getLongitud_caminos()).orientation(Orientation.vertical);
-//		plt.xlim(0, numEpisodes);
-//		plt.title("histogram");		
-//		try {
-//			plt.show();
-//		} catch (IOException | PythonExecutionException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		System.out.println("Longitud Media del Camino : " + longCamino_media.get(longCamino_media.size()-1));
+		datos_media.add(longCamino_media);
+		datos_media.add(tiempo_media);
+		datos_media.add(recompensa_media);
 		
 		
-	}
-
-private static List<? extends Number> normalizarLong(List<Long> datos) {
-	double media = 0;
-	double std = 0;
-	List<Double> normalized_list = new ArrayList<>();
-
-	for (Long a : datos){
-		media += a;
-	}
-	
-	media = media/datos.size();
-	
-	//System.out.println("mean: " + media);
-	
-	for (Long a : datos){
-		std += Math.pow((a - media),2);
-	}
-	
-	std = Math.sqrt(std/datos.size());
-	
-	//System.out.println("std: " + std);
-	long min = Integer.MAX_VALUE;
-	for (Long a : datos){
-		if (a < min)
-			min = a;
-	}
-	
-	long max = Integer.MIN_VALUE;
-	for (Long a : datos){
-		if (a > max)
-			max = a;
-	}
-	
-	
-	
-	for (Long a : datos) {
-//		double normalized_data = (a - media);
-//		normalized_data = normalized_data/std;
-//		normalized_list.add(normalized_data);
 		
-		double normalized_data = (a - min)/(max-min);
-		normalized_list.add(normalized_data);
+		return datos_media;
 	}
-	
-	return normalized_list;
-	
-	
-	
-}
 
-private static void writeCSV(List<Double> datos) throws IOException {
-
-	FileWriter writer = new FileWriter("C:\\Users\\afmhu\\Desktop\\output.txt"); 
-	for(Double d: datos) {
-	  writer.write(d.toString() + ",");
-	}
-	writer.close();
-}
-private static List<? extends Number> listEpisodes(int numEpisodes) {
-	List<Integer> eje = new ArrayList<>();
-	for (int i = 0; i < numEpisodes; i++) {
-		eje.add(i);
-	}
-	return eje;
-}
-
-private static List<Double> normalizarDouble(List<Double> datos){
-	
-	double media = 0;
-	double std = 0;
-	List<Double> normalized_list = new ArrayList<>();
-
-	for (Double a : datos){
-		media += a;
-	}
-	
-	media = media/datos.size();
-	
-	//System.out.println("mean: " + media);
-	
-	for (Double a : datos){
-		std += Math.pow((a - media),2);
-	}
-	
-	std = Math.sqrt(std/datos.size());
-	
-	//System.out.println("std: " + std);
-	double min = Double.MAX_VALUE;
-	for (Double a : datos){
-		if (a < min)
-			min = a;
-	}
-	
-	double max = Double.MIN_VALUE;
-	for (Double a : datos){
-		if (a > max)
-			max = a;
-	}
-	
-	
-	
-	for (Double a : datos) {
-//		double normalized_data = (a - media);
-//		normalized_data = normalized_data/std;
-//		normalized_list.add(normalized_data);
+	private static List<Double> escalarDoubleDouble(List<Double> longitud_caminos, List<Double> tiempo) {
 		
-		double normalized_data = (a - min)/(max-min);
-		normalized_list.add(normalized_data);
+		double max_long = Double.MIN_VALUE;
+		// Calculamos el camino máximo
+		for(Double l : longitud_caminos) {
+			if(l > max_long) {
+				max_long = l;
+			}
+		}
+		
+		// Calcuamos el tiempo máximo
+		double max_tiempo = Double.MIN_VALUE;
+		for(Double t : tiempo) {
+			if(t > max_tiempo) {
+				max_tiempo = t;
+			}
+		}
+		
+		// Constante de proporcionalidad
+		double k = max_long/max_tiempo;
+		
+		List<Double> tiempo_escalado = new ArrayList<>();
+		// Aplicar al segundo array
+		for (Double t : tiempo) {
+			double new_value = t*k;
+			tiempo_escalado.add(new_value);
+		}
+		
+		return tiempo_escalado;
 	}
+
+	private static List<Double> logaritmoDouble(List<Double> datos) {
+		List<Double> log_list = new ArrayList<>();
+		for (Double a : datos) {
+			double log_value = Math.log(a);
+			log_list.add(log_value);
+		}
+
+		return log_list;
+	}
+
 	
-	return normalized_list;
+	private static List<Double> logaritmoInt(List<Integer> datos) {
+		List<Double> log_list = new ArrayList<>();
+		for (Integer a : datos) {
+			double log_value = Math.log(a);
+			log_list.add(log_value);
+		}
+
+		return log_list;
+	}
+
 	
-	
-	
-	
-}
+	private static List<Double> normalizarDouble(List<Double> datos) {
+
+		List<Double> normalized_list = new ArrayList<>();
+
+		double min = Double.MAX_VALUE;
+		for (Double a : datos) {
+			if (a < min)
+				min = a;
+		}
+
+		double max = Double.MIN_VALUE;
+		for (Double a : datos) {
+			if (a > max)
+				max = a;
+		}
+
+		for (Double a : datos) {
+			double normalized_data = (a - min) / (max - min);
+			normalized_list.add(normalized_data);
+		}
+
+		return normalized_list;
+
+	}
 
 }
