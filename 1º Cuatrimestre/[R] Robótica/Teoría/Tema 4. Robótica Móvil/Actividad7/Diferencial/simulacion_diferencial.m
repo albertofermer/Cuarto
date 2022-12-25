@@ -1,19 +1,27 @@
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Simulación del movimiento de un robot móvil
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-clear all
 close all
-clc
-
-j=1;
-
+clear all
 global l
 global radio_rueda
 global camino
 global pose
 global punto
+global k
+k = 0;
+pose = [];
+punto = [];
+camino = [];
+camino_acumulado = [];
+while(true)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Simulación del movimiento de un robot móvil
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+close all
+clc
+
+j=1;
+
+
 %cargamos el camino
 
 % camino=load('camino.dat');
@@ -40,8 +48,7 @@ xc = [Pdx configuracion_inicial(1) 40 70 70 configuracion_final(1) Pax];
 yc = [Pdy configuracion_inicial(2) 40 40  50 configuracion_final(2) Pay];
 %yc=[0 0 40 40 100 120];
 
-ds=3; %distancia entre puntos en cm.
-camino = funcion_spline_cubica_varios_puntos(xc,yc,ds)';
+ds=5; %distancia entre puntos en cm.
 
 
 l=3.5; %distancia entre rudas delanteras y traseras, tambien definido en modelo
@@ -54,36 +61,51 @@ MAPA = imread('.\Mapa.bmp');
 %Transformación para colocar correctamente el origen del Sistema de
 %Referencia
 MAPA(1:end,:,:)=MAPA(end:-1:1,:,:);
+%Llamada del algoritmo
+delta = 15;
+
+%longitud_camino = length(camino);
+longitud_camino = length(camino_acumulado);
+c = A_estrella(MAPA, delta,punto,camino_acumulado);
+camino_acumulado = [camino_acumulado;c];
+
+%camino= [camino; c];
+camino = c;
+if(~isempty(c))
+    camino = funcion_spline_cubica_varios_puntos(camino(:,1)',camino(:,2)',ds)';
+end
 axis xy
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
+if (~isempty(c))
 %Condiciones iniciales
-pose0=[10; 10; 0];
 
+%pose0 = [camino(1 + longitud_camino,:), 0];
+pose0 = [camino_acumulado(1 + longitud_camino,:), 0];
 t0=0;
 
 %final de la simulación
-tf=30;
+tf=60;
 
 %paso de integracion
 h=0.1;
 %vector tiempo
 t=0:h:tf;
 %indice de la matriz
-k=0;
-
+%k=0;
+kt = 0;
 %inicialización valores iniciales
-pose(:,k+1)=pose0;
-punto = [0,0];
+pose(:,k+1)= pose0;
+punto = camino(end,:);
 t(k+1)=t0;
 
 
-while ((t0+h*k) < tf)
+while ((t0+h*kt) < tf)
 
     %punto(1)==pose(1,k) && (punto(2) == pose(2,k));
     %actualización
     k=k+1;
+    kt = kt+1;
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %valores de los parámetros de control
@@ -142,10 +164,10 @@ while ((t0+h*k) < tf)
     %metodo de integración ruge-kuta
 
     %pose(:,k+1)=kuta_diferencial(t(k),pose(:,k),h,conduccion);
-    pose(:,k+1)=kuta_diferencial_mapa(t(k),pose(:,k),h,conduccion,MAPA);
+    pose(:,k+1)=kuta_diferencial_mapa(t(kt),pose(:,k),h,conduccion,MAPA);
 end
 
+ 
+end 
 
-
-
-
+end

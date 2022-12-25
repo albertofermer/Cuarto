@@ -1,7 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % START ALGORITHM
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function Optimal_path=A_estrella(MAPA, delta)
+function Optimal_path=A_estrella(MAPA, delta, posInicial, camino)
 
 % obtiene información de los obstáculos a partir del mapa 
 % e introduce coordenadas de inicio y destino.
@@ -17,8 +17,9 @@ grid on
 hold on
 set(gca,'xtick',[1:delta:700])
 set(gca,'ytick',[1:delta:700])
-
-
+if(~isempty(camino))
+plot(camino(:,1),camino(:,2))
+end
 %MAP stores the coordinates of the map and the 
 %Objects in each coordinate
 
@@ -58,13 +59,13 @@ limites2=size(MAPB);
 for m=1:limites2(1)
     for h=1:limites2(2)
          if MAPB(m,h)==-1
-            plot(((m-1)*delta)+(delta/2),((h-1)*delta)+(delta/2),'*g');
+            plot(((m-1)*delta)+(delta/2),((h-1)*delta)+(delta/2),'*g'), hold on;
             %drawnow
          end
     end
 end
 
-
+if(isempty(posInicial))
 %The target
 %% INITIAL POSITION
 xlabel('Please Select the Vehicle initial position using the Left Mouse button','Color','black');
@@ -75,6 +76,14 @@ end
 
 xTarget=floor(xval/delta)+1;%X Coordinate of the Target
 yTarget=floor(yval/delta)+1;%Y Coordinate of the Target
+end
+if(~isempty(posInicial))
+    xval = posInicial(1);
+    yval = posInicial(2);
+    xTarget = floor(posInicial(1)/delta)+1;
+    yTarget = floor(posInicial(2)/delta)+1;
+end
+
 
 MAPB(xTarget,yTarget)=0;%Initialize MAP with location of the target
 plot(xval,yval,'rd');
@@ -97,13 +106,19 @@ text(xval,yval,'Target');
 
 tstart=tic;
    Optimal_path_original=Alg_estrella(MAPB, xStart, yStart, xTarget, yTarget); %llama al algoritmo
+    
+    if(isempty(Optimal_path_original))
+    Optimal_path = [];
+    else
+           Optimal_path_original=[Optimal_path_original;xStart, yStart]; %mete la configuración inicial
 
-   Optimal_path_original=[Optimal_path_original;xStart, yStart]; %mete la configuración inicial
    
    Optimal_path=((Optimal_path_original-1)*delta)+(delta/2); %convierte los indices de las celdas 
                                                              %del mápa básico MAPB en índices de las celdas 
                                                              %del mapa original. Se le resta 1para devolver
                                                              %el origen al (0,0)
+    end
+
    
 tfinal=toc(tstart) 
 
