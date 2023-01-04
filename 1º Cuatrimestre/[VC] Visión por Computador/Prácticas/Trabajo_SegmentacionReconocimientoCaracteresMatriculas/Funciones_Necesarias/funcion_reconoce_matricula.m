@@ -31,7 +31,7 @@ for figura = 1:numFiguras
     % funcion_segmentaMatriculas.
     simbolo = Ietiq_figura(perimetro(1+(4*(figura-1) ),2):perimetro(3+(4*(figura-1) ),2),perimetro(1+(4*(figura-1) ),1):perimetro(2+(4*(figura-1) ),1));
     % Rellenamos la matriz de correlación:
-    figure('Name',"Tabla de Correlacion"),
+    %figure('Name',"Tabla de Correlacion"),
     for indC=1:Objetos
         for indA=1:Angulos
             sentencia = "plantilla = Objeto" + num2str(indC,'%02d') + "Angulo" + num2str(indA,'%02d') + ";";
@@ -51,11 +51,16 @@ for figura = 1:numFiguras
     % El valor que nos interesa será la fila de la matriz de correlación
     % que tenga el valor máximo. La fila nos indica el caracter qué
     % corresponde con la figura que hemos estudiado.
-    [f,~] = find(correlacion == max(correlacion(:)));
+    [f,c] = find(correlacion == max(correlacion(:)));
 
     % Añadimos el caracter f a la matricula.
-    imshow(correlacion), title(Caracteres(f))
-    pause;
+    disp(figura)
+    %correlacion
+    eval("plantilla = Objeto" + num2str(f,'%02d') + "Angulo" + num2str(c,'%02d') + ";");
+    figure('Name','Correlacion'),
+    subplot(1,2,1), imshow(plantilla), title(Caracteres(f))
+    subplot(1,2,2), imshow(Ietiq_figura)
+    %pause;
     Matricula = Matricula + Caracteres(f);
     
 end

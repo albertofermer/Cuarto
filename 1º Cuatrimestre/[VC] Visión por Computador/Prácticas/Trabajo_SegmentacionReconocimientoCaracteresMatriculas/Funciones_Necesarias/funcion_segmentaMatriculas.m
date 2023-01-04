@@ -6,17 +6,16 @@ W = 11; sigma = round(W/5); % Parámetros de suavizado gaussiano
 % Seleccionamos la componente de color roja porque queremos detectar
 % también el logo de la UE para poder descartarlo posteriormente.
 R = I(:,:,1);
-if (mostrar)
-    figure('Name', 'Imagen Ruidosa y Suavizada'),
-    subplot(2,1,1),imshow(R), title("Imagen Ruidosa")
-end
 % Suavizamos la imagen con un filtro gaussiano para limpiarla.
 % Se utiliza el padding='replicate' para evitar falsos bordes alrededor de
 % la imagen.
 Rsuavizada = imfilter(R,fspecial('gaussian',W,sigma),'replicate');
 if(mostrar)
+    figure('Name', 'Imagen Ruidosa y Suavizada'),
+    subplot(2,1,1),imshow(R), title("Imagen Ruidosa")
     subplot(2,1,2), imshow(Rsuavizada), title("Imagen Suavizada")
 end
+%figure, imshow(Rsuavizada < (graythresh(Rsuavizada))*255)
 %% RESTA DE IMAGEN DE FONDO - IMAGEN RUIDOSA.
 % Con este método no tenemos que preocuparnos por el criterio de los
 % parámetros de otras técnicas como la de MEDIA-C.
