@@ -38,6 +38,6 @@ for imagen = 1:numImagenes
     close all;
 end
 
-tasa_acierto = sum(cell2mat(aciertos))/numImagenes;
+tasa_acierto = sum(cell2mat(aciertos))/numImagenes
 
 

@@ -53,13 +53,19 @@ for figura = 1:numFiguras
     % corresponde con la figura que hemos estudiado.
     [f,c] = find(correlacion == max(correlacion(:)));
 
+%     % Eliminamos los valores correctos
+%     correlacion(f,:) = 0;
+%     % Volvemos a calcular el máximo para encontrar el que más se parezca
+%     [f,c] = find(correlacion == max(correlacion(:)));
+
+
     % Añadimos el caracter f a la matricula.
     disp(figura)
-    %correlacion
-    eval("plantilla = Objeto" + num2str(f,'%02d') + "Angulo" + num2str(c,'%02d') + ";");
-    figure('Name','Correlacion'),
-    subplot(1,2,1), imshow(plantilla), title(Caracteres(f))
-    subplot(1,2,2), imshow(Ietiq_figura)
+    correlacion
+    %eval("plantilla = Objeto" + num2str(f,'%02d') + "Angulo" + num2str(c,'%02d') + ";");
+    %figure('Name','Correlacion'),
+    %subplot(1,2,1), imshow(plantilla), title(Caracteres(f))
+    %subplot(1,2,2), imshow(Ietiq_figura)
     %pause;
     Matricula = Matricula + Caracteres(f);
     
