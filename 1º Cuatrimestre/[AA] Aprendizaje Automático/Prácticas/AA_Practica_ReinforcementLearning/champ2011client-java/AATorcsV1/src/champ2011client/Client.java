@@ -3,8 +3,11 @@
  */
 package champ2011client;
 
+import java.util.ArrayList;
+import java.util.Random;
 import java.util.StringTokenizer;
 
+import QLearning.*;
 import champ2011client.Controller.Stage;
 
 /**
@@ -54,6 +57,7 @@ public class Client {
 		
 		long curEpisode = 0;
 		boolean shutdownOccurred = false;
+		
 		do {
 
 			/*
@@ -120,7 +124,8 @@ public class Client {
 		System.out.println("Bye, bye!");
 
 	}
-
+	
+	
 	private static void parseParameters(String[] args) {
 		/*
 		 * Set default values for the options
@@ -191,6 +196,7 @@ public class Client {
 		try {
 			controller = (Controller) (Object) Class.forName(name)
 					.newInstance();
+			System.out.println(Class.forName(name));
 		} catch (ClassNotFoundException e) {
 			System.out.println(name	+ " is not a class name");
 			System.exit(0);

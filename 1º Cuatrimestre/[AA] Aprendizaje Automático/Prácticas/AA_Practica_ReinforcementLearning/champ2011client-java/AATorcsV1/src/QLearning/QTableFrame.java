@@ -1,21 +1,10 @@
-package maze.view;
+package QLearning;
 
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-
-import maze.model.MovePosition;
-import maze.model.QCell;
-import maze.model.QTable;
 
 public class QTableFrame extends JFrame{
 	
@@ -29,14 +18,25 @@ public class QTableFrame extends JFrame{
 	public QTableFrame(QTable qTable) {
 		// Creates Window
 		this.setTitle("Q Table");
-		this.setSize(new Dimension(800,600));
+		this.setSize(new Dimension(800,110)); // 27.5 * num filas
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLocation(801, 0);
 		
 		// Creates QTable
 		this.setQTable(qTable);
+
+		
 		//this.columnsNames = new String[]{ "s", "m", "r" };
-		this.columnsNames = new String[] {"ESTADO","UP", "DOWN", "LEFT", "RIGHT"};
+		this.columnsNames = new String[Constantes.NUM_ANGLES + 1] ;
+		
+		columnsNames[0] = "Estado";
+		for (int column_name = 1; column_name < this.columnsNames.length; column_name++) {
+			columnsNames[column_name] = Double.toString(-1+(0.25)*(column_name-1));
+			//System.out.println(columnsNames[column_name]);
+		}
+		
+		
+		
 		this.jTable = new JTable(this.data, columnsNames);
 		this.jTable.disable();
 		
@@ -45,14 +45,14 @@ public class QTableFrame extends JFrame{
 		this.add(jScrollPane);
 		this.setVisible(true);
 	}
-	
+
 	private void setQTableData() {
 		Integer size = this.qTable.size();
 		Integer i = 0;
 		
 		if(this.data == null) {
 			//this.data = new String[size * 4][3];
-			this.data = new String[size][5];
+			this.data = new String[size][Constantes.NUM_ANGLES+1];
 		}
 		
 		while (i < size) {
@@ -62,23 +62,24 @@ public class QTableFrame extends JFrame{
 				
 				if (this.data[i]== null) {
 					
-					String[] values = new String[MovePosition.values().length]; // 4 posiciones
+					String[] values = new String[Constantes.NUM_ANGLES+1]; 
 					values[0] = Integer.toString(i + 1); // estado
 					//values[1] = movePosition.toString(); // movimiento
-					values[1] = qCell.getReward(MovePosition.UP).toString();
-					values[2] = qCell.getReward(MovePosition.DOWN).toString();
-					values[3] = qCell.getReward(MovePosition.LEFT).toString();
-					values[4] = qCell.getReward(MovePosition.RIGHT).toString();
-					//System.out.println(qCell.getReward(movePosition));
-					//values[2] = qCell.getReward(movePosition).toString(); // recompensa
+					
+					for (int index = 1 ; index < Constantes.NUM_ANGLES+1; index++) {
+						System.out.println(index);
+						values[index] = qCell.getReward(index-1).toString();
+					}
+
 					this.data[i] = values;
 					
 				} else {
 					this.data[i][0] = Integer.toString(i); // estado
-					this.data[i][1] = qCell.getReward(MovePosition.UP).toString();
-					this.data[i][2] = qCell.getReward(MovePosition.DOWN).toString();
-					this.data[i][3] = qCell.getReward(MovePosition.LEFT).toString();
-					this.data[i][4] = qCell.getReward(MovePosition.RIGHT).toString();
+					for (int index = 1 ; index < Constantes.NUM_ANGLES+1; index++) {
+						
+						data[i][index] = qCell.getReward(index-1).toString();
+					}
+
 //					this.data[i][1] = movePosition.toString(); // movimiento
 //					this.data[i][2] = qCell.getReward(movePosition).toString(); // recompensa
 				}
@@ -96,6 +97,7 @@ public class QTableFrame extends JFrame{
 	
 	public void setQTable(QTable qTable) {
 		this.qTable = qTable;
+		//this.initQTableData();
 		this.setQTableData();
 	}
 	
