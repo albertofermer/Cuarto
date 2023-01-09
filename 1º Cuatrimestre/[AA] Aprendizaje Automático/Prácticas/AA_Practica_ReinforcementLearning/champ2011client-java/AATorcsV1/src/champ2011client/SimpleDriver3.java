@@ -272,7 +272,6 @@ public class SimpleDriver3 extends Controller{
 				
 		float steer = 0.0f;
 		
-		// Por cada episodio
 
 			if (porcentaje > 1.0)
 				porcentaje = 1.0;
