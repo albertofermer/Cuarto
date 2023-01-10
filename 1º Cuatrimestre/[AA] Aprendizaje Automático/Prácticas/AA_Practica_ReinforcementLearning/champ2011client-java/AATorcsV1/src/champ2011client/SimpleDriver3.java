@@ -238,8 +238,9 @@ public class SimpleDriver3 extends Controller{
 	        // build a CarControl variable and return it
 	        Action action = new Action ();
 	        action.gear = gear;
-	        System.out.println("Estado " +getSteerState(sensors.getTrackPosition()));
-	        System.out.println("Posicion " +sensors.getTrackPosition());
+	        System.out.println("Estado: " +getSteerState(sensors.getTrackPosition()));
+	        System.out.println("Posicion: " +sensors.getTrackPosition());
+	        System.out.println("Steer: " + steer);
 	        double porcentaje = getPorcentaje(sensors);
 	        //sensors.getAngleToTrackAxis()
 	        action.steering = steer;

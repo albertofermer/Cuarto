@@ -30,11 +30,16 @@ public class QTableFrame extends JFrame{
 		this.columnsNames = new String[Constantes.NUM_ANGLES + 1] ;
 		
 		columnsNames[0] = "Estado";
-		for (int column_name = 1; column_name < this.columnsNames.length; column_name++) {
-			columnsNames[column_name] = Double.toString(-1+(0.25)*(column_name-1));
+		//for (int column_name = 1; column_name < this.columnsNames.length; column_name++) {
+		//	columnsNames[column_name] = Double.toString(-1+(0.25)*(column_name-1));
 			//System.out.println(columnsNames[column_name]);
-		}
+		//}
 		
+		columnsNames[1] = Double.toString(-0.5);
+		columnsNames[2] = Double.toString(-0.1);
+		columnsNames[3] = Double.toString(0);
+		columnsNames[4] = Double.toString(0.1);
+		columnsNames[5] = Double.toString(0.5);
 		
 		
 		this.jTable = new JTable(this.data, columnsNames);

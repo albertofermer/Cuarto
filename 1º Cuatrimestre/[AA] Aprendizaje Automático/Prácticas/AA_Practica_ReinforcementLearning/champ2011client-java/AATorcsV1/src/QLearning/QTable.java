@@ -4,17 +4,25 @@ import java.util.List;
 import java.util.Random;
 
 // QTable para controlar el volante
-
 public class QTable {
 
 	QCell[] qTable;
 	Random randomGenerator;
+	private Double[] steer_values;
 
 	public QTable(Integer maxPositions) {
 		this.qTable = new QCell[maxPositions];
 		for (int i = 0; i < maxPositions; i++) {
 			qTable[i] = new QCell(Constantes.NUM_ANGLES); // hay 9 posibles ángulos para controlar el volante
 		}
+		
+		steer_values[0] = -0.5;
+		steer_values[1] = -0.1;
+		steer_values[2] = 0.0;
+		steer_values[3] = 0.1;
+		steer_values[4] = 0.5;
+		
+		
 		this.randomGenerator = new Random();
 	}
 	
@@ -47,7 +55,7 @@ public class QTable {
 			// anteriormente y el movimiento no está contenido en la blacklist
 			if (reward > bestReward) {
 				// Se actualiza la mejor posición
-				bestPosition = accion;
+				bestPosition = steer_values[accion];
 				// Se actualiza la recompensa
 				bestReward = reward;
 			}
@@ -67,15 +75,15 @@ public class QTable {
 	public Double setReward(Integer estado, Integer target, Integer accion, Double targetReward,
 		Integer targetBestMove) {
 		
-		Double currentQ = this.getReward(estado, accion);
-		Double maxFutureQ = this.getReward(target, targetBestMove);
+		Double previuousQ = this.getReward(estado, accion);
+		Double maxCurrentQ = this.getReward(target, targetBestMove);
 		Double learningRate = 0.15;
 		Double discountFactor = 0.1;
 		
-		currentQ = (1-learningRate)*currentQ + learningRate*(targetReward + discountFactor * maxFutureQ);
+		previuousQ = (1-learningRate)*previuousQ + learningRate*(targetReward + discountFactor * maxCurrentQ);
 
-		this.qTable[estado].setReward(accion, currentQ);
-		return currentQ;
+		this.qTable[estado].setReward(accion, previuousQ);
+		return previuousQ;
 
 	}
 
