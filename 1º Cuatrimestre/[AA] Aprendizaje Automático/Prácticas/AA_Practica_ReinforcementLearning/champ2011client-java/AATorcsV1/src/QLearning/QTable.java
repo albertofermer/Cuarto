@@ -74,7 +74,7 @@ public class QTable {
 		
 		Double previuousQ = this.getReward(estado, accion);
 		Double maxCurrentQ = this.getReward(target, targetBestMove);
-		Double learningRate = 0.5;
+		Double learningRate = 0.15;
 		Double discountFactor = 0.1;
 		
 		previuousQ = (1-learningRate)*previuousQ + learningRate*(targetReward + discountFactor * maxCurrentQ);

@@ -32,7 +32,7 @@ public class QTableFrame extends JFrame{
 		
 		columnsNames[0] = "Estado";
 		for (int column_name = 1; column_name < this.columnsNames.length; column_name++) {
-			columnsNames[column_name] = Float.toString(Constantes.steer_values[column_name-1]);
+			columnsNames[column_name] = Float.toString(Constantes.STEER_VALUES[column_name-1]);
 		}
 		
 		

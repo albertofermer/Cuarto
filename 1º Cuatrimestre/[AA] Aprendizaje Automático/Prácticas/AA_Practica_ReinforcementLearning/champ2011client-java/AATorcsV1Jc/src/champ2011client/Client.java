@@ -78,7 +78,7 @@ public class Client {
 				 */
 				
 				inMsg = mySocket.receive(UDP_TIMEOUT);
-				System.out.println("Reiniciando");
+				//System.out.println("Reiniciando");
 
 				if (inMsg != null) {
 
@@ -119,6 +119,7 @@ public class Client {
 		/*
 		 * Shutdown the controller
 		 */
+		
 		driver.shutdown();
 		mySocket.close();
 		System.out.println("Client shutdown.");

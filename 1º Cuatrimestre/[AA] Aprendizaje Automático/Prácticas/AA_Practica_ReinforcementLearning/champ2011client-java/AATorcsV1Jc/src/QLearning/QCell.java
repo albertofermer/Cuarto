@@ -22,4 +22,14 @@ public class QCell {
 		return rewards[accion];
 	}
 	
+	@Override
+	public String toString() {
+		
+		String str = "";
+		for (double reward : rewards) {
+			str += Double.toString(reward) + " \t ";
+		}
+		
+		return str;
+	}
 }

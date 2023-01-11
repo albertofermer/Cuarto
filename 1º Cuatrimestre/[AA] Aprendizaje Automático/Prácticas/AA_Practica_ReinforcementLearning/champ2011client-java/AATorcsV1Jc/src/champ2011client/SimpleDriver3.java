@@ -14,7 +14,7 @@ public class SimpleDriver3 extends Controller{
 	final int[]  gearDown={0,2000,2000,2000,3000,4000};
 
 	/* Stuck constants*/
-	final int  stuckTime = 250;
+	final int  stuckTime = 25;
 	final float  stuckAngle = (float) 0.523598775; //PI/6
 
 	/* Accel and Brake Constants*/
@@ -60,12 +60,17 @@ public class SimpleDriver3 extends Controller{
 	private static QTableFrame qTableFrame = new QTableFrame(qtable);
 	private Random randomGenerator = new Random();
 
+	public SimpleDriver3() {
+		qtable.loadQTable();
+		qTableFrame.setQTable(qtable);
+	}
 	
 	public void reset() {
 		System.out.println("Restarting the race!");
 	}
 
 	public void shutdown() {
+		qtable.saveQTable();
 		System.out.println("Bye bye!");		
 	}
 	
@@ -154,11 +159,7 @@ public class SimpleDriver3 extends Controller{
 	}
 
 	public Action control(SensorModel sensors){
-		
-		/**
-		 * QTable
-		 */
-	
+
 		
 		// check if car is currently stuck
 		if ( Math.abs(sensors.getAngleToTrackAxis()) > stuckAngle )
@@ -209,7 +210,7 @@ public class SimpleDriver3 extends Controller{
 	        
 	        // compute steering
 	        //float steer = getSteer(sensors);
-	        float steer = train(getSteerState(sensors.getTrackPosition()), 1, 0.9);
+	        float steer = train(getSteerState(sensors.getTrackPosition()), 1, 0.7);
 	        // normalize steering
 	        if (steer < -1)
 	            steer = -1;
@@ -313,19 +314,19 @@ public class SimpleDriver3 extends Controller{
 				// Obtiene la recompensa del estado actual
 				Double targetReward = 0.0;
 				switch (currentState) {
-					case 0: 
+					case 0: // centro
 						targetReward = 1000.0;
 						break;
-					case 1:
+					case 1: //centro-derecha
 						targetReward = 10.0;
 						break;
-					case 2:
+					case 2: // centro-izquierda
 						targetReward = 10.0;
 						break;
-					case 3:
+					case 3: //izquierda
 						targetReward = 1.0;
 						break;
-					case 4:
+					case 4: // derecha
 						targetReward = 1.0;
 						break;
 					default:
@@ -346,7 +347,7 @@ public class SimpleDriver3 extends Controller{
 			//////////////////////////////////////
 			System.out.println("-----------------------------");
 			
-		return Constantes.steer_values[qtable.getBestRewardPosition(currentState)];
+		return Constantes.STEER_VALUES[qtable.getBestRewardPosition(currentState)];
 		
 	}
 	

@@ -118,6 +118,7 @@ public class Client {
 		/*
 		 * Shutdown the controller
 		 */
+		
 		driver.shutdown();
 		mySocket.close();
 		System.out.println("Client shutdown.");
