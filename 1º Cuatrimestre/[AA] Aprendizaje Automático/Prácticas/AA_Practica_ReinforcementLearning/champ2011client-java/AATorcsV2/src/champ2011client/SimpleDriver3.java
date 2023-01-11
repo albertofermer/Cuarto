@@ -18,8 +18,8 @@ public class SimpleDriver3 extends Controller{
 	final float  stuckAngle = (float) 0.523598775; //PI/6
 
 	/* Accel and Brake Constants*/
-	final float maxSpeedDist=70;
-	final float maxSpeed=50;
+	final float maxSpeedDist=7;
+	final float maxSpeed=75;
 	final float sin5 = (float) 0.08716;
 	final float cos5 = (float) 0.99619;
 
@@ -255,7 +255,7 @@ public class SimpleDriver3 extends Controller{
 	        System.out.println("Steer: " + steer);
 	        System.out.println("Distancia Recorrida: " + sensors.getDistanceRaced());
 	        System.out.println("Distancia desde el inicio: " + sensors.getDistanceFromStartLine());
-	        double porcentaje = getPorcentaje(sensors);
+	        //double porcentaje = getPorcentaje(sensors);
 	        //sensors.getAngleToTrackAxis()
 	        action.steering = steer;
 
@@ -269,8 +269,8 @@ public class SimpleDriver3 extends Controller{
 	private double getPorcentaje(SensorModel sensors) {
 		
 		//System.out.println(sensors.getCurrentLapTime());
-		if (sensors.getCurrentLapTime() > 60.0) return 1;
-		else return 1;
+		if (sensors.getCurrentLapTime() > 60.0) return 1.0;
+		else return 0.90;
 		
 		
 		//return 0;
@@ -334,7 +334,7 @@ public class SimpleDriver3 extends Controller{
 					/**
 					 * Si el coche se sale de la carretera, entonces se recompensa negativamente.
 					 */
-					targetReward = -2.0;
+					targetReward = -1000.0;
 					Action action = new Action();
 					action.restartRace = true;
 					
