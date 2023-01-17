@@ -171,19 +171,19 @@ public class SimpleDriver3 extends Controller {
 		float steer = -1;
 		// compute steering
 		// float steer = getSteer(sensors);
-		System.out.println("TICK:" + tick);
-		if (tick % 100 == 0) {
+		if (tick % 10 == 0) {
 			System.out.println("APRENDIENDO");
 			steer = train(getSteerState(sensors.getTrackPosition()), false, 0.9, sensors);
 			oldSteer = steer;
 		} else
 			steer = oldSteer;
 
+		tick++;
+		
+		
 		if (steer == -1) {
 			System.out.println("########################################");
 		}
-		
-		tick++;
 //	        
 //	        System.out.println(sensors.getTrackPosition());
 

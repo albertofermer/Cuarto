@@ -62,24 +62,24 @@ public class QTable {
 
 	/**
 	 * Calcula el Q-valor
-	 * @param estado
-	 * @param target
+	 * @param estado_anterior
+	 * @param estado_actual
 	 * @param accion
 	 * @param targetReward
 	 * @param targetBestMove
 	 * @return
 	 */
-	public Double setReward(Integer estado, Integer target, Integer accion, Double targetReward,
+	public Double setReward(Integer estado_anterior, Integer estado_actual, Integer accion, Double targetReward,
 		Integer targetBestMove) {
 		
-		Double previuousQ = this.getReward(estado, accion);
-		Double maxCurrentQ = this.getReward(target, targetBestMove);
-		Double learningRate = 0.7;
+		Double previuousQ = this.getReward(estado_anterior, accion);
+		Double maxCurrentQ = this.getReward(estado_actual, targetBestMove);
+		Double learningRate = 0.15;
 		Double discountFactor = 0.3;
 		
 		previuousQ = (1-learningRate)*previuousQ + learningRate*(targetReward + discountFactor * maxCurrentQ);
 
-		this.qTable[estado].setReward(accion, previuousQ);
+		this.qTable[estado_anterior].setReward(accion, previuousQ);
 		return previuousQ;
 
 	}
