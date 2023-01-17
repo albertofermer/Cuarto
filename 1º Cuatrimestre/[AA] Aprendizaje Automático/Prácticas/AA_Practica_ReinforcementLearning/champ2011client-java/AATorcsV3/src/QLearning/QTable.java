@@ -27,8 +27,8 @@ public class QTable {
 		return this.qTable.length;
 	}
 
-	public Double getReward(Integer estado, int accion) {
-		return this.qTable[estado].getReward(accion);
+	public Double getReward(Integer source, int movement) {
+		return this.qTable[source].getReward(movement);
 	}
 
 	/**
@@ -39,43 +39,47 @@ public class QTable {
 	 */
 	public int getBestRewardPosition(Integer estado) {
 		// Escoge un movimiento aleatorio.
-		int maxAction = this.randomGenerator.nextInt(Constantes.NUM_ANGLES);
+		int bestPosition = this.randomGenerator.nextInt(Constantes.NUM_ANGLES);
 		// Obtenemos la recompensa actual del mejor movimiento.
-		Double maxValue = this.getReward(estado, maxAction);
+		Double bestReward = this.getReward(estado, bestPosition);
 		
-		// Elegimos la acción que proporciona máxima recompensa en el estado.
-		
+		// Por cada accion posible.
 		for (int accion = 0; accion < Constantes.NUM_ANGLES; accion++) {
+			// Se obtiene la recompensa del estado siguiente
 			Double reward = getReward(estado, accion);
-			if (reward > maxValue) {
-				// Actualizamos la mejor acción y mejor valor.
-				maxAction = accion;
-				maxValue = reward;
+			
+			// Si la recompensa del movimiento es mejor que la del mejor movimiento calculado
+			// anteriormente y el movimiento no está contenido en la blacklist
+			if (reward > bestReward) {
+				// Se actualiza la mejor posición
+				bestPosition = accion;
+				// Se actualiza la recompensa
+				bestReward = reward;
 			}
 		}
-		return maxAction;
+		return bestPosition;
 	}
 
 	/**
 	 * Calcula el Q-valor
-	 * @param estado_anterior
-	 * @param estado_actual
+	 * @param estado
+	 * @param target
 	 * @param accion
 	 * @param targetReward
 	 * @param targetBestMove
 	 * @return
 	 */
-	public Double setReward(Integer estado_anterior, Integer estado_actual, Integer accion_actual, Integer accion_anterior, Double targetReward,
+	public Double setReward(Integer estado, Integer target, Integer accion, Double targetReward,
 		Integer targetBestMove) {
 		
-		Double previuousQ = this.getReward(estado_anterior, accion_anterior);
-		Double maxCurrentQ = this.getReward(estado_actual, targetBestMove);
-		Double learningRate = 0.15;
-		Double discountFactor = 0.3;
+		Double previuousQ = this.getReward(estado, accion);
+		Double maxCurrentQ = this.getReward(target, targetBestMove);
+		Double learningRate = 0.5;
+		Double discountFactor = 0.1;
 		
 		previuousQ = (1-learningRate)*previuousQ + learningRate*(targetReward + discountFactor * maxCurrentQ);
 
-		this.qTable[estado_anterior].setReward(accion_anterior, previuousQ);
+		this.qTable[estado].setReward(accion, previuousQ);
 		return previuousQ;
 
 	}

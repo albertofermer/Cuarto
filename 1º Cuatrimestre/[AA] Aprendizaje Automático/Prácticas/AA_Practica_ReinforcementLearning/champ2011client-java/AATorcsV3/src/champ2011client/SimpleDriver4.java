@@ -7,7 +7,7 @@ import QLearning.Constantes;
 import QLearning.QTable;
 import QLearning.QTableFrame;
 
-public class SimpleDriver3 extends Controller {
+public class SimpleDriver4 extends Controller {
 
 	/* Gear Changing Constants */
 	final int[] gearUp = { 5000, 6000, 6000, 6500, 7000, 0 };
@@ -19,7 +19,7 @@ public class SimpleDriver3 extends Controller {
 
 	/* Accel and Brake Constants */
 	final float maxSpeedDist = 7;
-	final float maxSpeed = 50;
+	final float maxSpeed = 75;
 	final float sin5 = (float) 0.08716;
 	final float cos5 = (float) 0.99619;
 
@@ -45,11 +45,9 @@ public class SimpleDriver3 extends Controller {
 	final float clutchMaxTime = (float) 1.5;
 
 	Integer oldState;
-	Integer oldAction;
-	
 	Integer lastLap = 0;
 	Integer tick = 0;
-	float oldSteer;
+	Integer old_steer_angle;
 	private int stuck = 0;
 
 	// current clutch
@@ -69,7 +67,7 @@ public class SimpleDriver3 extends Controller {
 
 	SocketHandler mySocket;
 
-	public SimpleDriver3() {
+	public SimpleDriver4() {
 		qtable.loadQTable();
 		qTableFrame.setQTable(qtable);
 	}
@@ -104,6 +102,17 @@ public class SimpleDriver3 extends Controller {
 			return gear;
 	}
 
+//	private float getSteer(SensorModel sensors){
+//		// steering angle is compute by correcting the actual car angle w.r.t. to track 
+//		// axis [sensors.getAngle()] and to adjust car position w.r.t to middle of track [sensors.getTrackPos()*0.5]
+//	    float targetAngle=(float) (sensors.getAngleToTrackAxis()-sensors.getTrackPosition()*0.5);
+//	    // at high speed reduce the steering command to avoid loosing the control
+//	    if (sensors.getSpeed() > steerSensitivityOffset)
+//	        return (float) (targetAngle/(steerLock*(sensors.getSpeed()-steerSensitivityOffset)*wheelSensitivityCoeff));
+//	    else
+//	        return (targetAngle)/steerLock;
+//
+//	}
 
 	private float getAccel(SensorModel sensors) {
 		// checks if car is out of track
@@ -151,70 +160,116 @@ public class SimpleDriver3 extends Controller {
 
 	}
 
-	public Action control(SensorModel sensors, SocketHandler mySocket) {
-		this.mySocket = mySocket;
-		
-		// compute accel/brake command
-		float accel_and_brake = getAccel(sensors);
-		// compute gear
-		int gear = getGear(sensors);
+	public Action control(SensorModel sensors) {
 
-		float steer = -1;
-		// compute steering
-		// float steer = getSteer(sensors);
-		System.out.println("Tick: " + tick);
-		if (tick > 120) {
-			System.out.println("APRENDIENDO");
-			steer = train(getSteerState(sensors.getTrackPosition()), false, 0.999, sensors);
-			oldSteer = steer;
-		} else
-			steer = oldSteer;
-
-		tick++;
-		
-		
-		if (steer == -1) {
-			System.out.println("########################################");
+		if (Math.abs(sensors.getAngleToTrackAxis()) > stuckAngle) {
+			// update stuck counter
+			stuck++;
+		} else {
+			// if not stuck reset stuck counter
+			stuck = 0;
 		}
+
+		if (stuck > stuckTime) {
+			/*
+			 * set gear and sterring command assuming car is pointing in a direction out of
+			 * track
+			 */
+
+			// to bring car parallel to track axis
+			float steer = (float) (-sensors.getAngleToTrackAxis() / steerLock);
+			int gear = -1; // gear R
+
+			// if car is pointing in the correct direction revert gear and steer
+			if (sensors.getAngleToTrackAxis() * sensors.getTrackPosition() > 0) {
+				gear = 1;
+				steer = -steer;
+			}
+			clutch = clutching(sensors, clutch);
+			// build a CarControl variable and return it
+			Action action = new Action();
+			action.gear = gear;
+			action.steering = steer;
+			action.accelerate = 1.0;
+			action.brake = 0;
+			action.clutch = clutch;
+			
+			train(getSteerState(sensors.getTrackPosition()), false, getPorcentaje(sensors), sensors, true, true);
+			return action;
+			
+		} else {
+			tick++;
+			// compute accel/brake command
+			float accel_and_brake = getAccel(sensors);
+			// compute gear
+			int gear = getGear(sensors);
+
+			float steer = -1;
+			// compute steering
+			// float steer = getSteer(sensors);
+			boolean aprende = false;
+			if (tick >= 40) {
+				tick = 0;
+				aprende = true;
+				System.out.println("APRENDIENDO");
+			}
+
+			steer = train(getSteerState(sensors.getTrackPosition()), false, getPorcentaje(sensors), sensors, aprende, false);
 //	        
 //	        System.out.println(sensors.getTrackPosition());
 
 //	        // set accel and brake from the joint accel/brake command 
-		float accel, brake;
-		if (accel_and_brake > 0) {
-			accel = accel_and_brake;
-			brake = 0;
-		} else {
-			accel = 0;
-			// apply ABS to brake
-			brake = filterABS(sensors, -accel_and_brake);
-		}
+			float accel, brake;
+			if (accel_and_brake > 0) {
+				accel = accel_and_brake;
+				brake = 0;
+			} else {
+				accel = 0;
+				// apply ABS to brake
+				brake = filterABS(sensors, -accel_and_brake);
+			}
 //	        
-		clutch = clutching(sensors, clutch);
+			clutch = clutching(sensors, clutch);
 
 //	        
-		// build a CarControl variable and return it
-		Action action = new Action();
+			// build a CarControl variable and return it
+			Action action = new Action();
+//	        if(Math.abs(sensors.getTrackPosition()) > 1) {
+//	        	System.out.println("FUERA DE CARRETERA.");
+//	        	action.restartRace = true;
+//	        	steer = train(getSteerState(sensors.getTrackPosition()),false, getPorcentaje(sensors),sensors);
+//		        oldSteer = steer;
+//	        }
 
+			
 
-		if (oldState != getSteerState(sensors.getTrackPosition()))
+//	        System.out.println("Estado: " +getSteerState(sensors.getTrackPosition()));
+//	        System.out.println("Posicion: " +sensors.getTrackPosition());
+//	        System.out.println("Angulo: " + sensors.getAngleToTrackAxis());
+//	        System.out.println("Steer: " + steer);
+//	        System.out.println("Distancia Recorrida: " + sensors.getDistanceRaced());
+//	        System.out.println("Distancia desde el inicio: " + sensors.getDistanceFromStartLine());
+//	        System.out.println("Porcentaje: " + getPorcentaje(sensors)); 
+//	        System.out.println("-----------------------------");
+			// sensors.getAngleToTrackAxis()
+			if (steer == -1) {
+				System.out.println("########################################");
+			}
+			action.gear = gear;
 			action.steering = steer;
-		else
-			action.steering = oldSteer;
-
-		action.gear = gear;
-		action.steering = steer;
-		action.accelerate = accel;
-		action.brake = 0;
-		action.clutch = 0;
-		return action;
+			action.accelerate = accel;
+			action.brake = 0;
+			action.clutch = 0;
+			
+			return action;
+		}
 	}
 
 	private double getPorcentaje(SensorModel sensors) {
 		double porcentaje = 1.0;
 
 		// System.out.println(sensors.getCurrentLapTime());
-		if (sensors.getCurrentLapTime() > 60.0)
+		if (sensors.getCurrentLapTime() > 5.0)
 			return 1.0;
 		else
 			return 0.9;
@@ -224,113 +279,101 @@ public class SimpleDriver3 extends Controller {
 
 	private Integer getSteerState(double trackPosition) {
 		// derecha negativo izquierda positivo
+//		if (trackPosition <= 0.3 && trackPosition >= -0.3) return 0; // centro
+//		else if (trackPosition < -0.3 && trackPosition >=-0.6) return 1; // centro-derecha
+//		else if (trackPosition > 0.3 && trackPosition <= 0.6) return 2; // centro-izquierda
+//		else if (trackPosition > 0.6) return 3; //izquierda
+//		else if(trackPosition < - 0.6) return 4; // derecha
+
 		if (trackPosition <= 0.2 && trackPosition >= -0.2)
 			return 0; // centro
-		else if (trackPosition < -0.2 && trackPosition >= -0.5)
-			return 1; // centro-derecha
-		else if (trackPosition > 0.2 && trackPosition <= 0.5)
-			return 2; // centro-izquierda
-		else if (trackPosition > 0.5)
-			return 3; // izquierda
-		else if (trackPosition < -0.5)
-			return 4; // derecha
+		else if (trackPosition < -0.2 && trackPosition > -1.0)
+			return 1;
+		else if(trackPosition > 0.2 && trackPosition < 1.0)
+			return 2;
+		else if(trackPosition >= 1.0)
+			return 3;
+		else if(trackPosition <= -1.0)
+			return 4;
 
-		return null;
+		 return null;
 	}
 
-	public float train(Integer newState, Boolean isStuck, Double porcentaje, SensorModel sensors) {
+	public float train(Integer newState, Boolean isStuck, Double porcentaje, SensorModel sensors, boolean aprende, boolean stuck) {
 
-		// Si el estado anterior es nulo (es la primera evaluación) entonces lo hace con
-		// el mismo estado actual.
-		if (oldState == null) oldState = newState;
-		// Si el porcentaje es mayor que 1, lo deja en 1.
-		if (porcentaje > 1.0) porcentaje = 1.0;
-
-		// Paso 1. Escoger un movimiento.
-
-		// Elige la posición que obtenga una mayor recompensa a partir del estado
-		// actual. //EXPLOTA
-		Integer accion = qtable.getBestRewardPosition(newState);
-		
-		
-		
-		// Explora nuevos estados
-		if (this.randomGenerator.nextDouble() > porcentaje) {
-			// Elige un movimiento aleatorio
-			Integer sorted = this.randomGenerator.nextInt(Constantes.NUM_ANGLES);
-			accion = sorted;
-		}
-
-		
-		if (oldAction == null) oldAction = accion;
-		
-		// Obtiene la recompensa del estado actual
-
-		Double targetReward = 0.0;
-
-		if (Math.abs(sensors.getTrackPosition()) > 1) {
+		// after car is stuck for a while apply recovering policy
+		if (stuck) {
 			/**
-			 * Si el coche se sale de la carretera, entonces se recompensa negativamente.
+			 * Se encuentra STUCK. Recompensa negativa
 			 */
-			targetReward = -1000.0;
-			Action action = new Action();
-			action.restartRace = true;
-
-			/**
-			 * Antes de reiniciar deberíamos actualizar la tabla con una recompensa
-			 * negativa.
-			 */
-
-			Double reward = qtable.setReward(oldState, newState, accion, oldAction, targetReward,
-					getBestMoveFromTarget(newState));
-
-			System.out.println("Porcentaje: " + porcentaje);
-			System.out.println("Estado: " + getSteerState(sensors.getTrackPosition()));
-			System.out.println("Posicion: " + sensors.getTrackPosition());
-			System.out.println("Angulo: " + sensors.getAngleToTrackAxis());
-			System.out.println("Steer: " + Constantes.STEER_VALUES[accion]);
-			System.out.println("Recompensa: " + targetReward);
-			System.out.println("Distancia Recorrida: " + sensors.getDistanceRaced());
-			System.out.println("Distancia desde el inicio: " + sensors.getDistanceFromStartLine());
-			System.out.println("-----------------------------");
-			// Actualiza la ventana de la Q-Tabla
-			qtable.setReward(oldState, newState, accion, oldAction, targetReward, getBestMoveFromTarget(newState));
-			qTableFrame.setQTable(qtable);
 			
-			tick = 0;
-
-			mySocket.send(action.toString());
-
+			Integer best_steer_angle = old_steer_angle;
+			double reward = qtable.setReward(oldState, newState, best_steer_angle, -1000.0,
+					getBestMoveFromTarget(newState));
+			
+			System.out.println("\n\n ****PENALIZADO***** \n\n");
+			return -1; //No se va a usar en el control.
 		} else {
+			
+			/**
+			 * Si no está STUCK ejecuta movmientos
+			 */
+			float steer = 0.0f;
+			if (oldState == null)
+				oldState = newState;
+
+			if (porcentaje > 1.0)
+				porcentaje = 1.0;
+
+			
+			// Mientras no se llegue al estado objetivo
+
+			// Paso 1. Escoger un movimiento.
+
+			// Elige la posición que obtenga una mayor recompensa a partir del estado
+			// actual.
+			// EXPLOTA
+			Integer best_steer_angle = qtable.getBestRewardPosition(newState);
+
+			// Explora nuevos estados
+			if (this.randomGenerator.nextDouble() > porcentaje) { // EXPLORA
+				// Elige un movimiento aleatorio
+				Integer sorted = this.randomGenerator.nextInt(Constantes.NUM_ANGLES);
+				best_steer_angle = sorted;
+			}
+
+			// Obtiene la recompensa del estado actual
+
+			Double targetReward = 0.0;
+
 			/**
 			 * La recompensa será proporcional a la distancia recorrida (cuanto mayor
 			 * distancia, mayor recompensa) e inversamente proporcional a la distancia al
 			 * centro de la carretera (cuanto más cercano a 0, más recompensa).
 			 */
-			targetReward = sensors.getDistanceRaced() - Math.abs(Math.sin(sensors.getTrackPosition())) * 10;
-			targetReward = Math.pow(1/((Math.abs(sensors.getTrackPosition()))+1),4)*0.7;
+			//targetReward = sensors.getDistanceRaced() - Math.abs(Math.sin(sensors.getTrackPosition())) * 50;
 			// sensors.getDistanceFromStartLine()
 			// targetReward = 1/(Math.abs(sensors.getTrackPosition())+1);
 
-//			switch (newState) {
-//			case 0: // centro
-//				targetReward = 1000.0;
-//				break;
-//			case 1: // centro-derecha
-//				targetReward = 200.0;
-//				break;
-//			case 2: // centro-izquierda
-//				targetReward = 200.0;
-//				break;
-//			case 3: // izquierda
-//				targetReward = -100.0;
-//				break;
-//			case 4: // derecha
-//				targetReward = -100.0;
-//				break;
-//			default:
-//				System.out.println("ERROR");
-//			}
+					switch (newState) {
+					case 0: // centro
+						targetReward = 100.0;
+						break;
+					case 1: //centro-derecha
+						targetReward = -1.0;
+						break;
+					case 2: // centro-izquierda
+						targetReward = -1.0;
+						break;
+					case 3: //izquierda
+						targetReward = -100.0;
+						break;
+					case 4: // derecha
+						targetReward = -100.0;
+						break;
+					default:
+						System.out.println("ERROR");
+					}
 
 			// Se establece la recompensa para el estado anterior en función del estado
 			// actual.
@@ -339,21 +382,21 @@ public class SimpleDriver3 extends Controller {
 			System.out.println("Porcentaje: " + porcentaje);
 			System.out.println("Estado: " + getSteerState(sensors.getTrackPosition()));
 			System.out.println("Estado Antiguo: " + oldState);
-			System.out.println("Accion_Actual : " + Constantes.STEER_VALUES[accion]);
-			System.out.println("Accion_Anterior : " + Constantes.STEER_VALUES[oldAction]);
 			System.out.println("Posicion: " + sensors.getTrackPosition());
-			//System.out.println("Angulo: " + sensors.getAngleToTrackAxis());
-			//System.out.println("Steer: " + Constantes.STEER_VALUES[accion]);
+			System.out.println("Angulo: " + sensors.getAngleToTrackAxis());
+			System.out.println("Steer: " + Constantes.STEER_VALUES[best_steer_angle]);
 			System.out.println("Recompensa: " + targetReward);
 			System.out.println("Distancia Recorrida: " + sensors.getDistanceRaced());
 			System.out.println("Distancia desde el inicio: " + sensors.getDistanceFromStartLine());
 			System.out.println("-----------------------------");
-			reward = qtable.setReward(oldState, newState, accion, oldAction, targetReward,
-					getBestMoveFromTarget(newState));
+			if (aprende) {
+				reward = qtable.setReward(oldState, newState, best_steer_angle, targetReward,
+						getBestMoveFromTarget(newState));
+			}
 
 			oldState = newState;
+			old_steer_angle = best_steer_angle;
 		}
-
 		// Actualiza la ventana de la Q-Tabla
 
 		qTableFrame.setQTable(qtable);
@@ -362,9 +405,6 @@ public class SimpleDriver3 extends Controller {
 
 		//////////////////////////////////////
 
-		
-		oldAction = accion;
-		
 		return Constantes.STEER_VALUES[qtable.getBestRewardPosition(newState)];
 
 	}
