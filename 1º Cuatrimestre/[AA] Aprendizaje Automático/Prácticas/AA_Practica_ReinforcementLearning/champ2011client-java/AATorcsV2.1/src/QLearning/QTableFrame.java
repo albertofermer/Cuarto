@@ -37,7 +37,7 @@ public class QTableFrame extends JFrame{
 		
 		
 		this.jTable = new JTable(this.data, columnsNames);
-		this.jTable.disable();
+		this.jTable.disable();	
 		
 		// Display Data
 		this.jScrollPane = new JScrollPane(jTable);
