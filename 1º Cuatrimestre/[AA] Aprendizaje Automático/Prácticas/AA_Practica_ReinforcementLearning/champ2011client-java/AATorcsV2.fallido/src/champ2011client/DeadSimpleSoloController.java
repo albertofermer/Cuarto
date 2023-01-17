@@ -37,4 +37,10 @@ public class DeadSimpleSoloController extends Controller {
 		System.out.println("Bye bye!");		
 	}
 
+	@Override
+	public Action control(SensorModel sensors, SocketHandler mySocket) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
