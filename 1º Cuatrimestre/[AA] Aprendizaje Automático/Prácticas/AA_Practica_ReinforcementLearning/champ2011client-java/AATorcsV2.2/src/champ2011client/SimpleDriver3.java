@@ -161,7 +161,7 @@ public class SimpleDriver3 extends Controller {
 		// compute gear
 		int gear = getGear(sensors);
 
-		float steer = -1;
+		float steer = 0f;
 		// compute steering
 		// float steer = getSteer(sensors);
 		System.out.println("Tick: " + tick);
@@ -278,7 +278,7 @@ public class SimpleDriver3 extends Controller {
 			/**
 			 * Si el coche se sale de la carretera, entonces se recompensa negativamente.
 			 */
-			targetReward = -1000.0;
+			targetReward = -1000.0*Math.abs(sensors.getAngleToTrackAxis());
 			Action action = new Action();
 			action.restartRace = true;
 
@@ -289,7 +289,7 @@ public class SimpleDriver3 extends Controller {
 
 			Double reward = qtable.setReward(oldState, newState, accion, oldAction, targetReward,
 					getBestMoveFromTarget(newState));
-
+			
 			System.out.println("Porcentaje: " + porcentaje);
 			System.out.println("Estado: " + getSteerState(sensors.getTrackPosition()));
 			System.out.println("Posicion: " + sensors.getTrackPosition());

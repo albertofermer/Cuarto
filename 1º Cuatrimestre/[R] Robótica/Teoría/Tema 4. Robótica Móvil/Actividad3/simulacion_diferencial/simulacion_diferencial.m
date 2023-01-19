@@ -54,8 +54,6 @@ while ((t0+h*k) < tf)
     punto = camino(orden_minimo+25,:);
     
     % --- Controlador de Alto Nivel ----
-
-
     delta = (pose(1,k) - punto(1))*sin(pose(3,k))-(pose(2,k) - punto(2))*cos(pose(3,k));
     LH = sqrt( (pose(1,k) - punto(1))^2 + (pose(2,k) - punto(2))^2 );
     rho=(2*delta)/(LH^2);
