@@ -1,0 +1,7 @@
+Autor;Tema;Longitud;Sitio;Accion;
+conocido;nuevo;largo;casa;saltar;
+desconocido;nuevo;corto;trabajo;leer;
+desconocido;viejo;largo;trabajo;saltar;
+conocido;viejo;largo;casa;saltar;
+conocido;nuevo;corto;casa;leer;
+conocido;viejo;largo;trabajo;saltar;
