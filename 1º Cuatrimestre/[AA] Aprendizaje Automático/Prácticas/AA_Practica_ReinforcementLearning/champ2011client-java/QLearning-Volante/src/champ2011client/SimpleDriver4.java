@@ -55,7 +55,7 @@ public class SimpleDriver4 extends Controller {
 	Integer lastLap = 0;
 	Integer tick = 0;
 	float oldSteer;
-	double porcentaje = 0.9;
+	double porcentaje = 0.0;
 	boolean isStuck = false;
 	private int stuck = 0;
 	
@@ -99,7 +99,7 @@ public class SimpleDriver4 extends Controller {
 		qtable.saveQTable();
 		
 		// Escribe un fichero
-		d.write("datos"+indice_carreras);
+		//d.write("datos"+indice_carreras);
 		d = new Dato();
 		
 		if(contador_entrenamientos == 10) contador_entrenamientos = 0;
@@ -191,6 +191,7 @@ public class SimpleDriver4 extends Controller {
 		// compute steering
 		System.out.println("Tick: " + tick);
 		System.out.println("Entrenamiento: " + contador_entrenamientos);
+		System.out.println("Carrera #" + indice_carreras);
 		
 		
 		
@@ -280,12 +281,12 @@ public class SimpleDriver4 extends Controller {
 	private double getPorcentaje(SensorModel sensors) {
 		
 		if(iRestart == 4) {
-			porcentaje = porcentaje + 0.05;
+			porcentaje = porcentaje + 0.005;
 			iRestart = 0;
 		}
 		
-		if(porcentaje >= 1)
-			porcentaje = 1;
+		if(porcentaje >= 0.999)
+			porcentaje = 0.999;
 		
 		return porcentaje;
 		// return 0;
@@ -301,7 +302,7 @@ public class SimpleDriver4 extends Controller {
 		double trackPosition = sensors.getTrackPosition();
 		double carAngle = sensors.getAngleToTrackAxis();
 		
-		if (estaEntre(trackPosition,-0.2,0.2)) {
+		if (estaEntre(trackPosition,-0.01,0.01)) {
 			if(estaEntre(carAngle, -0.05, 0.05))
 				return 0; //centro - coche mira recto
 			else if(estaEntre(carAngle, 0.05, 0.5))
@@ -313,7 +314,7 @@ public class SimpleDriver4 extends Controller {
 			else if(estaEntre(carAngle,-1,-0.5))
 				return 4;
 			
-		}else if (trackPosition < -0.2) { //derecha
+		}else if (trackPosition < -0.01) { //derecha
 			if(estaEntre(carAngle, -0.05, 0.05))
 				return 5; //centro - coche mira recto
 			else if(estaEntre(carAngle, 0.01, 0.5))
@@ -325,7 +326,7 @@ public class SimpleDriver4 extends Controller {
 			else if(estaEntre(carAngle,-1,-0.5))
 				return 9;
 			
-		}else if (trackPosition > 0.2) { // Izq
+		}else if (trackPosition > 0.0001) { // Izq
 			if(estaEntre(carAngle, -0.05, 0.05))
 				return 10; //centro - coche mira recto
 			else if(estaEntre(carAngle, 0.05, 0.5))

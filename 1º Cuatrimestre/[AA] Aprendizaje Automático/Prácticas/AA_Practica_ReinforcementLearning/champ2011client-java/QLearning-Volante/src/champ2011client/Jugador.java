@@ -19,7 +19,7 @@ public class Jugador extends Controller {
 
 	/* Accel and Brake Constants */
 	final float maxSpeedDist = 1;
-	final float maxSpeed = 70;
+	final float maxSpeed = 90;
 	final float sin5 = (float) 0.08716;
 	final float cos5 = (float) 0.99619;
 
@@ -242,52 +242,57 @@ public class Jugador extends Controller {
 		return Constantes.STEER_VALUES[steer];
 	}
 
+	private boolean estaEntre(double valor, double minimo, double maximo) {
+		return (minimo <= valor && valor <= maximo);
+		
+	}
+	
 	private Integer getSteerState(SensorModel sensors) {
 		// derecha negativo izquierda positivo
 		double trackPosition = sensors.getTrackPosition();
 		double carAngle = sensors.getAngleToTrackAxis();
 		
-		if (trackPosition <= 0.2 && trackPosition >= -0.2) {
-			if(carAngle == 0)
+		if (estaEntre(trackPosition,-0.01,0.01)) {
+			if(estaEntre(carAngle, -0.05, 0.05))
 				return 0; //centro - coche mira recto
-			else if(carAngle > 0 && carAngle < 0.05)
+			else if(estaEntre(carAngle, 0.05, 0.5))
 				return 1; //centro - coche mira der
-			else if(carAngle < 0 && carAngle > -0.05)
+			else if(estaEntre(carAngle,-0.5,-0.05))
 				return 2; //centro - coche mira izq
-			else if(carAngle >=0.05)
+			else if(estaEntre(carAngle,0.5,1))
+				return 3;
+			else if(estaEntre(carAngle,-1,-0.5))
 				return 4;
-			else if(carAngle <= -0.05)
-				return 5;
 			
-		}else if (trackPosition < -0.2) { //derecha
-			if(carAngle == 0)
-				return 6; //Der - coche mira recto
-			else if(carAngle > 0 && carAngle < 0.05)
-				return 7; //Der - coche mira der
-			else if(carAngle < 0 && carAngle > -0.05)
-				return 8; //Der - coche mira izq
-			else if(carAngle >=0.05)
+		}else if (trackPosition < -0.01) { //derecha
+			if(estaEntre(carAngle, -0.05, 0.05))
+				return 5; //centro - coche mira recto
+			else if(estaEntre(carAngle, 0.01, 0.5))
+				return 6; //centro - coche mira der
+			else if(estaEntre(carAngle,-0.5,-0.05))
+				return 7; //centro - coche mira izq
+			else if(estaEntre(carAngle,0.5,1))
+				return 8;
+			else if(estaEntre(carAngle,-1,-0.5))
 				return 9;
-			else if(carAngle <= -0.05)
-				return 10;
 			
-		}else if (trackPosition > 0.2) { // Izq
-			if(carAngle == 0)
-				return 11; //Izq - coche mira recto
-			else if(carAngle > 0 && carAngle < 0.05)
-				return 12; //Izq - coche mira der
-			else if(carAngle < 0 && carAngle > -0.05)
-				return 13; //Izq - coche mira izq
-			else if(carAngle >=0.05)
+		}else if (trackPosition > 0.0001) { // Izq
+			if(estaEntre(carAngle, -0.05, 0.05))
+				return 10; //centro - coche mira recto
+			else if(estaEntre(carAngle, 0.05, 0.5))
+				return 11; //centro - coche mira der
+			else if(estaEntre(carAngle,-0.5,-0.05))
+				return 12; //centro - coche mira izq
+			else if(estaEntre(carAngle,0.5,1))
+				return 13;
+			else if(estaEntre(carAngle,-1,-0.5))
 				return 14;
-			else if(carAngle <= -0.05)
-				return 15;
-			
 		}
 
 
 		return null;
 	}
+
 
 	// Para calcular la maxFutureQ en la QTable
 	private Integer getBestMoveFromTarget(Integer nextState) {
