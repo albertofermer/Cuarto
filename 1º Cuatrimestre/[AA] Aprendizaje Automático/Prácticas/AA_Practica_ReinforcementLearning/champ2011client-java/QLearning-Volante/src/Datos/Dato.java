@@ -1,5 +1,6 @@
 package Datos;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,62 +10,75 @@ import QLearning.Constantes;
 
 public class Dato {
 
-	private ArrayList<Double> recompensa_acumulada;
-	private ArrayList<Integer> ticks_duracion;
-	private ArrayList<Double> longitud_recorrida;
-	private ArrayList<Float> angulos_volante;
-	private ArrayList<Double> posicion_carretera;
-	private ArrayList<Double> epsilon;
+	private Double longitud_recorrida;
+	private Double posicion_carretera;
+	private Double epsilon;
+	private Double distancia_punto_comienzo;
+	private Integer ticks_duracion;
+	private Integer indice_carrera;
+	private Float angulo_volante;
 
 	public Dato() {
-		recompensa_acumulada = new ArrayList<>();
-		ticks_duracion = new ArrayList<>();
-		longitud_recorrida = new ArrayList<>();
-		angulos_volante = new ArrayList<>();
-		posicion_carretera = new ArrayList<>();
-		epsilon = new ArrayList<>();
 	}
 
-	public void addRecompensa(Double recompensa) {
-		this.recompensa_acumulada.add(recompensa);
+	public void setLongitud_recorrida(Double longitud_recorrida) {
+		this.longitud_recorrida = longitud_recorrida;
 	}
 
-	public void addTick(Integer tick) {
-		this.ticks_duracion.add(tick);
+	public void setPosicion_carretera(Double posicion_carretera) {
+		this.posicion_carretera = posicion_carretera;
 	}
 
-	public void addLongitudRecorrida(Double longitud) {
-		this.longitud_recorrida.add(longitud);
+	public void setEpsilon(Double epsilon) {
+		this.epsilon = epsilon;
 	}
 
-	public void addAnguloVolante(float steer_angle) {
-		this.angulos_volante.add(steer_angle);
+	public void setDistancia_punto_comienzo(Double distancia_punto_comienzo) {
+		this.distancia_punto_comienzo = distancia_punto_comienzo;
 	}
 
-	public void addTrackPosition(Double tp) {
-		this.posicion_carretera.add(tp);
+	public void setTicks_duracion(Integer ticks_duracion) {
+		this.ticks_duracion = ticks_duracion;
 	}
 
-	public void addEpsilon(Double epsilon) {
-		this.epsilon.add(epsilon);
+	public void setIndice_carrera(Integer indice_carrera) {
+		this.indice_carrera = indice_carrera;
 	}
-	
+
+	public void setAngulo_volante(Float angulo_volante) {
+		this.angulo_volante = angulo_volante;
+	}
+
+	public void writeHeader(String file_name) {
+		String str = "#CARRERA;TICK;STEER_ANGLE;TRACK_POSITION;EPSILON;DIST_RACED;DIST_FROM_START_LINE;"
+				+ "RECOMPENSA_ACUMULADA;\n";
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter(file_name + ".csv"));
+			writer.append(str);
+			writer.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public void write(String file_name) {
 		// Escribe los angulos del volante en columnas para representarlo posteriormente
 		String str = "";
-		for(int i = 0; i<angulos_volante.size(); i++) {
-			str += i + ";"; // Tick
-			str += angulos_volante.get(i) + ";";
-			str += posicion_carretera.get(i) + ";";
-			
-			str += "\n"; // Salto de linea
-		}
-		
+		str += indice_carrera + ";";
+		str += ticks_duracion + ";";
+		str += angulo_volante + ";";
+		str += posicion_carretera + ";";
+		str += epsilon + ";";
+		str += longitud_recorrida + ";";
+		str += distancia_punto_comienzo + ";";
+		str += "\n";
+
 		try {
-			FileWriter writer = new FileWriter(file_name+".csv");
-			writer.write(str);
+			BufferedWriter writer = new BufferedWriter(new FileWriter(file_name + ".csv", true));
+			writer.append(str);
 			writer.close();
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

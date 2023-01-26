@@ -19,7 +19,7 @@ public class Jugador extends Controller {
 
 	/* Accel and Brake Constants */
 	final float maxSpeedDist = 1;
-	final float maxSpeed = 90;
+	final float maxSpeed = 50;
 	final float sin5 = (float) 0.08716;
 	final float cos5 = (float) 0.99619;
 
@@ -252,40 +252,40 @@ public class Jugador extends Controller {
 		double trackPosition = sensors.getTrackPosition();
 		double carAngle = sensors.getAngleToTrackAxis();
 		
-		if (estaEntre(trackPosition,-0.01,0.01)) {
-			if(estaEntre(carAngle, -0.05, 0.05))
-				return 0; //centro - coche mira recto
-			else if(estaEntre(carAngle, 0.05, 0.5))
-				return 1; //centro - coche mira der
-			else if(estaEntre(carAngle,-0.5,-0.05))
-				return 2; //centro - coche mira izq
-			else if(estaEntre(carAngle,0.5,1))
+		if (estaEntre(trackPosition, Constantes.CENTRO_MIN, Constantes.CENTRO_MAX)) {
+			if (estaEntre(carAngle, Constantes.STEER_RECTO_MIN, Constantes.STEER_RECTO_MAX))
+				return 0; // centro - coche mira recto
+			else if (estaEntre(carAngle, Constantes.STEER_RECTO_MAX, Constantes.STEER_IZQUIERDA))
+				return 1; // centro - coche mira der
+			else if (estaEntre(carAngle, Constantes.STEER_DERECHA, Constantes.STEER_RECTO_MIN))
+				return 2; // centro - coche mira izq
+			else if (estaEntre(carAngle, Constantes.STEER_IZQUIERDA, 1))
 				return 3;
-			else if(estaEntre(carAngle,-1,-0.5))
+			else if (estaEntre(carAngle, -1, Constantes.STEER_DERECHA))
 				return 4;
-			
-		}else if (trackPosition < -0.01) { //derecha
-			if(estaEntre(carAngle, -0.05, 0.05))
-				return 5; //centro - coche mira recto
-			else if(estaEntre(carAngle, 0.01, 0.5))
-				return 6; //centro - coche mira der
-			else if(estaEntre(carAngle,-0.5,-0.05))
-				return 7; //centro - coche mira izq
-			else if(estaEntre(carAngle,0.5,1))
+
+		} else if (trackPosition < Constantes.CENTRO_MIN) { // derecha
+			if (estaEntre(carAngle, Constantes.STEER_RECTO_MIN, Constantes.STEER_RECTO_MAX))
+				return 5; // centro - coche mira recto
+			else if (estaEntre(carAngle, Constantes.STEER_RECTO_MAX, Constantes.STEER_IZQUIERDA))
+				return 6; // centro - coche mira der
+			else if (estaEntre(carAngle, Constantes.STEER_DERECHA, Constantes.STEER_RECTO_MIN))
+				return 7; // centro - coche mira izq
+			else if (estaEntre(carAngle, Constantes.STEER_IZQUIERDA, 1))
 				return 8;
-			else if(estaEntre(carAngle,-1,-0.5))
+			else if (estaEntre(carAngle, -1, Constantes.STEER_DERECHA))
 				return 9;
-			
-		}else if (trackPosition > 0.0001) { // Izq
-			if(estaEntre(carAngle, -0.05, 0.05))
-				return 10; //centro - coche mira recto
-			else if(estaEntre(carAngle, 0.05, 0.5))
-				return 11; //centro - coche mira der
-			else if(estaEntre(carAngle,-0.5,-0.05))
-				return 12; //centro - coche mira izq
-			else if(estaEntre(carAngle,0.5,1))
+
+		} else if (trackPosition > Constantes.CENTRO_MAX) { // Izq
+			if (estaEntre(carAngle, Constantes.STEER_RECTO_MIN, Constantes.STEER_RECTO_MAX))
+				return 10; // centro - coche mira recto
+			else if (estaEntre(carAngle, Constantes.STEER_RECTO_MAX, Constantes.STEER_IZQUIERDA))
+				return 11; // centro - coche mira der
+			else if (estaEntre(carAngle, Constantes.STEER_DERECHA, Constantes.STEER_RECTO_MIN))
+				return 12; // centro - coche mira izq
+			else if (estaEntre(carAngle, Constantes.STEER_IZQUIERDA, 1))
 				return 13;
-			else if(estaEntre(carAngle,-1,-0.5))
+			else if (estaEntre(carAngle, -1, Constantes.STEER_DERECHA))
 				return 14;
 		}
 
