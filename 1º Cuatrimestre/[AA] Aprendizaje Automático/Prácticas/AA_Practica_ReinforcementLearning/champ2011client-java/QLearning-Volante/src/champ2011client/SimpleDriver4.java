@@ -48,6 +48,7 @@ public class SimpleDriver4 extends Controller {
 	Integer contador_entrenamientos = 0; // se resetea
 	Double recompensa_acumulada = 0.0;
 	Integer indice_carreras = 0; // no se resetea
+	private int contador_vueltas = 0;
 
 	Integer lastLap = 0;
 	Integer tick = 0;
@@ -67,6 +68,16 @@ public class SimpleDriver4 extends Controller {
 	private static QTableFrame qTableFrame_steer = new QTableFrame(qtable_steer);
 	private Random randomGenerator = new Random();
 	/////////////////////////////////////////////////////////////////////////
+	
+	private float last_steer;
+	private double last_trackPosition;
+	private double last_distRaced;
+	private double last_distFromStartLine;
+	
+	private boolean carrera_terminada = false;
+	
+	
+	
 	SocketHandler mySocket;
 
 	public SimpleDriver4() {
@@ -78,13 +89,24 @@ public class SimpleDriver4 extends Controller {
 
 	public void reset() {
 
+		if (contador_entrenamientos == Constantes.CARRERA_JUGADOR) {
+			/* Escribimos los datos que vamos a sacar para hacer gráficas */
+			datos.setIndice_carrera(indice_carreras);
+			datos.setTicks_duracion(tick);
+			datos.setLongitud_recorrida(last_distRaced);
+			datos.setEpsilon(1-porcentaje);
+			datos.writeDistRaced(Constantes.FILE_NAME);
+		}
+		
 		iRestart++;
 		contador_entrenamientos++;
 		indice_carreras++;
 		tick = 0;
 		recompensa_acumulada = 0.0;
+		contador_vueltas = 0;
 
 		qtable_steer.saveQTable();
+
 
 		if (contador_entrenamientos == Constantes.CARRERA_JUGADOR + 1)
 			contador_entrenamientos = 0;
@@ -93,7 +115,14 @@ public class SimpleDriver4 extends Controller {
 
 	public void shutdown() {
 		qtable_steer.saveQTable();
-		// datos.write("datos_Jugador");
+		if (contador_entrenamientos == Constantes.CARRERA_JUGADOR) {
+			/* Escribimos los datos que vamos a sacar para hacer gráficas */
+			datos.setIndice_carrera(indice_carreras);
+			datos.setTicks_duracion(tick);
+			datos.setLongitud_recorrida(last_distRaced);
+			datos.setEpsilon(1-porcentaje);
+			datos.writeDistRaced(Constantes.FILE_NAME);
+		}
 		System.out.println("Bye bye!");
 	}
 
@@ -164,6 +193,14 @@ public class SimpleDriver4 extends Controller {
 	}
 
 	public Action control(SensorModel sensors, SocketHandler mySocket) {
+		
+		if (sensors.getLastLapTime() > 0.0) {
+			System.out.println("VUELTA TERMINADA!");
+			Action restart = new Action();
+			restart.restartRace = true;
+			return restart;
+		}
+		
 		this.mySocket = mySocket;
 
 		// compute accel/brake command
@@ -173,6 +210,7 @@ public class SimpleDriver4 extends Controller {
 
 		float steer;
 		// compute steering
+		
 		System.out.println("Tick: " + tick);
 		System.out.println("Entrenamiento: " + contador_entrenamientos);
 		System.out.println("Carrera #" + indice_carreras);
@@ -242,7 +280,7 @@ public class SimpleDriver4 extends Controller {
 	}
 
 	private float play(SensorModel sensors) {
-
+		
 		if (Math.abs(sensors.getTrackPosition()) > 1) {
 
 			isStuck = true;
@@ -251,18 +289,9 @@ public class SimpleDriver4 extends Controller {
 
 		Integer state = getSteerState(sensors);
 		int steer = qtable_steer.getBestRewardPosition(state);
-
-		/* Escribimos los datos que vamos a sacar para hacer gráficas */
-		datos.setIndice_carrera(indice_carreras);
-		datos.setTicks_duracion(tick);
-		datos.setAngulo_volante(Constantes.STEER_VALUES[steer]);
-		datos.setPosicion_carretera(sensors.getTrackPosition());
-		datos.setEpsilon(1 - porcentaje);
-		datos.setLongitud_recorrida(sensors.getDistanceRaced());
-		datos.setDistancia_punto_comienzo(sensors.getDistanceFromStartLine());
-
-		datos.write(Constantes.FILE_NAME);
-
+		
+		last_distRaced = sensors.getDistanceRaced();
+		
 		return Constantes.STEER_VALUES[steer];
 	}
 
@@ -338,6 +367,10 @@ public class SimpleDriver4 extends Controller {
 		// actual. //EXPLOTA
 		Integer accion = qtable_steer.getBestRewardPosition(newState);
 
+
+		if (porcentaje > 1.0)
+			porcentaje = 1.0;
+		
 		// Explora nuevos estados
 		if (this.randomGenerator.nextDouble() > porcentaje) {
 			// Elige un movimiento aleatorio
@@ -353,8 +386,6 @@ public class SimpleDriver4 extends Controller {
 		if (oldAction == null)
 			oldAction = accion;
 
-		if (porcentaje > 1.0)
-			porcentaje = 1.0;
 
 		// Double targetReward = 0.0;
 

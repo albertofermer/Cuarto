@@ -50,8 +50,8 @@ public class Dato {
 	}
 
 	public void writeHeader(String file_name) {
-		String str = "#CARRERA;TICK;STEER_ANGLE;TRACK_POSITION;EPSILON;DIST_RACED;DIST_FROM_START_LINE;"
-				+ "RECOMPENSA_ACUMULADA;\n";
+		String str = "#CARRERA;TICK;EPSILON;DIST_RACED"
+				+ "\n";
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file_name + ".csv"));
 			writer.append(str);
@@ -82,6 +82,26 @@ public class Dato {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void writeDistRaced(String file_name) {
+		// Escribe los angulos del volante en columnas para representarlo posteriormente
+		String str = "";
+		str += indice_carrera + ";";
+		str += ticks_duracion + ";";
+		str += epsilon + ";";
+		str += longitud_recorrida;
+		str += "\n";
+
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter(file_name + ".csv", true));
+			writer.append(str);
+			writer.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 }
