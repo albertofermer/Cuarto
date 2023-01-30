@@ -1,4 +1,4 @@
-package Velocidad;
+package zbVelocidad;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -90,7 +90,7 @@ public class TrainVelocidad extends Controller {
 	private boolean carrera_terminada = false;
 
 	private String name_qtable = "qtable_velocidad";
-	private String name_politica = "volante";
+	private String name_politica = "velocidad";
 	String name_datos = Constantes.FILE_NAME + "_velocidad";
 
 	ArrayList<float[]> recompensa = new ArrayList<>();
@@ -100,7 +100,7 @@ public class TrainVelocidad extends Controller {
 
 	public TrainVelocidad() {
 		politica_volante = new Politica();
-		politica_volante.loadPolitica(name_politica);
+		politica_volante.loadPolitica("volante");
 
 		datos = new Dato();
 		qtable_velocidad.loadQTable(name_qtable);
@@ -138,7 +138,7 @@ public class TrainVelocidad extends Controller {
 
 	public void shutdown() {
 		qtable_velocidad.saveQTable(name_qtable);
-		// Politica.savePolitica(name_politica, qtable_velocidad);
+		Politica.savePolitica(name_politica, qtable_velocidad, Constantes.VEL_VALUES);
 
 		if (contador_entrenamientos == Constantes.CARRERA_JUGADOR) {
 			/* Escribimos los datos que vamos a sacar para hacer grÃ¡ficas */
@@ -192,7 +192,7 @@ public class TrainVelocidad extends Controller {
 		int gear = getGear(sensors);
 
 		// compute steering
-		float steer = politica_volante.getSteer(getSteerState(sensors));
+		float steer = politica_volante.getAccion(getSteerState(sensors))[0];
 		float accel = 0.0f;
 		float brake = 0.0f;
 
@@ -241,7 +241,7 @@ public class TrainVelocidad extends Controller {
 
 		/**
 		 * Si el coche no se mueve, al menos, una diferencia de 5 metros en 10 ticks, se
-		 * reinicia el juego y se puntúa negativamente.
+		 * reinicia el juego y se puntï¿½a negativamente.
 		 */
 		System.out.println(Math.abs(sensors.getTrackPosition() - oldTrackPosition));
 		if (Math.abs(sensors.getTrackPosition() - oldTrackPosition) <= 0.001 && sensors.getSpeed() < 1) {
@@ -252,7 +252,7 @@ public class TrainVelocidad extends Controller {
 			count_tick = 0;
 		}
 
-		// Actualiza la posición de referencia cada X ticks.
+		// Actualiza la posiciï¿½n de referencia cada X ticks.
 		if (tick > Constantes.TICK_COMIENZO && tick % Constantes.TICKS_ESPERA == 0) {
 			oldTrackPosition = sensors.getTrackPosition();
 		}
@@ -273,27 +273,11 @@ public class TrainVelocidad extends Controller {
 		return action;
 	}
 
-	private void recompensar(SensorModel sensors, ArrayList<float[]> recompensa, char modo) {
-		Double reward = (tick - bestLapTick) * 100;
-		reward = Math.pow((sensors.getSpeed() / 260.0f), 4);
-		if (modo == '-')
-			reward = -1000.0;
-
-		for (int i = recompensa.size() - 1; i >= 0; i--) {
-			float[] accion_reward = recompensa.get(i);
-			float factor_recompensa = (float) Math.exp(i / recompensa.size());
-			reward = factor_recompensa * reward;
-			qtable_velocidad.setReward(Integer.valueOf((int) accion_reward[0]), Integer.valueOf((int) accion_reward[1]),
-					Integer.valueOf((int) accion_reward[2]), Integer.valueOf((int) accion_reward[3]), reward,
-					getBestMoveFromTarget((int) accion_reward[1]));
-		}
-	}
-
 	private float[] play(SensorModel sensors) {
 
 		Integer state = getSpeedState(sensors);
 
-		if (/*state == 10*/ Math.abs(sensors.getTrackPosition()) >= 1.3 || count_tick > Constantes.TICKS_ESPERA) {
+		if (/*state == 10*/ Math.abs(sensors.getTrackPosition()) == 1.3 || count_tick > Constantes.TICKS_ESPERA) {
 			isStuck = true;
 			float[] default_value = { 0f, 0f };
 			return default_value;
@@ -307,7 +291,7 @@ public class TrainVelocidad extends Controller {
 
 	private double getPorcentaje(SensorModel sensors) {
 
-		if (iRestart >= Constantes.MAX_CARRERAS_INCREMENTO_PORCENTAJE) {
+		if (iRestart == Constantes.MAX_CARRERAS_INCREMENTO_PORCENTAJE) {
 			porcentaje += Constantes.INCREMENTO_PORCENTAJE;
 			iRestart = 0;
 		}
@@ -421,21 +405,11 @@ public class TrainVelocidad extends Controller {
 		if (oldAction == null)
 			oldAction = accion;
 
-		if (/*newState == 10 || */ Math.abs(sensors.getTrackPosition()) >= 1.3 || count_tick > Constantes.TICKS_ESPERA) {
+		if (/*newState == 10 || */ Math.abs(sensors.getTrackPosition()) >= 1.1 || count_tick > Constantes.TICKS_ESPERA) {
 			/**
 			 * Si el coche se sale de la carretera, entonces se recompensa negativamente.
 			 */
 
-//			if (tick > bestLapTick) {
-//				float[] accion_recompensa = new float[4];
-//				accion_recompensa[0] = oldState;
-//				accion_recompensa[1] = newState;
-//				accion_recompensa[2] = accion;
-//				accion_recompensa[3] = oldAction;
-//
-//				recompensa.add(accion_recompensa);
-//				recompensar(sensors, recompensa, '-');
-//			}
 			/**
 			 * Antes de reiniciar deberiamos actualizar la tabla con una recompensa
 			 * negativa.
