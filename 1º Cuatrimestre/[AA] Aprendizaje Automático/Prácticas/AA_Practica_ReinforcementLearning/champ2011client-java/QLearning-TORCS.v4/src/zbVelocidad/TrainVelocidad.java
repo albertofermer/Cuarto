@@ -62,6 +62,7 @@ public class TrainVelocidad extends Controller {
 	float oldBrake;
 	double oldTrackPosition = 0.0;
 	int count_tick = 0;
+	double last_lapTime = 0.0;
 
 	double porcentaje = Constantes.PORCENTAJE_INICIAL;
 	boolean isStuck = false;
@@ -118,7 +119,9 @@ public class TrainVelocidad extends Controller {
 			datos.setTicks_duracion(tick);
 			datos.setLongitud_recorrida(last_distRaced);
 			datos.setEpsilon(1 - porcentaje);
-			datos.writeDistRaced(name_datos);
+			datos.setTiempo_vuelta(last_lapTime);
+			
+			datos.write(name_datos);
 		}
 
 		iRestart++;
@@ -141,12 +144,13 @@ public class TrainVelocidad extends Controller {
 		Politica.savePolitica(name_politica, qtable_velocidad, Constantes.VEL_VALUES);
 
 		if (contador_entrenamientos == Constantes.CARRERA_JUGADOR) {
-			/* Escribimos los datos que vamos a sacar para hacer gráficas */
+			/* Escribimos los datos que vamos a sacar para hacer graficas */
 			datos.setIndice_carrera(indice_carreras);
 			datos.setTicks_duracion(tick);
 			datos.setLongitud_recorrida(last_distRaced);
 			datos.setEpsilon(1 - porcentaje);
 			datos.writeDistRaced(name_datos);
+			datos.setTiempo_vuelta(last_lapTime);
 		}
 
 		System.out.println("Bye bye!");
@@ -286,6 +290,7 @@ public class TrainVelocidad extends Controller {
 		int vel = qtable_velocidad.getBestRewardPosition(state);
 
 		last_distRaced = sensors.getDistanceRaced();
+		last_lapTime = sensors.getCurrentLapTime();
 		return Constantes.VEL_VALUES[vel];
 	}
 
