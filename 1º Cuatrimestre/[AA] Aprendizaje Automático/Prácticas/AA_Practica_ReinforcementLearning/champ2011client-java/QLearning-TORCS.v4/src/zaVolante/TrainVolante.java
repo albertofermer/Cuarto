@@ -87,7 +87,7 @@ public class TrainVolante extends Controller {
 	SocketHandler mySocket;
 
 	public TrainVolante() {
-		datos = new Dato();
+		datos = new Dato(Constantes.NUM_STATES_STEER, Constantes.NUM_ANGLES);
 		qtable_steer.loadQTable(name_qtable);
 		qTableFrame_steer.setQTable(qtable_steer);
 		datos.writeHeader(name_datos); // escribe el header.

@@ -104,7 +104,7 @@ public class TrainMarchas extends Controller {
 		politica_velocidad = new Politica();
 		politica_velocidad.loadPolitica("velocidad");
 		
-		datos = new Dato();
+		datos = new Dato(Constantes.NUM_STATES_GEAR, Constantes.NUM_GEAR);
 		qtable_marchas.loadQTable(name_qtable);
 		qTableFrame_velocidad.setQTable(qtable_marchas);
 		datos.writeHeader(name_datos); // escribe el header.

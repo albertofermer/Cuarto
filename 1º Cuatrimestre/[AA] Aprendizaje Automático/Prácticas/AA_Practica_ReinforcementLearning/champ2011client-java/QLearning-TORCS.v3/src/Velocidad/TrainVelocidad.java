@@ -178,7 +178,7 @@ public class TrainVelocidad extends Controller {
 		if (sensors.getLastLapTime() > 0.0) {
 
 			System.out.println("VUELTA TERMINADA!");
-			train(getSpeedState(sensors), getPorcentaje(sensors), sensors, true);
+			//train(getSpeedState(sensors), getPorcentaje(sensors), sensors, true);
 
 			recompensa = new ArrayList<>();
 			Action restart = new Action();

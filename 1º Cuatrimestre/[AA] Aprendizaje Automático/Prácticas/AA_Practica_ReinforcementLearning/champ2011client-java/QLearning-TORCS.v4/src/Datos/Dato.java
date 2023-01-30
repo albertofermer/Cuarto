@@ -19,9 +19,34 @@ public class Dato {
 	private Integer ticks_duracion;
 	private Integer indice_carrera;
 	private Float angulo_volante;
-	private ArrayList<HashMap<Float, Integer>> Dict_AccionValor;
+	private Double max_speed;
+	private boolean finished_lap = false;
+	private ArrayList<HashMap<Integer, Integer>> Dict_AccionValor;
+	
 
-	public Dato() {
+	public Dato(Integer num_estados, Integer num_acciones) {
+		Dict_AccionValor = new ArrayList<>(num_estados);
+		for (int i = 0 ; i < num_estados; i++) {
+			HashMap<Integer, Integer> hm = new HashMap<>();
+			for(int j = 0; j < num_acciones; j++) {
+				hm.put(j, 0);
+			}
+			Dict_AccionValor.add(hm);
+		}
+	}
+	
+	public void addAccionValor(Integer estado, Integer accion) {
+		
+		Integer value = Dict_AccionValor.get(estado).get(accion);
+		Dict_AccionValor.get(estado).replace(accion, value+1);
+		
+	}
+	
+	public void setMaxSpeed(double max_speed) {
+		this.max_speed = max_speed;
+	}
+	public void setFinishedLap(boolean bool) {
+		finished_lap = bool;
 	}
 
 	public void setLongitud_recorrida(Double longitud_recorrida) {
@@ -57,11 +82,10 @@ public class Dato {
 	}
 
 	public void writeHeader(String file_name) {
-		String str = "#CARRERA;TICK;TIEMPO_VUELTA;EPSILON;DIST_RACED;STEER_ANGLE;TRACKPOSITION;DIST_FROM_START"
+		String str = "#CARRERA;TICK;TIEMPO_VUELTA;EPSILON;DIST_RACED;DIST_STARTPOINT;MAX_SPEED;FINISHED_LAP"
 				+ "\n";
 		try {
 			File file = new File("Datos", file_name);
-			System.out.println(file.getAbsolutePath());
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file.getAbsolutePath() + ".csv"));
 			writer.append(str);
 			writer.close();
@@ -71,6 +95,31 @@ public class Dato {
 		}
 	}
 
+	
+	public void write_vel(String file_name) {
+		// Escribe los angulos del volante en columnas para representarlo posteriormente
+		String str = "";
+		str += indice_carrera + ";";
+		str += ticks_duracion + ";";
+		str += tiempo_vuelta + ";";
+		str += epsilon + ";";
+		str += longitud_recorrida + ";";
+		str += distancia_punto_comienzo + ";";
+		str += max_speed + ";";
+		str += finished_lap + ";";
+		str += "\n";
+
+		try {
+			File file = new File("Datos",file_name);
+			BufferedWriter writer = new BufferedWriter(new FileWriter(file.getAbsolutePath()+ ".csv", true));
+			writer.append(str);
+			writer.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void write(String file_name) {
 		// Escribe los angulos del volante en columnas para representarlo posteriormente
 		String str = "";
@@ -95,6 +144,23 @@ public class Dato {
 		}
 	}
 
+	
+	public void writeActUse(String file_name) {
+		String str = "";
+		str += Dict_AccionValor + "\n";
+		String directory = "Datos";
+		try {
+			File file = new File(directory, file_name);
+			BufferedWriter writer = new BufferedWriter(new FileWriter(file.getAbsolutePath()+".csv", true));
+			writer.append(str);
+			System.out.println(str);
+			writer.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void writeDistRaced(String file_name) {
 		// Escribe los angulos del volante en columnas para representarlo posteriormente
 		String str = "";

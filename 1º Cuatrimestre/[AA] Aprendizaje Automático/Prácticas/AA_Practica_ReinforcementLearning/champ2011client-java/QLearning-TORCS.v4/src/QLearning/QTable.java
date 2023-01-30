@@ -97,7 +97,7 @@ public class QTable {
 		String directory = "QTable";
 		File qtable = new File(directory, qtable_name);
 		try {
-			System.out.println(qtable.getAbsolutePath() + ".csv");
+			//System.out.println(qtable.getAbsolutePath() + ".csv");
 			FileWriter writer = new FileWriter(qtable.getAbsolutePath() + ".csv");
 			
 			String cabecera = "";
