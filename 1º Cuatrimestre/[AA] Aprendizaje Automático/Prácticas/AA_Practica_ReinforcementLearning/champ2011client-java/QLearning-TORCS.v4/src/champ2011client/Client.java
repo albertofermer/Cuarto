@@ -113,7 +113,7 @@ public class Client {
 					System.out.println("Server did not respond within the timeout");
 			}
 
-		} while (/*++curEpisode < maxEpisodes &&*/ !shutdownOccurred);
+		} while (true/*++curEpisode < maxEpisodes &&*/ ||  !shutdownOccurred);
 
 		/*
 		 * Shutdown the controller

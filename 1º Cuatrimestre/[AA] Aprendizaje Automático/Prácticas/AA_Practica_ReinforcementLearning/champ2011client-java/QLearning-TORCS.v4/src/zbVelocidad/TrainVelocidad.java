@@ -205,6 +205,13 @@ public class TrainVelocidad extends Controller {
 			restart.restartRace = true;
 			return restart;
 		}
+		
+		if (tick > 10000) {
+			System.out.println("TIEMPO AGOTADO!");
+			Action restart = new Action();
+			restart.restartRace = true;
+			return restart;
+		}
 
 		this.mySocket = mySocket;
 
