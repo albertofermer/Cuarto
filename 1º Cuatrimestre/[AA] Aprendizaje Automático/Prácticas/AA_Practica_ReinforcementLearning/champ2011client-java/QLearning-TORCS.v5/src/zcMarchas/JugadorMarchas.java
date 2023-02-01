@@ -1,4 +1,4 @@
-package zbVelocidad;
+package zcMarchas;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -12,7 +12,7 @@ import champ2011client.Controller;
 import champ2011client.SensorModel;
 import champ2011client.SocketHandler;
 
-public class JugadorVelocidad extends Controller {
+public class JugadorMarchas extends Controller {
 
 	/* Gear Changing Constants */
 	final int[] gearUp = { 3500, 4500, 4500, 5000, 6500, 0 };; // 2000-7000 es el m�ximo
@@ -61,10 +61,12 @@ public class JugadorVelocidad extends Controller {
 
 	Politica politica_velocidad = new Politica();
 	Politica politica_volante = new Politica();
+	Politica politica_marchas = new Politica();
 
-	public JugadorVelocidad() {
+	public JugadorMarchas() {
 		politica_velocidad.loadPolitica("velocidad");
 		politica_volante.loadPolitica("volante");
+		politica_marchas.loadPolitica("marchas");
 	}
 
 	public void reset() {
@@ -94,21 +96,6 @@ public class JugadorVelocidad extends Controller {
 		else // otherwhise keep current gear
 			return gear;
 	}
-
-	private float getSteer(SensorModel sensors) {
-		// steering angle is compute by correcting the actual car angle w.r.t. to track
-		// axis [sensors.getAngle()] and to adjust car position w.r.t to middle of track
-		// [sensors.getTrackPos()*0.5]
-		float targetAngle = (float) (sensors.getAngleToTrackAxis() - sensors.getTrackPosition() * 0.5);
-		// at high speed reduce the steering command to avoid loosing the control
-		if (sensors.getSpeed() > steerSensitivityOffset)
-			return (float) (targetAngle
-					/ (steerLock * (sensors.getSpeed() - steerSensitivityOffset) * wheelSensitivityCoeff));
-		else
-			return (targetAngle) / steerLock;
-
-	}
-
 	
 	public Action control(SensorModel sensors, SocketHandler mySocket) {
 
@@ -153,7 +140,7 @@ public class JugadorVelocidad extends Controller {
 		}else // car is not stuck
 		{
 			// compute gear
-			int gear = getGear(sensors);
+			int gear = getGearState(sensors);
 
 			// compute steering
 			float steer = play(sensors)[0];
@@ -169,21 +156,29 @@ public class JugadorVelocidad extends Controller {
 			action.gear = gear;
 			action.steering = steer;
 			action.accelerate = accel;
-			action.brake = brake;
+			action.brake = 0;
 			action.clutch = 0;
 			return action;
 		}
 	}
 
 	private float[] play(SensorModel sensors) {
-		float[] play = new float[3];
+		float[] play = new float[4];
 		Integer steerState = getSteerState(sensors);
 		play[0] = politica_volante.getAccion(steerState)[0];
 		
 		Integer velocidadState = getSpeedState(sensors);
 		play[1] = politica_velocidad.getAccion(velocidadState)[0];
 		play[2] = politica_velocidad.getAccion(velocidadState)[0];
+		
+		Integer gearState = getGearState(sensors);
+		play[3] = politica_marchas.getAccion(gearState)[0];
 		return play;
+	}
+
+	private Integer getGearState(SensorModel sensors) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	private boolean estaEntre(double valor, double minimo, double maximo) {

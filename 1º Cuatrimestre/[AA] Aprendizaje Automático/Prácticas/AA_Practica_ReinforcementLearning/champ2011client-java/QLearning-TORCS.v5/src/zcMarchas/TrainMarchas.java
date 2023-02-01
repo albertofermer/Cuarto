@@ -1,4 +1,4 @@
-package zbVelocidad;
+package zcMarchas;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -9,7 +9,7 @@ import champ2011client.Controller;
 import champ2011client.SensorModel;
 import champ2011client.SocketHandler;
 
-public class TrainVelocidad extends Controller {
+public class TrainMarchas extends Controller {
 
 	/* Gear Changing Constants */
 	final int[] gearUp = { 5000, 6000, 6000, 6500, 7000, 0 };
@@ -48,6 +48,9 @@ public class TrainVelocidad extends Controller {
 
 	Integer oldState;
 	Integer oldAction;
+	double oldSpeed;
+	int oldGearT;
+	int oldGearP;
 
 	Integer iRestart = 0;
 	Integer contador_entrenamientos = 0; // se resetea
@@ -57,12 +60,8 @@ public class TrainVelocidad extends Controller {
 	Integer lastLap = 0;
 	Integer tick = 0;
 
-	float oldSteer;
-	float oldAccel;
-	float oldBrake;
 	double oldTrackPosition = 0.0;
 	int count_tick = 0;
-	double last_lapTime = 0.0;
 
 	double porcentaje = Constantes.PORCENTAJE_INICIAL;
 	boolean isStuck = false;
@@ -74,12 +73,10 @@ public class TrainVelocidad extends Controller {
 	// current clutch
 	private float clutch = 0;
 
-	/* Q-Table - Volante */
+	/* Q-Table - Marchas */
 	/////////////////////////////////////////////////////////////////////////
-	private static QTable qtable_velocidad = new QTable("Velocidad", Constantes.NUM_STATES_VEL, Constantes.NUM_VEL,
-			Constantes.VEL_VALUES);
-	private static QTableFrame qTableFrame_velocidad = new QTableFrame(qtable_velocidad, Constantes.VEL_VALUES,
-			Constantes.NUM_VEL);
+	private static QTable qtable_marchas = new QTable("Marchas", Constantes.NUM_STATES_GEAR, Constantes.NUM_GEAR, Constantes.GEAR_VALUES);
+	private static QTableFrame qTableFrame_velocidad = new QTableFrame(qtable_marchas, Constantes.GEAR_VALUES, Constantes.NUM_GEAR);
 	private Random randomGenerator = new Random();
 	/////////////////////////////////////////////////////////////////////////
 
@@ -87,29 +84,32 @@ public class TrainVelocidad extends Controller {
 	private double last_trackPosition;
 	private double last_distRaced;
 	private double last_distFromStartLine;
-	private double max_speed = 0.0f;
+
 	private boolean carrera_terminada = false;
 
-	private String name_qtable = "qtable_velocidad";
-	private String name_politica = "velocidad";
-	String name_datos = Constantes.FILE_NAME + "_velocidad";
+	private String name_qtable = "qtable_marchas";
+	private String name_politica = "marchas";
+	String name_datos = Constantes.FILE_NAME + "_marchas";
 
 	ArrayList<float[]> recompensa = new ArrayList<>();
 
 	SocketHandler mySocket;
 	Politica politica_volante;
+	Politica politica_velocidad;
 
-	public TrainVelocidad() {
+	public TrainMarchas() {
 		politica_volante = new Politica();
 		politica_volante.loadPolitica("volante");
 
-		datos = new Dato(Constantes.NUM_STATES_VEL, Constantes.NUM_VEL);
-		System.out.println();
-		qtable_velocidad.loadQTable(name_qtable);
-		qTableFrame_velocidad.setQTable(qtable_velocidad);
+		politica_velocidad = new Politica();
+		politica_velocidad.loadPolitica("velocidad");
+		
+		datos = new Dato(Constantes.NUM_STATES_GEAR, Constantes.NUM_GEAR);
+		qtable_marchas.loadQTable(name_qtable);
+		qTableFrame_velocidad.setQTable(qtable_marchas);
 		datos.writeHeader(name_datos); // escribe el header.
 
-		qtable_velocidad.saveQTable(name_qtable);
+		qtable_marchas.saveQTable(name_qtable);
 	}
 
 	public void reset() {
@@ -120,12 +120,7 @@ public class TrainVelocidad extends Controller {
 			datos.setTicks_duracion(tick);
 			datos.setLongitud_recorrida(last_distRaced);
 			datos.setEpsilon(1 - porcentaje);
-			datos.setTiempo_vuelta(last_lapTime);
-			datos.setMaxSpeed(max_speed);
-
-			datos.write_vel(name_datos);
-			datos.writeActUse("accion_uso_Velocidad");
-			
+			datos.writeDistRaced(name_datos);
 		}
 
 		iRestart++;
@@ -135,33 +130,29 @@ public class TrainVelocidad extends Controller {
 		recompensa_acumulada = 0.0;
 		// contador_vueltas = 0;
 		oldTrackPosition = 0.0;
-		max_speed = 0.0;
+		
+		//Marcha inicial es N(0) ¿Punto Muerto?
+		oldGearT = 0;
+		oldGearP = 0;
 
-		qtable_velocidad.saveQTable(name_qtable);
+		qtable_marchas.saveQTable(name_qtable);
 
 		if (contador_entrenamientos == Constantes.CARRERA_JUGADOR + 1)
 			contador_entrenamientos = 0;
-		
-		
-		datos = new Dato(Constantes.NUM_STATES_VEL, Constantes.NUM_VEL);
-		Politica.savePolitica(name_politica, qtable_velocidad, Constantes.VEL_VALUES);
-
 
 	}
 
 	public void shutdown() {
-		qtable_velocidad.saveQTable(name_qtable);
-		Politica.savePolitica(name_politica, qtable_velocidad, Constantes.VEL_VALUES);
+		qtable_marchas.saveQTable(name_qtable);
+		Politica.savePolitica(name_politica, qtable_marchas, Constantes.VEL_VALUES);
 
 		if (contador_entrenamientos == Constantes.CARRERA_JUGADOR) {
-			/* Escribimos los datos que vamos a sacar para hacer graficas */
+			/* Escribimos los datos que vamos a sacar para hacer gráficas */
 			datos.setIndice_carrera(indice_carreras);
 			datos.setTicks_duracion(tick);
 			datos.setLongitud_recorrida(last_distRaced);
 			datos.setEpsilon(1 - porcentaje);
-			datos.setTiempo_vuelta(last_lapTime);
-			datos.write_vel(name_datos);
-
+			datos.writeDistRaced(name_datos);
 		}
 
 		System.out.println("Bye bye!");
@@ -192,24 +183,10 @@ public class TrainVelocidad extends Controller {
 
 		if (sensors.getLastLapTime() > 0.0) {
 
-			System.out.println("VUELTA TERMINADA!: " + sensors.getLastLapTime());
-			if (contador_entrenamientos == Constantes.CARRERA_JUGADOR) {
-				datos.setFinishedLap(true);
-			}
-
-			// Si ha tardado menos que en la mejor vuelta:
-			if (tick < bestLapTick) {
-				bestLapTick = tick;
-			}
+			System.out.println("VUELTA TERMINADA!");
+			train(getGearState(sensors), getPorcentaje(sensors), sensors);
 
 			recompensa = new ArrayList<>();
-			Action restart = new Action();
-			restart.restartRace = true;
-			return restart;
-		}
-		
-		if (tick > 10000) {
-			System.out.println("TIEMPO AGOTADO!");
 			Action restart = new Action();
 			restart.restartRace = true;
 			return restart;
@@ -217,18 +194,17 @@ public class TrainVelocidad extends Controller {
 
 		this.mySocket = mySocket;
 
-		// compute gear
-		int gear = getGear(sensors);
-
-		// compute steering
+		// compute steering, accel and brake
 		float steer = politica_volante.getAccion(getSteerState(sensors))[0];
-		float accel = 0.0f;
-		float brake = 0.0f;
+		float accel = politica_velocidad.getAccion(getSpeedState(sensors))[0];
+		float brake = politica_velocidad.getAccion(getSpeedState(sensors))[1];
 
 		System.out.println("Tick: " + tick);
 		System.out.println("Entrenamiento: " + contador_entrenamientos);
 		System.out.println("Carrera #" + indice_carreras);
-
+		
+		int gear;
+		
 		if (tick >= Constantes.TICK_COMIENZO && (tick % Constantes.TICK_ENTRENAMIENTO == 0)
 				&& contador_entrenamientos < Constantes.CARRERA_JUGADOR) {
 
@@ -237,17 +213,28 @@ public class TrainVelocidad extends Controller {
 			 * cada TICK_ENTRENAMIENTO ticks para no aprender cada tick.
 			 */
 			System.out.println("TRAIN");
-			float[] accel_and_brake = train(getSpeedState(sensors), getPorcentaje(sensors), sensors, false);
-			accel = accel_and_brake[0];
-			brake = accel_and_brake[1];
-
+			// compute gear
+			int acc_gear = (int) train(getGearState(sensors), getPorcentaje(sensors), sensors);
+			gear = oldGearT;
+			
+			System.out.println("Estado: ");
+			System.out.println("Accion GEAR: " + acc_gear);
+			gear = aplicaAccionGear(acc_gear, gear);
+			System.out.println("oldGear: " + oldGearT);
+			System.out.println("GEAR: " + gear);
+			oldGearT = gear;
+			
 		} else if (tick >= Constantes.TICK_COMIENZO && contador_entrenamientos == Constantes.CARRERA_JUGADOR) {
 			/**
 			 * Cada 10 entrenamientos, probamos a jugar con el jugador para ver su progreso
 			 * y poder sacar resultados consistentes.
 			 */
 			System.out.println("--JUGADOR--");
-			float[] accel_and_brake = play(sensors);
+			int acc_gear = (int) play(sensors);
+			gear = oldGearP;
+			
+			gear = aplicaAccionGear(acc_gear, gear);
+			
 			// Si el coche se sale de la pista, reiniciamos la partida.
 			if (isStuck) {
 				Action reset = new Action();
@@ -255,13 +242,11 @@ public class TrainVelocidad extends Controller {
 				isStuck = false;
 				return reset;
 			}
-
-			accel = accel_and_brake[0];
-			brake = accel_and_brake[1];
+			
+			oldGearP = gear;
 
 		} else {
-			accel = oldAccel;
-			brake = oldBrake;
+			gear = oldGearT;
 		}
 
 		tick++;
@@ -292,45 +277,49 @@ public class TrainVelocidad extends Controller {
 		action.gear = gear;
 		action.steering = steer;
 		action.accelerate = accel;
-		action.brake = brake;
+		action.brake = 0;
 		action.clutch = 0;
 
-		oldAccel = accel;
-		oldBrake = brake;
-		System.out.println("PLAY -> " + action.accelerate + "//" + action.brake);
+		oldGearT = gear;
+		System.out.println("PLAY -> " + gear);
 
 		return action;
 	}
 
-	private float[] play(SensorModel sensors) {
+	private int aplicaAccionGear(int acc_gear, int gear) {
+		
+		if(acc_gear == -1)
+			gear--;
+		else if(acc_gear == 1)
+			gear++;
+			
+		if(gear < -1)
+			gear = -1;
+		else if(gear >6)
+			gear = 6;
+		
+		return gear;
+	}
 
-		Integer state = getSpeedState(sensors);
+	private float play(SensorModel sensors) {
 
-		if (/* state == 10 */ Math.abs(sensors.getTrackPosition()) >= 1.3 || count_tick > Constantes.TICKS_ESPERA) {
+		Integer state = getGearState(sensors);
+
+		if (/*state == 10*/ Math.abs(sensors.getTrackPosition()) == 1.3 || count_tick > Constantes.TICKS_ESPERA) {
 			isStuck = true;
-			float[] default_value = { 0f, 0f };
+			float default_value = 0f;
 			return default_value;
 		}
 
-		int vel = qtable_velocidad.getBestRewardPosition(state);
+		int gear = qtable_marchas.getBestRewardPosition(state);
 
 		last_distRaced = sensors.getDistanceRaced();
-		last_lapTime = sensors.getCurrentLapTime();
-
-		datos.addAccionValor(state, vel);
-		datos.setLongitud_recorrida(last_distRaced);
-		datos.setDistancia_punto_comienzo(sensors.getDistanceFromStartLine());
-		System.out.println("SPEED: " + sensors.getSpeed());
-		if (sensors.getSpeed() > maxSpeed) {
-			max_speed = sensors.getSpeed();
-		}
-
-		return Constantes.VEL_VALUES[vel];
+		return Constantes.GEAR_VALUES[gear][0];
 	}
 
 	private double getPorcentaje(SensorModel sensors) {
 
-		if (iRestart >= Constantes.MAX_CARRERAS_INCREMENTO_PORCENTAJE) {
+		if (iRestart == Constantes.MAX_CARRERAS_INCREMENTO_PORCENTAJE) {
 			porcentaje += Constantes.INCREMENTO_PORCENTAJE;
 			iRestart = 0;
 		}
@@ -344,6 +333,26 @@ public class TrainVelocidad extends Controller {
 	private boolean estaEntre(double valor, double minimo, double maximo) {
 		return (minimo <= valor && valor <= maximo);
 
+	}
+	
+	private Integer getGearState(SensorModel sensors) {
+		double actualSpeed = sensors.getSpeed();
+		double rpm = sensors.getRPM();
+		
+		
+		if(actualSpeed < oldSpeed) {
+			if(estaEntre(rpm, 0, 2000))
+				return 0;
+			else
+				return 1;
+		}else if(Math.abs(actualSpeed - oldSpeed) > 1) {
+			if(estaEntre(rpm, 7000, 10000))
+				return 2;
+			else
+				return 3;
+		}else {
+			return 4;
+		}	
 	}
 
 	private Integer getSpeedState(SensorModel sensors) {
@@ -420,12 +429,16 @@ public class TrainVelocidad extends Controller {
 
 		return null;
 	}
+	
+	private Integer getStateGear(SensorModel sensors) {
+		return -1;
+	}
 
-	public float[] train(Integer newState, Double porcentaje, SensorModel sensors, boolean vuelta_terminada) {
+	public float train(Integer newState, Double porcentaje, SensorModel sensors) {
 
 		// Elige la posici�n que obtenga una mayor recompensa a partir del estado
 		// actual. //EXPLOTA
-		Integer accion = qtable_velocidad.getBestRewardPosition(newState);
+		Integer accion = qtable_marchas.getBestRewardPosition(newState);
 
 		if (porcentaje > 1.0)
 			porcentaje = 1.0;
@@ -433,7 +446,7 @@ public class TrainVelocidad extends Controller {
 		// Explora nuevos estados
 		if (this.randomGenerator.nextDouble() > porcentaje) {
 			System.out.println("EXPLORA");
-			accion = this.randomGenerator.nextInt(Constantes.NUM_VEL);
+			accion = this.randomGenerator.nextInt(Constantes.NUM_GEAR);
 		}
 
 		// Si el estado anterior es nulo (es la primera evaluacion) entonces lo hace
@@ -444,8 +457,7 @@ public class TrainVelocidad extends Controller {
 		if (oldAction == null)
 			oldAction = accion;
 
-		if (/* newState == 10 || */ Math.abs(sensors.getTrackPosition()) >= 1.3
-				|| count_tick > Constantes.TICKS_ESPERA) {
+		if (/*newState == 10 || */ Math.abs(sensors.getTrackPosition()) >= 1.1 || count_tick > Constantes.TICKS_ESPERA) {
 			/**
 			 * Si el coche se sale de la carretera, entonces se recompensa negativamente.
 			 */
@@ -458,7 +470,7 @@ public class TrainVelocidad extends Controller {
 
 			System.out.println("SE HA SALIDO DE LA CARRETERA.");
 			Double targetReward = -1000.0;
-			Double reward = qtable_velocidad.setReward(oldState, newState, accion, oldAction, targetReward,
+			Double reward = qtable_marchas.setReward(oldState, newState, accion, oldAction, targetReward,
 					getBestMoveFromTarget(newState));
 
 			// }
@@ -472,7 +484,7 @@ public class TrainVelocidad extends Controller {
 			System.out.println("Distancia desde el inicio: " + sensors.getDistanceFromStartLine());
 			System.out.println("-----------------------------");
 			// Actualiza la ventana de la Q-Tabla
-			qTableFrame_velocidad.setQTable(qtable_velocidad);
+			qTableFrame_velocidad.setQTable(qtable_marchas);
 
 			// recompensa_acumulada += reward;
 
@@ -487,53 +499,63 @@ public class TrainVelocidad extends Controller {
 			 * distancia, mayor recompensa) e inversamente proporcional a la distancia al
 			 * centro de la carretera (cuanto mas cercano a 0, mas recompensa).
 			 */
-			// double rewardTrackPosition = Math.pow(1 /
-			// ((Math.abs(sensors.getTrackPosition())) + 1), 4) * 0.7;
-			// double rewardAngle = Math.pow(1 / ((Math.abs(sensors.getAngleToTrackAxis()))
-			// + 1), 4) * 0.25;
-			double rewardSpeed = (sensors.getSpeed() / 360);
-
-			// rewardSpeed = sensors.getDistanceFromStartLine()/sensors.getCurrentLapTime();
-
-			Double targetReward = rewardSpeed;
+			
+			Double targetReward = sensors.getDistanceFromStartLine()/sensors.getCurrentLapTime();
+			
+			// La recompensa podría ser en función de las RPM, es decir, si se encuentra en buenas revoluciones recompensar que no cambie de marcha
+			// Si revoluciones bajas y disminuye --> recompensar
+			// Si revoluciones bajas y aumenta o mantiene --> castigar
+			// Si revoluciones altas y aumenta --> recompensar
+			// Si revoulciones altas y disminuye o mantiene --> castigar
+			
+//			switch(getGearState(sensors)) {
+//			case 0: //Revoluciones bajas y velocidad disminuye
+//				if(oldGearT < actualGear)
+//					targetReward = 1.0;
+//				else
+//					targetReward = -5.0;
+//				break;
+//			case 2: //Revoluciones altas y velocidad aumenta
+//				if(oldGearT > actualGear)
+//					targetReward = 1.0;
+//				else
+//					targetReward = -5.0;
+//				break;
+//			default: //1 o 3
+//				if(oldGearT == actualGear)
+//					targetReward = 1.0;
+//				else
+//					targetReward = -5.0;
+//				break;
+//			}
 
 			// Se establece la recompensa para el estado anterior en funci�n del estado
 			// actual.
 
-			Double reward = qtable_velocidad.setReward(oldState, newState, accion, oldAction, targetReward,
+			Double reward = qtable_marchas.setReward(oldState, newState, accion, oldAction, targetReward,
 					getBestMoveFromTarget(newState));
 
 			System.out.println("Porcentaje: " + porcentaje);
-			System.out.println("Estado: " + getSpeedState(sensors));
+			System.out.println("Estado: " + getGearState(sensors));
 			System.out.println("Estado Antiguo: " + oldState);
-			System.out.println("Accion_Actual : " + Constantes.VEL_VALUES[accion]);
-			System.out.println("Distancia Vector#9: " + sensors.getTrackEdgeSensors()[9]);
+			System.out.println("Accion_Actual : " + Constantes.GEAR_VALUES[accion]);
+			System.out.println("RPM: " + sensors.getRPM());
 			System.out.println("Velocidad: " + sensors.getSpeed());
-			// System.out.println("Recompensa Actual: " + targetReward);
+			System.out.println("Recompensa Actual: " + targetReward);
 			System.out.println("Recompensa Acumulada " + recompensa_acumulada);
 			System.out.println("Distancia a la meta: " + sensors.getDistanceFromStartLine());
 			System.out.println("-----------------------------");
 
 			// recompensa_acumulada += reward;
-//
-//			float[] accion_recompensa = new float[4];
-//
-//			accion_recompensa[0] = oldState;
-//			accion_recompensa[1] = newState;
-//			accion_recompensa[2] = accion;
-//			accion_recompensa[3] = oldAction;
-//
-//			// Acumula las acciones realizadas
-//			recompensa.add(accion_recompensa);
 
-			// recompensar(sensors, recompensa, '-');
 
 			oldState = newState;
+			oldSpeed = sensors.getSpeed();
 		}
 
 		// Actualiza la ventana de la Q-Tabla
 
-		qTableFrame_velocidad.setQTable(qtable_velocidad);
+		qTableFrame_velocidad.setQTable(qtable_marchas);
 
 		// Actualiza el estado previo.
 
@@ -541,14 +563,14 @@ public class TrainVelocidad extends Controller {
 
 		oldAction = accion;
 
-		return Constantes.VEL_VALUES[accion];
+		return Constantes.GEAR_VALUES[accion][0];
 
 	}
 
 	// Para calcular la maxFutureQ en la QTable
 	private Integer getBestMoveFromTarget(Integer nextState) {
 		Integer best_angle = null;
-		best_angle = qtable_velocidad.getBestRewardPosition(nextState);
+		best_angle = qtable_marchas.getBestRewardPosition(nextState);
 		return best_angle;
 	}
 

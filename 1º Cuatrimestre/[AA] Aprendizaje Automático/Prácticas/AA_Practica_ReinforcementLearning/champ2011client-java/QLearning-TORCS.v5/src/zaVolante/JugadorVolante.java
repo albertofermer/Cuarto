@@ -1,4 +1,4 @@
-package zbVelocidad;
+package zaVolante;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -12,10 +12,10 @@ import champ2011client.Controller;
 import champ2011client.SensorModel;
 import champ2011client.SocketHandler;
 
-public class JugadorVelocidad extends Controller {
+public class JugadorVolante extends Controller {
 
 	/* Gear Changing Constants */
-	final int[] gearUp = { 3500, 4500, 4500, 5000, 6500, 0 };; // 2000-7000 es el m�ximo
+	final int[] gearUp = { 3500, 4500, 4500, 5000, 6500, 0 };; // 2000-7000
 	final int[] gearDown = { 0, 2000, 2000, 2000, 3000, 4000 };
 
 	/* Stuck constants */
@@ -59,11 +59,9 @@ public class JugadorVelocidad extends Controller {
 	 * Q-TABLE
 	 */
 
-	Politica politica_velocidad = new Politica();
 	Politica politica_volante = new Politica();
 
-	public JugadorVelocidad() {
-		politica_velocidad.loadPolitica("velocidad");
+	public JugadorVolante() {
 		politica_volante.loadPolitica("volante");
 	}
 
@@ -79,6 +77,8 @@ public class JugadorVelocidad extends Controller {
 		int gear = sensors.getGear();
 		double rpm = sensors.getRPM();
 
+		System.out.println("RMP:" + rpm);
+		
 		// if gear is 0 (N) or -1 (R) just return 1
 		if (gear < 1)
 			return 1;
@@ -109,7 +109,52 @@ public class JugadorVelocidad extends Controller {
 
 	}
 
-	
+	private float getAccel(SensorModel sensors) {
+		// checks if car is out of track
+		if (sensors.getTrackPosition() < 1 && sensors.getTrackPosition() > -1) {
+			// reading of sensor at +5 degree w.r.t. car axis
+			float rxSensor = (float) sensors.getTrackEdgeSensors()[10];
+			// reading of sensor parallel to car axis
+			float sensorsensor = (float) sensors.getTrackEdgeSensors()[9];
+			// reading of sensor at -5 degree w.r.t. car axis
+			float sxSensor = (float) sensors.getTrackEdgeSensors()[8];
+
+			float targetSpeed;
+
+			// track is straight and enough far from a turn so goes to max speed
+			if (sensorsensor > maxSpeedDist || (sensorsensor >= rxSensor && sensorsensor >= sxSensor))
+				targetSpeed = maxSpeed;
+			else {
+				// approaching a turn on right
+				if (rxSensor > sxSensor) {
+					// computing approximately the "angle" of turn
+					float h = sensorsensor * sin5;
+					float b = rxSensor - sensorsensor * cos5;
+					float sinAngle = b * b / (h * h + b * b);
+					// estimate the target speed depending on turn and on how close it is
+					targetSpeed = maxSpeed * (sensorsensor * sinAngle / maxSpeedDist);
+				}
+				// approaching a turn on left
+				else {
+					// computing approximately the "angle" of turn
+					float h = sensorsensor * sin5;
+					float b = sxSensor - sensorsensor * cos5;
+					float sinAngle = b * b / (h * h + b * b);
+					// estimate the target speed depending on turn and on how close it is
+					targetSpeed = maxSpeed * (sensorsensor * sinAngle / maxSpeedDist);
+				}
+
+			}
+
+			// accel/brake command is exponentially scaled w.r.t. the difference between
+			// target speed and current one
+			return (float) (2 / (1 + Math.exp(sensors.getSpeed() - targetSpeed)) - 1);
+			// return 1;
+		} else
+			return (float) 0.3; // when out of track returns a moderate acceleration command
+
+	}
+
 	public Action control(SensorModel sensors, SocketHandler mySocket) {
 
 		/**
@@ -150,40 +195,53 @@ public class JugadorVelocidad extends Controller {
 			action.brake = 0;
 			action.clutch = clutch;
 			return action;
-		}else // car is not stuck
+		}
+
+		else // car is not stuck
 		{
+			// compute accel/brake command
+			float accel_and_brake = getAccel(sensors);
 			// compute gear
 			int gear = getGear(sensors);
 
 			// compute steering
-			float steer = play(sensors)[0];
-			
-	        // set accel and brake from the joint accel/brake command 
-			float accel = play(sensors)[1];
-			float brake = play(sensors)[2];
-	        
+			// float steer = getSteer(sensors);
+			float steer = play(sensors);
+			// normalize steering
+			if (steer < -1)
+				steer = -1;
+			if (steer > 1)
+				steer = 1;
+//	        
+
+//	        // set accel and brake from the joint accel/brake command 
+			float accel, brake;
+			if (accel_and_brake > 0) {
+				accel = accel_and_brake;
+				brake = 0;
+			} else {
+				accel = 0;
+				// apply ABS to brake
+				brake = filterABS(sensors, -accel_and_brake);
+			}
+//	        
 			clutch = clutching(sensors, clutch);
-	        
+//	        
 			// build a CarControl variable and return it
 			Action action = new Action();
 			action.gear = gear;
 			action.steering = steer;
 			action.accelerate = accel;
-			action.brake = brake;
+			action.brake = 0;
 			action.clutch = 0;
 			return action;
 		}
 	}
 
-	private float[] play(SensorModel sensors) {
-		float[] play = new float[3];
-		Integer steerState = getSteerState(sensors);
-		play[0] = politica_volante.getAccion(steerState)[0];
-		
-		Integer velocidadState = getSpeedState(sensors);
-		play[1] = politica_velocidad.getAccion(velocidadState)[0];
-		play[2] = politica_velocidad.getAccion(velocidadState)[0];
-		return play;
+	private float play(SensorModel sensors) {
+		Integer state = getSteerState(sensors);
+		float[] steer = politica_volante.getAccion(state);
+		return steer[0];
 	}
 
 	private boolean estaEntre(double valor, double minimo, double maximo) {
@@ -233,36 +291,6 @@ public class JugadorVelocidad extends Controller {
 				return 14;
 		}
 
-
-		return null;
-	}
-	
-	private Integer getSpeedState(SensorModel sensors) {
-
-		double distVec9 = sensors.getTrackEdgeSensors()[9];
-
-		if (estaEntre(distVec9, 0, 20))
-			return 0;
-		if (estaEntre(distVec9, 20, 40))
-			return 1;
-		if (estaEntre(distVec9, 40, 60))
-			return 2;
-		if (estaEntre(distVec9, 60, 80))
-			return 3;
-		if (estaEntre(distVec9, 80, 100))
-			return 4;
-		if (estaEntre(distVec9, 100, 120))
-			return 5;
-		if (estaEntre(distVec9, 120, 140))
-			return 6;
-		if (estaEntre(distVec9, 140, 160))
-			return 7;
-		if (estaEntre(distVec9, 160, 180))
-			return 8;
-		if (estaEntre(distVec9, 180, 200))
-			return 9;
-		if (distVec9 < 0)
-			return 10;
 
 		return null;
 	}
