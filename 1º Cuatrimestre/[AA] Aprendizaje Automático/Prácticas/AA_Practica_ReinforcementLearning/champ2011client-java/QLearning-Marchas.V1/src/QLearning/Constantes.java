@@ -21,7 +21,7 @@ public final class Constantes {
 	public final static int NUM_VEL = VEL_VALUES.length;
 	
 	/* Constantes de la QTable - Marchas */
-	public final static int NUM_STATES_GEAR = 7; 
+	public final static int NUM_STATES_GEAR = 21; 
 	public final static float[][] GEAR_VALUES = {{-1}, {0}, {+1}}; // Bajar, Mantener, Subir
 	public final static int NUM_GEAR = GEAR_VALUES.length;
 	

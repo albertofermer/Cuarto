@@ -60,6 +60,8 @@ public class TrainMarchas extends Controller {
 	Integer lastLap = 0;
 	Integer tick = 0;
 	float oldSteer;
+	double aceleracion_actual = 0.0;
+	double aceleracion_anterior = 0.0;
 	float oldAccel;
 	float oldBrake;
 	double last_lapTime = 0.0;
@@ -130,7 +132,7 @@ public class TrainMarchas extends Controller {
 		System.out.println("Porcentaje: " + porcentaje);
 		System.out.println("Velocidad: " + sensors.getSpeed());
 		System.out.println("Marcha: " + sensors.getGear());
-		System.out.println("Accel: " + (sensors.getSpeed() - oldSpeed));
+		System.out.println("Accel: " + aceleracion_actual);
 		System.out.println("Distancia Recorrida: " + sensors.getDistanceRaced());
 		System.out.println("Distancia a la meta: " + sensors.getDistanceFromStartLine());
 		System.out.println("-----------------------------");
@@ -156,6 +158,9 @@ public class TrainMarchas extends Controller {
 		recompensa_acumulada = 0.0;
 		oldTrackPosition = 0.0;
 		max_speed = 0.0;
+		
+		aceleracion_actual = 0.0;
+		aceleracion_anterior = 0.0;
 
 		// Marcha inicial es N(0) øPunto Muerto?
 		oldGearT = 0;
@@ -207,7 +212,7 @@ public class TrainMarchas extends Controller {
 
 	public Action control(SensorModel sensors, SocketHandler mySocket) {
 		this.mySocket = mySocket;
-
+		
 		if (sensors.getLastLapTime() > 0.0) {
 			System.out.println("VUELTA TERMINADA!");
 			Action restart = new Action();
@@ -215,6 +220,9 @@ public class TrainMarchas extends Controller {
 			return restart;
 		}
 
+		aceleracion_actual = sensors.getSpeed() - oldSpeed;
+		
+		
 		int gear = 0;
 		float steer = politica_volante.getAccion(getSteerState(sensors))[0];
 		float accel = politica_velocidad.getAccion(getSpeedState(sensors))[0];
@@ -269,6 +277,8 @@ public class TrainMarchas extends Controller {
 			gear = oldGearT;
 		}
 
+		aceleracion_anterior = aceleracion_actual;
+		
 		tick++;
 
 		clutch = clutching(sensors, clutch);
@@ -355,15 +365,29 @@ public class TrainMarchas extends Controller {
 		double rpm = sensors.getRPM();
 
 		if ( (actualSpeed - oldSpeed) < 0) { // Est· frenando
-			if (estaEntre(rpm, 0, 2000)) return 0;
-			else if (estaEntre(rpm, 2000, 5000)) return 1;
-			else return 2;
+			if (estaEntre(rpm, -1, 1000)) return 0;
+			else if (estaEntre(rpm, 1001, 2000)) return 1;
+			else if (estaEntre(rpm, 2001, 3000)) return 2;
+			else if (estaEntre(rpm, 3001, 4000)) return 3;
+			else if (estaEntre(rpm, 4001, 5000)) return 4;
+			else if (estaEntre(rpm, 5001, 6000)) return 5;
+			else if (estaEntre(rpm, 6001, 7000)) return 6;
+			else if (estaEntre(rpm, 7001, 8000)) return 7;
+			else if (estaEntre(rpm, 8001, 9000)) return 8;
+			else return 9;
 		} else if (actualSpeed - oldSpeed > 0) { // Est· acelerando
-			if (estaEntre(rpm, 0, 2000)) return 3;
-			else if (estaEntre(rpm, 2000, 5000)) return 4;
-			else return 5;
+			if (estaEntre(rpm, 0, 1000)) return 10;
+			else if (estaEntre(rpm, 1001, 2000)) return 11;
+			else if (estaEntre(rpm, 2001, 3000)) return 12;
+			else if (estaEntre(rpm, 3001, 4000)) return 13;
+			else if (estaEntre(rpm, 4001, 5000)) return 14;
+			else if (estaEntre(rpm, 5001, 6000)) return 15;
+			else if (estaEntre(rpm, 6001, 7000)) return 16;
+			else if (estaEntre(rpm, 7001, 8000)) return 17;
+			else if (estaEntre(rpm, 8001, 9000)) return 18;
+			else return 19;
 		} else { // Se mantiene la velocidad.
-			return 6;
+			return 20;
 		}
 	}
 
@@ -494,7 +518,7 @@ public class TrainMarchas extends Controller {
 			Double targetReward = sensors.getDistanceFromStartLine() / sensors.getCurrentLapTime();
 			Double rewardFuel = sensors.getFuelLevel() * 0.6;
 			Double rewardSpeed = sensors.getSpeed() * 0.4;
-			Double rewardAccel = (sensors.getSpeed() - oldSpeed)*100;
+			Double rewardAccel = sensors.getRPM()*(aceleracion_actual-aceleracion_anterior);
 			
 			targetReward = rewardAccel;
 			// La recompensa podr√≠a ser en funci√≥n de las RPM, es decir, si se encuentra
