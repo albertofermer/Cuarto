@@ -19,7 +19,7 @@ public class Jugador extends Controller {
 
 	/* Accel and Brake Constants */
 	final float maxSpeedDist = 1;
-	final float maxSpeed = 100;
+	final float maxSpeed = 50;
 	final float sin5 = (float) 0.08716;
 	final float cos5 = (float) 0.99619;
 

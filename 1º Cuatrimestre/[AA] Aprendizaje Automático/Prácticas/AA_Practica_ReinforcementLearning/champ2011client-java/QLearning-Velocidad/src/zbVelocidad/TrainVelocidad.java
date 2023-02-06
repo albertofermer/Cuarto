@@ -371,9 +371,9 @@ public class TrainVelocidad extends Controller {
 			else if (estaEntre(carAngle, Constantes.STEER_DERECHA, Constantes.STEER_RECTO_MIN))
 				return 12; // centro - coche mira izq
 			else if (carAngle > Constantes.STEER_IZQUIERDA)
-				return 14;
-			else if (carAngle < Constantes.STEER_DERECHA)
 				return 13;
+			else if (carAngle < Constantes.STEER_DERECHA)
+				return 14;
 		}
 
 		return null;
