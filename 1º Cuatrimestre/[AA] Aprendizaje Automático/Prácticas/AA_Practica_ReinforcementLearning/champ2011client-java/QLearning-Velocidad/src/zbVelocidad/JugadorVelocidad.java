@@ -54,7 +54,6 @@ public class JugadorVelocidad extends Controller {
 	// current clutch
 	private float clutch = 0;
 
-	
 	/**
 	 * Q-TABLE
 	 */
@@ -95,7 +94,6 @@ public class JugadorVelocidad extends Controller {
 			return gear;
 	}
 
-	
 	public Action control(SensorModel sensors, SocketHandler mySocket) {
 
 		/**
@@ -136,20 +134,20 @@ public class JugadorVelocidad extends Controller {
 			action.brake = 0;
 			action.clutch = clutch;
 			return action;
-		}else // car is not stuck
+		} else // car is not stuck
 		{
 			// compute gear
 			int gear = getGear(sensors);
 
 			// compute steering
 			float steer = play(sensors)[0];
-			
-	        // set accel and brake from the joint accel/brake command 
+
+			// set accel and brake from the joint accel/brake command
 			float accel = play(sensors)[1];
 			float brake = play(sensors)[2];
-	        
+
 			clutch = clutching(sensors, clutch);
-	        
+
 			// build a CarControl variable and return it
 			Action action = new Action();
 			action.gear = gear;
@@ -165,11 +163,11 @@ public class JugadorVelocidad extends Controller {
 		float[] play = new float[3];
 		Integer steerState = getSteerState(sensors);
 		play[0] = politica_volante.getAccion(steerState)[0];
-		
+
 		Integer velocidadState = getSpeedState(sensors);
 		play[1] = politica_velocidad.getAccion(velocidadState)[0];
 		play[2] = politica_velocidad.getAccion(velocidadState)[1];
-		
+
 //		System.out.println(politica_velocidad.getAccion(velocidadState).length);
 //		System.out.println("S:" + play[0]);
 //		System.out.println("A:" + play[1]);
@@ -179,9 +177,9 @@ public class JugadorVelocidad extends Controller {
 
 	private boolean estaEntre(double valor, double minimo, double maximo) {
 		return (minimo <= valor && valor <= maximo);
-		
+
 	}
-	
+
 	private Integer getSteerState(SensorModel sensors) {
 		// derecha negativo izquierda positivo
 		double trackPosition = sensors.getTrackPosition();
@@ -227,7 +225,7 @@ public class JugadorVelocidad extends Controller {
 		return null;
 
 	}
-	
+
 	private Integer getSpeedState(SensorModel sensors) {
 
 		double distVec9 = sensors.getTrackEdgeSensors()[9];
@@ -257,7 +255,6 @@ public class JugadorVelocidad extends Controller {
 
 		return null;
 	}
-
 
 	private float filterABS(SensorModel sensors, float brake) {
 		// convert speed to m/s
