@@ -1,4 +1,5 @@
 # Practica 1: Búsquedas Locales #
+import random
 
 # Bibliotecas
 import numpy as np
@@ -10,6 +11,10 @@ capacidad_bateria = 300  # Capacidad total de la bateria
 porcentaje_bateria = 0  # Capacidad actual de la bateria
 wb = np.array([0.0 for _ in range(24)])   # % Lleno de la bateria
 wg = np.array([np.random.randint(0, 100) for _ in range(24)])   # Energia generada en cada hora
+precio_compra = [26, 26, 25, 24,23,24,25,27,30,29,34,32,31,31,25,24,25,26,34,36,39,40,38,29]
+precio_venta = [24, 23, 22, 23,22,22,20,20,20,19,19,20,19,20,22,23,22,23,26,28,34,35,34,24]
+r = [0, 0, 0, 0, 0, 0, 0, 0, 100, 313, 500, 661, 786, 419, 865, 230, 239, 715, 634, 468, 285, 96,
+0, 0]
 precio_venta = np.array([np.random.randn()*100 for _ in range(24)])
 precio_compra = np.array([np.random.randn()*100 for _ in range(24)])
 
@@ -22,7 +27,7 @@ def funcion_coste(solucion):
 
 # Generador de la solucion Inicial
 def generar_inicial(longitud_vector):
-    solucion_inicial = np.tile(np.array([0 for i in range(longitud_vector)]), [3, 1])
+    solucion_inicial = np.tile(np.array([random.randint(0,100) for i in range(longitud_vector)]), [3, 1])
     return solucion_inicial
 
 
