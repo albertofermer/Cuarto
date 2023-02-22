@@ -20,23 +20,25 @@ r = [0, 0, 0, 0, 0, 0, 0, 0, 100, 313, 500, 661, 786, 419, 865, 230, 239, 715, 6
 
 # Funcion de Coste
 def funcion_coste(solucion):
-    coste = sum(solucion[0, :] * precio_venta - solucion[1, :] * precio_compra)
+    coste = 0
     return coste
 
 
 # Generador de la solucion Inicial
 def generar_inicial(longitud_vector):
     # Genera un vector aleatorio de porcentaje de venta/compra 
-    solucion_inicial = [random.randint(-100, 100) for i in range(longitud_vector)]
+    solucion_inicial = [round(random.uniform(-1, 1), 2) for _ in range(longitud_vector)]
+    # >0 : compra
+    # <0 : vende
+    # 0 : almacena
     return solucion_inicial
 
 
 # Generador de Soluciones Vecinas
 def genera_vecinos(solucion):
     vecino = solucion
-
     h = np.random.randint(0, 23)  # Numero aleatorio para seleccionar la columna
-
+    return vecino
 
 # Funcion de aceptacion de soluciones
 def acepta(solucion):
@@ -49,8 +51,8 @@ def busqueda_elMejor():
     mejor_vecino = solucion_actual
     contador = 0
     while True:  # Repetir
+        solucion_vecina = genera_vecinos(solucion_actual)  # Genera vecinos
         while True:  # Repetir
-            solucion_vecina = genera_vecinos(solucion_actual)  # Genera vecinos
             # Hasta que la funcion de coste del vecino sea mejor que la del mejor vecino
             # TODO: o hasta que se haya generado el espacio de busqueda completo
             if funcion_coste(solucion_vecina) < funcion_coste(mejor_vecino):
