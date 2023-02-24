@@ -19,7 +19,6 @@ else:
     precio_compra = constantes.precio_compra
     r = constantes.r
 
-
 evaluaciones = [0 for _ in range(numero_repeticiones)]
 media_evaluaciones = statistics.mean(evaluaciones)
 mejor_evaluacion = evaluaciones.index(min(evaluaciones))
@@ -45,34 +44,37 @@ def greedy():
         # Cuando llegue la hora en la que hay que vender, se vende toda la energia que hay en la bateria + la que se
         # haya generado. A partir de dicha hora se vende toda la energia que genere.
         if hora >= hora_venta:
-            energia_disponible = r[hora] * 0.2 * 1000
-            dinero += (bateria + energia_disponible / 1000) * precio_venta[hora]
+            energia_disponible = bateria + r[hora] * 0.2  # En KWH
+            dinero += energia_disponible * precio_venta[hora]
             bateria = 0
         # Si la hora es anterior a la hora de venta, se almacena en la bateria
         else:
             # Guarda toda la energia hasta que se llene
-            energia_disponible = bateria + r[hora] * 0.2 * 1000
+            energia_generada = r[hora] * 0.2  # En KWh
 
-            if bateria < capacidad_bateria and energia_disponible <= (capacidad_bateria - bateria) * 1000:
-                bateria += energia_disponible / 1000
-                energia_disponible = 0
-            elif bateria < capacidad_bateria and energia_disponible > (capacidad_bateria - bateria) * 1000:
-                energia_disponible = energia_disponible - (capacidad_bateria - bateria) * 1000
+            # Si la bateria no esta llena y, la energia generada cabe en la bateria:
+            if bateria < capacidad_bateria and energia_generada <= (capacidad_bateria - bateria):
+                # Llenamos la bateria con la energia generada.
+                bateria += energia_generada  # En KWh
+                energia_generada = 0
+            # Si la bateria no esta llena, pero no cabe toda la energia generada en la bateria:
+            elif bateria < capacidad_bateria and energia_generada > (capacidad_bateria - bateria):
+                # Decrementamos la energia generada con lo que cabe en la bateria hasta llenarla.
+                energia_generada = energia_generada - (capacidad_bateria - bateria)
+                # Llenamos la bateria
                 bateria = capacidad_bateria
 
             # Si sobra energia, se vende
-            dinero += energia_disponible / 1000 * precio_venta[hora]
+            dinero += energia_generada * precio_venta[hora]
 
         # Graficas
-        energia_disponible_hora[hora] = energia_disponible
         dinero_acumulado[hora] = dinero
         bateria_hora[hora] = bateria
 
-    return dinero, dinero_acumulado, bateria_hora, energia_disponible_hora
+    return dinero, dinero_acumulado, bateria_hora
 
 
 def grafica_greedy():
-
     # Inicialización de las variables
     dinero = [0 for _ in range(numero_repeticiones)]
     dinero_acumulado_gr = 0
@@ -80,7 +82,7 @@ def grafica_greedy():
 
     # Llamamos a la funcion de búsqueda:
     for i in range(numero_repeticiones):
-        dinero_greedy, dinero_acumulado_gr, bateria_hora_gr, energia_disponible_hora_gr = greedy()
+        dinero_greedy, dinero_acumulado_gr, bateria_hora_gr = greedy()
         dinero[i] = dinero_greedy
 
     # Dinero acumulado en cada hora
@@ -93,7 +95,7 @@ def grafica_greedy():
     plt.plot([precio_venta.index(max(precio_venta)) for _ in [0, round(max(dinero_acumulado_gr))]],
              [i for i in [0, round(max(dinero_acumulado_gr))]], linestyle=':')
 
-    plt.legend(["Dinero Acumulado", "Batería", "Hora de Venta"])    # La leyenda
+    plt.legend(["Dinero Acumulado", "Batería", "Hora de Venta"])  # La leyenda
     plt.show()  # Mostramos la gráfica
 
     # Generamos los datos obtenidos de la búsqueda
@@ -118,4 +120,3 @@ def grafica_greedy():
 
 # main
 grafica_greedy()
-
