@@ -45,23 +45,23 @@ def greedy():
         # Cuando llegue la hora en la que hay que vender, se vende toda la energia que hay en la bateria + la que se
         # haya generado. A partir de dicha hora se vende toda la energia que genere.
         if hora >= hora_venta:
-            energia_disponible = bateria + r[hora_venta] * 0.2  # KwH
-            dinero += energia_disponible * precio_venta[hora_venta]
+            energia_disponible = r[hora] * 0.2 * 1000
+            dinero += (bateria + energia_disponible / 1000) * precio_venta[hora]
             bateria = 0
         # Si la hora es anterior a la hora de venta, se almacena en la bateria
         else:
             # Guarda toda la energia hasta que se llene
-            energia_disponible = bateria + r[hora] * 0.2
+            energia_disponible = bateria + r[hora] * 0.2 * 1000
 
-            if bateria < capacidad_bateria and energia_disponible <= (capacidad_bateria - bateria):
-                bateria += energia_disponible - bateria
+            if bateria < capacidad_bateria and energia_disponible <= (capacidad_bateria - bateria) * 1000:
+                bateria += energia_disponible / 1000
                 energia_disponible = 0
-            elif bateria < capacidad_bateria and energia_disponible > (capacidad_bateria - bateria):
-                energia_disponible = energia_disponible - (capacidad_bateria - bateria)
+            elif bateria < capacidad_bateria and energia_disponible > (capacidad_bateria - bateria) * 1000:
+                energia_disponible = energia_disponible - (capacidad_bateria - bateria) * 1000
                 bateria = capacidad_bateria
 
             # Si sobra energia, se vende
-            dinero += energia_disponible * precio_venta[hora]
+            dinero += energia_disponible / 1000 * precio_venta[hora]
 
         # Graficas
         energia_disponible_hora[hora] = energia_disponible
