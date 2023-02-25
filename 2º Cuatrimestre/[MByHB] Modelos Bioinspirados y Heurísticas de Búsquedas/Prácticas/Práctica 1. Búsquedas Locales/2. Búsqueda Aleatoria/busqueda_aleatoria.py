@@ -6,7 +6,7 @@ import statistics
 import matplotlib.pyplot as plt
 import pandas as pd
 
-isRandom = False
+isRandom = True
 numero_repeticiones = 5
 
 # Constantes

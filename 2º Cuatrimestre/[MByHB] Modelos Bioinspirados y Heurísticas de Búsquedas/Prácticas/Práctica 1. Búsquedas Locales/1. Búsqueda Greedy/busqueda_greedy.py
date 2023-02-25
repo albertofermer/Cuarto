@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import statistics
 
-isRandom = False
+isRandom = True
 numero_repeticiones = 5
 
 # Constantes
@@ -85,17 +85,22 @@ def grafica_greedy():
         dinero_greedy, dinero_acumulado_gr, bateria_hora_gr = greedy()
         dinero[i] = dinero_greedy
 
+    fig, ax = plt.subplots()
+    ax.set_xticks(range(0, 23, 1))
     # Dinero acumulado en cada hora
-    plt.plot([i for i in range(24)], [cent/100 for cent in dinero_acumulado_gr])
+    plt.plot([i for i in range(24)], [cent/100 for cent in dinero_acumulado_gr], label="Dinero Acumulado")
+    plt.scatter([i for i in range(24)], [cent/100 for cent in dinero_acumulado_gr])
 
     # Capacidad de la bateria en cada hora
-    plt.plot([i for i in range(24)], bateria_hora_gr)
+    plt.plot([i for i in range(24)], bateria_hora_gr, label="Batería")
+    plt.scatter([i for i in range(24)], bateria_hora_gr)
 
     # Linea de hora de venta
-    plt.plot([precio_venta.index(max(precio_venta)) for _ in [0, round(max([cent/100 for cent in dinero_acumulado_gr]))]],
-             [i for i in [0, round(max([cent/100 for cent in dinero_acumulado_gr]))]], linestyle=':')
+    plt.plot([precio_venta.index(max(precio_venta)) for _ in range(2)],
+             [i for i in [0, round(max([cent/100 for cent in dinero_acumulado_gr]))]], linestyle=':',
+             label="Hora de Venta")
 
-    plt.legend(["Dinero Acumulado", "Batería", "Hora de Venta"])  # La leyenda
+    plt.legend()
     plt.xlabel("Horas")
     plt.ylabel("Euros (€)")
     plt.show()  # Mostramos la gráfica

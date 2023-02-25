@@ -114,7 +114,6 @@ Contiene un bucle que recorre el vector completo y para cada valor comprueba si:
 def funcion_evaluacion(solucion):
     bateria = 0  # 1 -- 300 kWh
     dinero = 0  # en centimos
-
     # Listas para sacar los datos de las graficas
     dinero_acumulado = [0 for _ in range(24)]
     bateria_hora = [0 for _ in range(24)]
@@ -164,5 +163,7 @@ def genera_vecinos(semilla, solucion):
     vecino = solucion
     random.seed(semilla)
     h = random.randint(0, 23)  # Numero aleatorio para seleccionar la columna
+
+    
 
     return vecino
