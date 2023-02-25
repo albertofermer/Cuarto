@@ -86,16 +86,18 @@ def grafica_greedy():
         dinero[i] = dinero_greedy
 
     # Dinero acumulado en cada hora
-    plt.plot([i for i in range(24)], dinero_acumulado_gr)
+    plt.plot([i for i in range(24)], [cent/100 for cent in dinero_acumulado_gr])
 
     # Capacidad de la bateria en cada hora
-    plt.plot([i for i in range(24)], [b * max(dinero_acumulado_gr) / capacidad_bateria for b in bateria_hora_gr])
+    plt.plot([i for i in range(24)], bateria_hora_gr)
 
     # Linea de hora de venta
-    plt.plot([precio_venta.index(max(precio_venta)) for _ in [0, round(max(dinero_acumulado_gr))]],
-             [i for i in [0, round(max(dinero_acumulado_gr))]], linestyle=':')
+    plt.plot([precio_venta.index(max(precio_venta)) for _ in [0, round(max([cent/100 for cent in dinero_acumulado_gr]))]],
+             [i for i in [0, round(max([cent/100 for cent in dinero_acumulado_gr]))]], linestyle=':')
 
     plt.legend(["Dinero Acumulado", "Batería", "Hora de Venta"])  # La leyenda
+    plt.xlabel("Horas")
+    plt.ylabel("Euros (€)")
     plt.show()  # Mostramos la gráfica
 
     # Generamos los datos obtenidos de la búsqueda
