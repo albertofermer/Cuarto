@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import statistics
 
-isRandom = True
+isRandom = False
 numero_repeticiones = 5
 
 # Constantes
@@ -103,6 +103,10 @@ def grafica_greedy():
     plt.legend()
     plt.xlabel("Horas")
     plt.ylabel("Euros (€)")
+    if not isRandom:
+        plt.savefig(f'.\\graficas\\ProblemaReal\\greedy_search_ProblemaReal.png')
+    else:
+        plt.savefig(f'.\\graficas\\ProblemaAleatorio\\greedy_search_ProblemaAleatorio.png')
     plt.show()  # Mostramos la gráfica
 
     # Generamos los datos obtenidos de la búsqueda

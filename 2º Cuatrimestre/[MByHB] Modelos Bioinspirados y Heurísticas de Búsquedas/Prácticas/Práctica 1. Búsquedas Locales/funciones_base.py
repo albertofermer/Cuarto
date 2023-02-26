@@ -76,7 +76,7 @@ def generar_inicial(semilla, longitud_vector, granularidad):
 def vender(bateria, hora, solucion, dinero):
     # Vender
     energia_disponible = bateria + r[hora] * 0.2  # En KWh
-    energia_vendida = solucion[hora] / 100 * energia_disponible  # En KWh
+    energia_vendida = abs(solucion[hora]) / 100 * energia_disponible  # En KWh
     dinero += energia_vendida * precio_venta[hora]  # En KWh
 
     if bateria >= energia_vendida:  # Si hay suficiente energia para vender en la bateria
@@ -123,6 +123,7 @@ def funcion_evaluacion(solucion):
         if solucion[hora] >= 0:
 
             bateria, energia_disponible, dinero = vender(bateria, hora, solucion, dinero)
+            #if bateria > 300: print(f"bateria: {bateria}")
 
         else:
             # Comprar
@@ -159,11 +160,13 @@ def funcion_evaluacion(solucion):
 
 
 # Generador de Soluciones Vecinas
-def genera_vecinos(semilla, solucion):
+def genera_vecinos(semilla, solucion, visitados):
     vecino = solucion
     random.seed(semilla)
-    h = random.randint(0, 23)  # Numero aleatorio para seleccionar la columna
-
-    
-
-    return vecino
+    for h in range(23):
+        # Aumentar o Disminuir el porcentaje en %granularidad%
+        if vecino not in visitados:
+            visitados.append(vecino)
+            return vecino
+        else:
+            continue
