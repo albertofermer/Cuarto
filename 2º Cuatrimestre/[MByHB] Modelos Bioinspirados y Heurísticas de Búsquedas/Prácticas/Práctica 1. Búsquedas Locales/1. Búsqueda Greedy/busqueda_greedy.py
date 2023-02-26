@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import statistics
 
-isRandom = False
+isRandom = True
 numero_repeticiones = 5
 
 # Constantes
@@ -88,21 +88,24 @@ def grafica_greedy():
     fig, ax = plt.subplots()
     ax.set_xticks(range(0, 23, 1))
     # Dinero acumulado en cada hora
-    plt.plot([i for i in range(24)], [cent/100 for cent in dinero_acumulado_gr], label="Dinero Acumulado")
-    plt.scatter([i for i in range(24)], [cent/100 for cent in dinero_acumulado_gr])
-
-    # Capacidad de la bateria en cada hora
-    plt.plot([i for i in range(24)], bateria_hora_gr, label="Batería")
-    plt.scatter([i for i in range(24)], bateria_hora_gr)
+    ln0 = ax.plot([i for i in range(24)], [cent / 100 for cent in dinero_acumulado_gr], label="Dinero Acumulado")
+    ax.scatter([i for i in range(24)], [cent / 100 for cent in dinero_acumulado_gr])
 
     # Linea de hora de venta
-    plt.plot([precio_venta.index(max(precio_venta)) for _ in range(2)],
-             [i for i in [0, round(max([cent/100 for cent in dinero_acumulado_gr]))]], linestyle=':',
-             label="Hora de Venta")
+    ln1 = ax.plot([precio_venta.index(max(precio_venta)) for _ in range(2)],
+                  [i for i in [0, round(max([cent / 100 for cent in dinero_acumulado_gr]))]], linestyle=':',
+                  label="Hora de Venta", c="green")
 
-    plt.legend()
-    plt.xlabel("Horas")
-    plt.ylabel("Euros (€)")
+    ax2 = ax.twinx()
+    ax.set_xlabel("Horas")
+    ax.set_ylabel("Euros (€)")
+    # Capacidad de la bateria en cada hora
+    ln2 = ax2.plot([i for i in range(24)], bateria_hora_gr, label="Batería", c="orange")
+    ax2.scatter([i for i in range(24)], bateria_hora_gr, c="orange")
+
+    leg = ln0 + ln1 + ln2
+    labs = [legend.get_label() for legend in leg]
+    plt.legend(leg, labs, loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=3)
     if not isRandom:
         plt.savefig(f'.\\graficas\\ProblemaReal\\greedy_search_ProblemaReal.png')
     else:

@@ -82,15 +82,19 @@ def grafica_aleatoria():
             fig, ax = plt.subplots()
             plt.title(f"Búsqueda Aleatoria. G = {granularidades[g]}, S = {semillas[i]}")
             ax.set_xticks(range(0, 23, 1))
-            ax.plot([j for j in range(24)], [cent/100 for cent in dinero_acumulado_aleatorio], label="Dinero Acumulado")
+            ln0 = ax.plot([j for j in range(24)], [cent/100 for cent in dinero_acumulado_aleatorio], label="Dinero Acumulado")
             ax.scatter([j for j in range(24)], [cent/100 for cent in dinero_acumulado_aleatorio])
 
             # Capacidad de la bateria en cada hora
-            ax.plot([j for j in range(24)], bateria_hora_aleatorio, c='orange', label="Bateria")
-            ax.scatter([j for j in range(24)], bateria_hora_aleatorio, c='orange')
-            ax.legend()  # La leyenda
-            plt.xlabel("Horas")
-            plt.ylabel("Euros (€)")
+            ax1 = ax.twinx()
+            ln1 = ax1.plot([j for j in range(24)], bateria_hora_aleatorio, c='orange', label="Bateria")
+            ax1.scatter([j for j in range(24)], bateria_hora_aleatorio, c='orange')
+            ax.set_xlabel("Horas")
+            ax.set_ylabel("Euros (€)")
+            ax1.set_ylabel("MW")
+            leg = ln0 + ln1
+            labs = [legend.get_label() for legend in leg]
+            plt.legend(leg, labs, loc='upper center', bbox_to_anchor=(0.5, 1.17), ncol=3)
             if not isRandom:
                 plt.savefig(f'.\\graficas\\ProblemaReal\\'
                             f'randomsearch_g{granularidades[g]}_s{semillas[i]}_ProblemaReal.png')
