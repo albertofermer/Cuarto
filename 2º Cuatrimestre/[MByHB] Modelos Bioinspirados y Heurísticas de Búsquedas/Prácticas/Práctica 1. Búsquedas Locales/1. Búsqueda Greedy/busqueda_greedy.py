@@ -102,7 +102,8 @@ def grafica_greedy():
     # Capacidad de la bateria en cada hora
     ln2 = ax2.plot([i for i in range(24)], bateria_hora_gr, label="Batería", c="orange")
     ax2.scatter([i for i in range(24)], bateria_hora_gr, c="orange")
-
+    ax2.set(ylim=ax.get_ylim())
+    ax2.set_ylabel("MW")
     leg = ln0 + ln1 + ln2
     labs = [legend.get_label() for legend in leg]
     plt.legend(leg, labs, loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=3)

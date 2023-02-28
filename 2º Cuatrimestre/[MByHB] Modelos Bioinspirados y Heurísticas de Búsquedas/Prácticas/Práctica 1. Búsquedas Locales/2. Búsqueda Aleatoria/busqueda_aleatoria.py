@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-isRandom = True
+isRandom = False
 numero_repeticiones = 5
 
 # Constantes
@@ -92,6 +92,7 @@ def grafica_aleatoria():
             ax.set_xlabel("Horas")
             ax.set_ylabel("Euros (€)")
             ax1.set_ylabel("MW")
+            ax1.set(ylim=ax.get_ylim())
             leg = ln0 + ln1
             labs = [legend.get_label() for legend in leg]
             plt.legend(leg, labs, loc='upper center', bbox_to_anchor=(0.5, 1.17), ncol=3)
