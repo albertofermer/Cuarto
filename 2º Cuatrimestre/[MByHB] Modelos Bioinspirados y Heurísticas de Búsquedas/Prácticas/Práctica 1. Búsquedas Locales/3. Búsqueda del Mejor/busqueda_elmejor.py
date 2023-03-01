@@ -24,6 +24,9 @@ else:
     precio_compra = constantes.precio_compra
     r = constantes.r
 
+evaluaciones = np.tile(np.array([0 for _ in range(numero_repeticiones)], dtype=np.float64), (3, 1))
+dinero = np.tile(np.array([0 for _ in range(numero_repeticiones)], dtype=np.float64), (3, 1))
+
 
 def entorno(solucion_actual, granularidad):
     entorno_soluciones = []
@@ -47,22 +50,105 @@ def entorno(solucion_actual, granularidad):
 
 
 def busqueda_elmejor(semilla, granularidad):
+    random.seed(semilla)
+
+    dinero_acumulado = []
+    bateria_hora = []
+
     solucion_inicial = base.generar_inicial(semilla, 24, granularidad)
     solucion_actual = solucion_inicial
+    best_dinero_acumulado = []
+    best_bateria_hora = []
+    max_dinero = 0
+    num_evaluaciones = 0
 
     while True:  # Repetir
         mejor_vecino = solucion_actual
+        dinero_vecino, dinero_acumulado_vecino, bateria_hora_vecino = base.funcion_evaluacion(mejor_vecino)
+        num_evaluaciones += 1
         for s_prima in entorno(solucion_actual, granularidad):  # Repetir para toda S' perteneciente a E(S_act)
             # Si el objetivo(s_prima) es mejor que objetivo(mejor_vecino)
-            if base.funcion_evaluacion(s_prima) > base.funcion_evaluacion(mejor_vecino):
+            dinero_sprima, dinero_acumulado_sprima, bateria_hora_sprima = base.funcion_evaluacion(s_prima)
+            num_evaluaciones += 1
+            if dinero_sprima > dinero_vecino:
                 mejor_vecino = s_prima  # Actualizamos el mejor vecino
+                dinero_vecino, dinero_acumulado_vecino, bateria_hora_vecino = base.funcion_evaluacion(mejor_vecino)
+                num_evaluaciones += 1
+                best_dinero_acumulado = dinero_acumulado_vecino
+                best_bateria_hora = bateria_hora_vecino
+                max_dinero = dinero_vecino
+
         # Fin-Para
         # Si el objetivo(mejor_vecino) es mejor que objetivo(solucion_actual)
-        if base.funcion_evaluacion(mejor_vecino) > base.funcion_evaluacion(solucion_actual):
+        num_evaluaciones += 1
+        if dinero_vecino > base.funcion_evaluacion(solucion_actual)[0]:
             solucion_actual = mejor_vecino  # Actualiza solucion_actual
         else:  # En caso contrario
             break  # Sale del bucle
-    return solucion_actual  # Devuelve la solucion actual
+    print(num_evaluaciones)
+    return max_dinero, best_dinero_acumulado, best_bateria_hora, num_evaluaciones, solucion_actual  # Devuelve la solucion actual
 
 
-print((busqueda_elmejor(123456, 1)))
+def grafica_elmejor():
+    # Llamamos a la funcion de búsqueda:
+    for i in range(numero_repeticiones):
+        for g in range(len(granularidades)):
+            dinero_mejor, dinero_acumulado, bateria_hora, num_evaluaciones_mejor, solucion = busqueda_elmejor(semillas[i],
+                                                                                                        granularidades[g])
+
+            dinero[g, i] = dinero_mejor
+            evaluaciones[g, i] = num_evaluaciones_mejor
+
+            # Dinero acumulado en cada hora
+            fig, ax = plt.subplots()
+            plt.title(f"Búsqueda El Mejor. G = {granularidades[g]}, S = {semillas[i]}")
+            ax.set_xticks(range(0, 23, 1))
+            ln0 = ax.plot([j for j in range(24)], [cent / 100 for cent in dinero_acumulado],
+                          label="Dinero Acumulado")
+            ax.scatter([j for j in range(24)], [cent / 100 for cent in dinero_acumulado])
+
+            # Capacidad de la bateria en cada hora
+            ax1 = ax.twinx()
+            ln1 = ax1.plot([j for j in range(24)], bateria_hora, c='orange', label="Bateria")
+            ax1.scatter([j for j in range(24)], bateria_hora, c='orange')
+            ax.set_xlabel("Horas")
+            ax.set_ylabel("Euros (€)")
+            ax1.set_ylabel("MW")
+            ax1.set(ylim=ax.get_ylim())
+            leg = ln0 + ln1
+            labs = [legend.get_label() for legend in leg]
+            plt.legend(leg, labs, loc='upper center', bbox_to_anchor=(0.5, 1.17), ncol=3)
+            if not isRandom:
+                plt.savefig(f'.\\graficas\\ProblemaReal\\'
+                            f'randomsearch_g{granularidades[g]}_s{semillas[i]}_ProblemaReal.png')
+            else:
+                plt.savefig(f'.\\graficas\\ProblemaAleatorio\\'
+                            f'randomsearch_g{granularidades[g]}_s{semillas[i]}_ProblemaAleatorio.png')
+            plt.show()  # Mostramos la gráfica
+
+            print(solucion)
+
+    # Generamos los datos obtenidos de la búsqueda
+    for gr in range(3):
+        data = {
+            'Media Evaluaciones': [statistics.mean(evaluaciones[gr, :])],
+            'Mejor Evaluación': [min(evaluaciones[gr, :])],
+            'Desviación Evaluaciones': [statistics.stdev(evaluaciones[gr, :])],
+            'Media Dinero (€)': [round(statistics.mean(dinero[gr, :]) / 100, 2)],
+            'Mejor Dinero (€)': [round(max(dinero[gr, :]) / 100, 2)],
+            'Desviación Dinero (€)': [round(statistics.stdev(dinero[gr, :]) / 100, 2)]
+        }
+
+        # Opciones de Pandas para mostrar la tabla completa en la consola
+        pd.set_option('display.max_rows', None)
+        pd.set_option('display.max_columns', None)
+        pd.set_option('display.width', None)
+        pd.set_option('display.max_colwidth', None)
+
+        # Mostramos los datos obtenidos
+        print(f"Granularidad: {granularidades[gr]}")
+        print(pd.DataFrame(data))
+
+
+# print((busqueda_elmejor(123456, 1)))
+grafica_elmejor()
