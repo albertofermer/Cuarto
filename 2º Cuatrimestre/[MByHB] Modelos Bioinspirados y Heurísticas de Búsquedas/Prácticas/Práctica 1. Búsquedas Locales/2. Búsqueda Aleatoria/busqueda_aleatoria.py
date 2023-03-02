@@ -25,8 +25,8 @@ else:
     r = constantes.r
 
 # Valores de estudio para rellenar la tabla.
-evaluaciones = np.tile(np.array([0 for _ in range(numero_repeticiones)]), (3, 1))
-dinero = np.tile(np.array([0 for _ in range(numero_repeticiones)]), (3, 1))
+evaluaciones = np.tile(np.array([0 for _ in range(numero_repeticiones)], dtype=np.float64), (3, 1))
+dinero = np.tile(np.array([0 for _ in range(numero_repeticiones)], dtype=np.float64), (3, 1))
 
 
 # El Algoritmo de Búsqueda Aleatoria (BA) consistirá en generar aleatoriamente una solución en cada
@@ -38,7 +38,6 @@ def busqueda_aleatoria(semilla, granularidad):
     best_bateria_hora = []
 
     contador_evaluaciones = 0
-    # mejor_evaluacion = -1
 
     # Genera la solucion Inicial
     solucion_inicial = base.generar_inicial(semilla, 24, granularidad)
@@ -52,7 +51,7 @@ def busqueda_aleatoria(semilla, granularidad):
         # Genera solucion aleatoria
         solucion_actual = [random.randrange(-100, 101, granularidad) for _ in range(24)]
         # Comprueba si la funcion objetivo es mejor
-        objetivo_actual, dinero_acumulado_act, bateria_hora_act = base.funcion_evaluacion(solucion_actual)
+        objetivo_actual, dinero_acumulado_act, bateria_hora_act = base.funcion_evaluacion(solucion_actual, isRandom)
 
         if objetivo_actual > max_dinero:
             max_dinero = objetivo_actual
@@ -71,9 +70,11 @@ def grafica_aleatoria():
 
     # Llamamos a la funcion de búsqueda:
     for i in range(numero_repeticiones):
+        ingresos_granularidad = np.tile(np.array([0 for _ in range(24)], dtype=np.float64), (3, 1))
         for g in range(len(granularidades)):
             dinero_aleatorio, dinero_acumulado_aleatorio, bateria_hora_aleatorio, num_evaluaciones, solucion = \
                 busqueda_aleatoria(semillas[i], granularidades[g])
+            ingresos_granularidad[g] = dinero_acumulado_aleatorio
 
             dinero[g, i] = dinero_aleatorio
             evaluaciones[g, i] = num_evaluaciones
@@ -105,6 +106,28 @@ def grafica_aleatoria():
             plt.show()  # Mostramos la gráfica
 
             print(solucion)
+        # Grafica de ingresos de las tres granularidades:
+        fig, ax2 = plt.subplots()
+        plt.title(f"Comparacion de ingresos por granularidad\n Semilla: {semillas[i]}")
+        for granularidad in range(3):
+            ln0 = ax2.plot([j for j in range(24)], [cent / 100 for cent in ingresos_granularidad[granularidad, :]],
+                          label=f"Ingresos con granularidad = {granularidades[granularidad]}")
+            ax2.scatter([j for j in range(24)], [cent / 100 for cent in ingresos_granularidad[granularidad, :]])
+
+        plt.legend()
+        ax2.set_xticks(range(0, 24, 1))
+        plt.xlabel("Horas")
+        plt.ylabel("Euros (€)")
+        if not isRandom:
+            plt.savefig(f'.\\graficas\\ProblemaReal\\ingresos-granularidad\\'
+                        f'random_search_s{semillas[i]}_ProblemaReal.png')
+        else:
+            plt.savefig(f'.\\graficas\\ProblemaAleatorio\\ingresos-granularidad\\'
+                        f'random_search_s{semillas[i]}_ProblemaAleatorio.png')
+
+
+        plt.show()
+        plt.close()
 
     # Generamos los datos obtenidos de la búsqueda
     for i in range(3):
@@ -129,3 +152,4 @@ def grafica_aleatoria():
 
 
 grafica_aleatoria()
+#print(busqueda_aleatoria(123456, 1)[0])

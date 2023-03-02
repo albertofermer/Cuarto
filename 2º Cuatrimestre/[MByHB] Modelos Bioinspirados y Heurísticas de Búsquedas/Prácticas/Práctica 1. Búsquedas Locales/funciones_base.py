@@ -3,19 +3,22 @@ import random
 
 # Carga los datos de precio de venta, de compra y de radiacion de cada uno de los
 # dos problemas: True -> Problema Aleatorio.
-isRandom = False
 
 # Constantes
 capacidad_bateria = constantes.capacidad_bateria
 
-if isRandom:
-    precio_venta = constantes.precio_venta_random
-    precio_compra = constantes.precio_compra_random
-    r = constantes.r_random
-else:
-    precio_venta = constantes.precio_venta
-    precio_compra = constantes.precio_compra
-    r = constantes.r
+
+def get_vectores(israndom):
+    if israndom:
+        precio_venta = constantes.precio_venta_random
+        precio_compra = constantes.precio_compra_random
+        r = constantes.r_random
+    else:
+        precio_venta = constantes.precio_venta
+        precio_compra = constantes.precio_compra
+        r = constantes.r
+    return precio_venta, precio_compra, r
+
 
 '''
 -----------------------------------------------------------------------------------------------------------
@@ -33,7 +36,8 @@ Devuelve el estado de la bateria, la energia disponible y el dinero generado.
 '''
 
 
-def almacenar_bateria(bateria, energia_generada, dinero, i):
+def almacenar_bateria(bateria, energia_generada, dinero, i, israndom):
+    precio_venta, precio_compra, r = get_vectores(israndom)
     # En caso de que quepa toda la energia disponible en la bateria.
     if bateria < capacidad_bateria and energia_generada <= (capacidad_bateria - bateria):
         bateria += energia_generada  # En KWh
@@ -73,7 +77,8 @@ def generar_inicial(semilla, longitud_vector, granularidad):
     return solucion_inicial
 
 
-def vender(bateria, hora, solucion, dinero):
+def vender(bateria, hora, solucion, dinero, israndom):
+    precio_venta, precio_compra, r = get_vectores(israndom)
     # Vender
     energia_disponible = bateria + r[hora] * 0.2  # En KWh
     energia_vendida = abs(solucion[hora]) / 100 * energia_disponible  # En KWh
@@ -88,7 +93,7 @@ def vender(bateria, hora, solucion, dinero):
         bateria = 0
 
     # Almacena en la bateria lo que sobre y vende lo que no quepa en la bateria
-    bateria, energia_disponible, dinero = almacenar_bateria(bateria, energia_disponible - bateria, dinero, hora)
+    bateria, energia_disponible, dinero = almacenar_bateria(bateria, energia_disponible - bateria, dinero, hora, israndom)
 
     return bateria, energia_disponible, dinero
 
@@ -111,7 +116,8 @@ Contiene un bucle que recorre el vector completo y para cada valor comprueba si:
 
 
 # Funcion de Coste
-def funcion_evaluacion(solucion):
+def funcion_evaluacion(solucion, israndom):
+    precio_venta, precio_compra, r = get_vectores(israndom)
     bateria = 0  # 1 -- 300 kWh
     dinero = 0  # en centimos
     # Listas para sacar los datos de las graficas
@@ -122,7 +128,7 @@ def funcion_evaluacion(solucion):
     for hora in range(24):
         if solucion[hora] >= 0:
 
-            bateria, energia_disponible, dinero = vender(bateria, hora, solucion, dinero)
+            bateria, energia_disponible, dinero = vender(bateria, hora, solucion, dinero, israndom)
             #if bateria > 300: print(f"bateria: {bateria}")
 
         else:
@@ -131,7 +137,7 @@ def funcion_evaluacion(solucion):
             energia_disponible = bateria + r[hora] * 0.2  # En KWh
 
             # Almacena y vende el sobrante
-            bateria, energia_disponible, dinero = almacenar_bateria(bateria, energia_disponible - bateria, dinero, hora)
+            bateria, energia_disponible, dinero = almacenar_bateria(bateria, energia_disponible - bateria, dinero, hora, israndom)
 
             # Compro un porcentaje de lo que me sobra de bateria. De esta forma no podemos sobrepasar el limite de la
             # bateria en ningun momento.
@@ -142,7 +148,7 @@ def funcion_evaluacion(solucion):
 
             # Si la energia comprada es 0, entonces ¿vendo?
             if energia_comprada == 0:
-                bateria, energia_disponible, dinero = vender(bateria, hora, solucion, dinero)
+                bateria, energia_disponible, dinero = vender(bateria, hora, solucion, dinero, israndom)
 
         # Guardamos los datos para las gráficas
         energia_disponible_hora[hora] = energia_disponible

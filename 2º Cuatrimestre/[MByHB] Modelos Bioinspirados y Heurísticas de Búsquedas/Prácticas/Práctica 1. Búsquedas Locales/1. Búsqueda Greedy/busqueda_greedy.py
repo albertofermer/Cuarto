@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import statistics
 
-isRandom = True
+isRandom = False
 numero_repeticiones = 5
 
 # Constantes
@@ -86,7 +86,7 @@ def grafica_greedy():
         dinero[i] = dinero_greedy
 
     fig, ax = plt.subplots()
-    ax.set_xticks(range(0, 23, 1))
+    ax.set_xticks(range(0, 24, 1))
     # Dinero acumulado en cada hora
     ln0 = ax.plot([i for i in range(24)], [cent / 100 for cent in dinero_acumulado_gr], label="Dinero Acumulado")
     ax.scatter([i for i in range(24)], [cent / 100 for cent in dinero_acumulado_gr])
