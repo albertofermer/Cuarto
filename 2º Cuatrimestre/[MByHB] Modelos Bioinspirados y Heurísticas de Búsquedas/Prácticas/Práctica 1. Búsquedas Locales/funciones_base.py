@@ -129,8 +129,6 @@ def funcion_evaluacion(solucion, israndom):
         if solucion[hora] >= 0:
 
             bateria, energia_disponible, dinero = vender(bateria, hora, solucion, dinero, israndom)
-            #if bateria > 300: print(f"bateria: {bateria}")
-
         else:
             # Comprar
             # Aunque hayamos decidido comprar, también generamos cierta energía ese día:

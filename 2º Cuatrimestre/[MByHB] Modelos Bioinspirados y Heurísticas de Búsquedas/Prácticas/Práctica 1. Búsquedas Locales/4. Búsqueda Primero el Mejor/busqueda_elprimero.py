@@ -25,22 +25,20 @@ else:
     r = constantes.r
 
 
-def genera_vecinos(solucion, granularidad, lista_entorno):
+def genera_vecinos(solucion, granularidad, pos):
     solucion_vecina = solucion.copy()
-    print(lista_entorno)
-    while solucion_vecina in lista_entorno:
-        solucion_vecina = solucion.copy()
-        h = random.randint(0, 24)   # Accede a una posicion aleatoria
-        accion = random.randint(0, 1)   # Elige una accion (decrementar o incrementar)
+    solucion_vecina = solucion.copy()
 
-        if accion == 0:     # Incrementa
-            solucion_vecina[h] += granularidad
-            if solucion_vecina[h] > 100:
-                solucion_vecina[h] = 100
-        else:   # Decrementa
-            solucion_vecina[h] -= granularidad
-            if solucion_vecina[h] < -100:
-                solucion_vecina[h] = -100
+    accion = random.randint(0, 1)  # Elige una accion (decrementar o incrementar)
+
+    if accion == 0:  # Incrementa
+        solucion_vecina[pos] += granularidad
+        if solucion_vecina[pos] > 100:
+            solucion_vecina[pos] = 100
+    else:  # Decrementa
+        solucion_vecina[pos] -= granularidad
+        if solucion_vecina[pos] < -100:
+            solucion_vecina[pos] = -100
 
     return solucion_vecina
 
@@ -50,30 +48,33 @@ def busqueda_primero(semilla, granularidad):
     solucion_actual = base.generar_inicial(semilla, 24, granularidad)  # Genera la solucion inicial
     mejor_vecino = solucion_actual
     contador = 0
-    lista_vecinos = []
 
     while True:  # Repetir
+        pos = 0
         while True:  # Repetir
-            solucion_vecina = genera_vecinos(solucion_actual, granularidad, lista_vecinos)  # Genera vecinos
-            lista_vecinos.append(solucion_vecina)
+            solucion_vecina = genera_vecinos(solucion_actual, granularidad, pos)  # Genera vecinos
             # Hasta que la funcion de coste del vecino sea mejor que la del mejor vecino
             # o hasta que se haya generado el espacio de busqueda completo
+            contador += 2
             if base.funcion_evaluacion(solucion_vecina, isRandom) > base.funcion_evaluacion(mejor_vecino, isRandom) or \
-                    len(lista_vecinos) >= 48:
+                    pos > 23:
                 break
+            pos += 1
 
         # Si el coste de la solucion vecina es mejor que el de la solucion actual, se actualiza
         # la solucion
+        contador += 2
         if base.funcion_evaluacion(solucion_vecina, isRandom) > base.funcion_evaluacion(solucion_actual, isRandom):
             solucion_actual = solucion_vecina
             mejor_vecino = solucion_actual
 
+        contador += 2
         # Hasta que el coste de la solucion vecina sea peor o igual que el coste de la solucion actual.
         if base.funcion_evaluacion(solucion_vecina, isRandom) <= base.funcion_evaluacion(solucion_actual, isRandom):
             break
 
+    print(contador)
     return solucion_actual
 
 
-print(busqueda_primero(123456, 1))
-
+print(busqueda_primero(521463, 1))

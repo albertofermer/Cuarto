@@ -66,13 +66,14 @@ def busqueda_elmejor(semilla, granularidad):
         if num_evaluaciones < 3000:
             num_evaluaciones += 1
         for s_prima in entorno(solucion_actual, granularidad):  # Repetir para toda S' perteneciente a E(S_act)
-            # Si el objetivo(s_prima) es mejor que objetivo(mejor_vecino)
+
             if num_evaluaciones < 3000:
                 num_evaluaciones += 1
                 dinero_sprima, dinero_acumulado_sprima, bateria_hora_sprima = base.funcion_evaluacion(s_prima, isRandom)
             else:
                 break
 
+            # Si el objetivo(s_prima) es mejor que objetivo(mejor_vecino)
             if dinero_sprima > dinero_vecino and num_evaluaciones < 3000:
                 mejor_vecino = s_prima  # Actualizamos el mejor vecino
                 dinero_vecino, dinero_acumulado_vecino, bateria_hora_vecino = base.funcion_evaluacion(mejor_vecino,
@@ -87,12 +88,13 @@ def busqueda_elmejor(semilla, granularidad):
 
         # Fin-Para
         # Si el objetivo(mejor_vecino) es mejor que objetivo(solucion_actual)
-        if num_evaluaciones < 3000:
+        if dinero_vecino > base.funcion_evaluacion(solucion_actual, isRandom)[0] and num_evaluaciones < 3000:
             num_evaluaciones += 1
-        if dinero_vecino > base.funcion_evaluacion(solucion_actual, isRandom)[0] or num_evaluaciones < 3000:
             solucion_actual = mejor_vecino  # Actualiza solucion_actual
-        else:  # En caso contrario
-            break  # Sale del bucle
+
+        if dinero_vecino <= base.funcion_evaluacion(solucion_actual, isRandom)[0]:
+            break
+
     print(num_evaluaciones)
     return max_dinero, best_dinero_acumulado, best_bateria_hora, num_evaluaciones, solucion_actual  # Devuelve la solucion actual
 
