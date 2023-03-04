@@ -27,7 +27,6 @@ else:
 
 def genera_vecinos(solucion, granularidad, pos):
     solucion_vecina = solucion.copy()
-    solucion_vecina = solucion.copy()
 
     accion = random.randint(0, 1)  # Elige una accion (decrementar o incrementar)
 

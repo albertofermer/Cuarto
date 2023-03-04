@@ -34,11 +34,10 @@ def greedy():
     hora_venta = precio_venta.index(max(precio_venta))  # Obtiene la hora con el precio mas alto.
     bateria = 0
     dinero = 0
-
+    solucion = [0 for _ in range(24)]
     # Listas para sacar los datos de las graficas
     dinero_acumulado = [0 for _ in range(24)]
     bateria_hora = [0 for _ in range(24)]
-    energia_disponible_hora = [0 for _ in range(24)]
 
     for hora in range(24):
         # Cuando llegue la hora en la que hay que vender, se vende toda la energia que hay en la bateria + la que se
@@ -47,6 +46,7 @@ def greedy():
             energia_disponible = bateria + r[hora] * 0.2  # En KWH
             dinero += energia_disponible * precio_venta[hora]
             bateria = 0
+            solucion[hora] = 100
         # Si la hora es anterior a la hora de venta, se almacena en la bateria
         else:
             # Guarda toda la energia hasta que se llene
@@ -66,12 +66,14 @@ def greedy():
 
             # Si sobra energia, se vende
             dinero += energia_generada * precio_venta[hora]
+            solucion[hora] = 0
 
         # Graficas
         dinero_acumulado[hora] = dinero
         bateria_hora[hora] = bateria
 
-    return dinero, dinero_acumulado, bateria_hora
+    #print(solucion)
+    return dinero, dinero_acumulado, bateria_hora, solucion
 
 
 def grafica_greedy():
@@ -82,7 +84,7 @@ def grafica_greedy():
 
     # Llamamos a la funcion de búsqueda:
     for i in range(numero_repeticiones):
-        dinero_greedy, dinero_acumulado_gr, bateria_hora_gr = greedy()
+        dinero_greedy, dinero_acumulado_gr, bateria_hora_gr, solucion = greedy()
         dinero[i] = dinero_greedy
 
     fig, ax = plt.subplots()
@@ -134,4 +136,5 @@ def grafica_greedy():
 
 
 # main
-grafica_greedy()
+if __name__ == "__main__":
+    grafica_greedy()
