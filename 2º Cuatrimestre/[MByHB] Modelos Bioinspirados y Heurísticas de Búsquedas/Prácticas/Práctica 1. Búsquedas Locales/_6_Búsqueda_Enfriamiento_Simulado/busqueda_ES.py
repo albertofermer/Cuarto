@@ -8,7 +8,6 @@ import statistics
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-from itertools import combinations
 
 isRandom = False
 numero_repeticiones = 5
@@ -59,24 +58,28 @@ def seleccionar_solucion(solucion, granularidad, pos):
 
 def enfriamiento_simulado(semilla, granularidad, num_vecinos_, mu_, phi_):
     random.seed(semilla)
-    solucion_actual = greedy.greedy()[3]  # Solucion Greedy
+    solucion_actual = greedy.greedy(isRandom)[3]  # Solucion Greedy
     t0 = temperatura_inicial(mu_, phi_, solucion_actual)
     t = t0
     k = 0
+
     max_dinero = 0
     dinero_acumulado = []
     temperatura = [t]
     bateria_acumulada = []
     num_evaluaciones = 0
-    while k < 6:  # El algoritmo finaliza cuando se alcance un num maximo de iteraciones
+
+    while k < 8:  # El algoritmo finaliza cuando se alcance un num maximo de iteraciones
         for i in range(num_vecinos_):  # Condicion de Enfriamiento: Cuando se hayan generado un num de vecinos.
 
             solucion_candidata = seleccionar_solucion(solucion_actual, granularidad, random.randint(0, 23))
 
             num_evaluaciones += 2
             max_dinero, dinero_hora, bateria_hora = base.funcion_evaluacion(solucion_candidata, isRandom)
-            delta = max_dinero - base.funcion_evaluacion(solucion_actual, isRandom)[0]
-            #print(delta)
+
+            # Como estamos maximizando, el delta se calcula al revés que en el ppt de teoría.
+            delta = - max_dinero + base.funcion_evaluacion(solucion_actual, isRandom)[0]
+            # if delta > 0: print(np.exp(-delta / t))
             if random.uniform(0, 1) < np.exp(-delta / t) or delta < 0:
                 solucion_actual = solucion_candidata
                 dinero_acumulado = dinero_hora
@@ -84,6 +87,7 @@ def enfriamiento_simulado(semilla, granularidad, num_vecinos_, mu_, phi_):
 
         t = t / (1 + k)  # Esquema de Enfriamiento: Esquema de Cauchy
         k += 1
+        # print(t)
         temperatura.append(t)
     return max_dinero, dinero_acumulado, bateria_acumulada, num_evaluaciones, temperatura, solucion_actual
 
@@ -106,12 +110,11 @@ def experimentacion_parametros():
                                 num_vecinos[nv],
                                 mu[m],
                                 phi[p])
-                        #print(f"phi = {phi[p]} \n mu = {mu[m]}")
                         data = {
                             'mu': [mu[m]],
                             'phi': [phi[p]],
                             'dinero': [dinero_mejor],
-                            'T0': [temperatura_inicial(m, p, greedy.greedy()[3])]
+                            'T0': [temperatura_inicial(mu[m], phi[p], greedy.greedy(isRandom)[3])]
                         }
 
                         if dinero_mejor > max_dinero:
@@ -119,12 +122,13 @@ def experimentacion_parametros():
                             max_mu = mu[m]
                             max_phi = phi[p]
 
-                        #print(data)
-    print(f"mu = {max_mu} \n phi = {max_phi} \n dinero = {max_dinero}")
+                        print(data)
+    print(f"mu = {max_mu} \nphi = {max_phi} \ndinero = {max_dinero}")
 
 
 def graficas_enfriamiento_simulado(nv, m, p):
     # Llamamos a la funcion de búsqueda:
+    temperatura_enfriamiento = []
     for i in range(numero_repeticiones):
         ingresos_granularidad = np.tile(np.array([0 for _ in range(24)], dtype=np.float64), (3, 1))
         for g in range(len(granularidades)):
@@ -136,6 +140,7 @@ def graficas_enfriamiento_simulado(nv, m, p):
                     m,
                     p)
 
+            temperatura_enfriamiento = temperatura
             ingresos_granularidad[g] = dinero_acumulado
             dinero[g, i] = dinero_mejor
             evaluaciones[g, i] = num_evaluaciones_mejor
@@ -155,7 +160,7 @@ def graficas_enfriamiento_simulado(nv, m, p):
             ax.set_xlabel("Horas")
             ax.set_ylabel("Euros (€)")
             ax1.set_ylabel("MW")
-            # ax1.set(ylim=ax.get_ylim())
+            ax1.set(ylim=ax.get_ylim())
             leg = ln0 + ln1
             labs = [legend.get_label() for legend in leg]
             plt.legend(leg, labs, loc='upper center', bbox_to_anchor=(0.5, 1.17), ncol=3)
@@ -167,19 +172,29 @@ def graficas_enfriamiento_simulado(nv, m, p):
                             f'simulated_anealing_g{granularidades[g]}_s{semillas[i]}_ProblemaAleatorio.png')
             plt.show()  # Mostramos la gráfica
             plt.close()
-
-            # Representa el enfriamiento de la temperatura
-            fig, ax = plt.subplots()
-            plt.title(f"Esquema de Enfriamiento. G = {granularidades[g]}, S = {semillas[i]}")
-            ax.plot([j for j in range(len(temperatura))], temperatura, label="Temperatura")
-            plt.legend()
-            plt.xlabel("Iteraciones")
-            plt.ylabel("T")
-            #plt.yscale('log')
-            plt.show()
-            plt.close()
-
             print(solucion)
+
+        # Grafica de ingresos de las tres granularidades:
+        fig, ax = plt.subplots()
+        plt.title(f"Comparacion de ingresos por granularidad\n Semilla: {semillas[i]}")
+        for granularidad in range(3):
+            ln0 = ax.plot([j for j in range(24)], [cent / 100 for cent in ingresos_granularidad[granularidad, :]],
+                          label=f"Ingresos con granularidad = {granularidades[granularidad]}")
+            ax.scatter([j for j in range(24)], [cent / 100 for cent in ingresos_granularidad[granularidad, :]])
+
+        plt.legend()
+        ax.set_xticks(range(0, 24, 1))
+        plt.xlabel("Horas")
+        plt.ylabel("Euros (€)")
+
+        if not isRandom:
+            plt.savefig(f'.\\graficas\\ProblemaReal\\ingresos-granularidad\\'
+                        f'simulated_anealing_s{semillas[i]}_ProblemaReal.png')
+        else:
+            plt.savefig(f'.\\graficas\\ProblemaAleatorio\\ingresos-granularidad\\'
+                        f'simulated_anealing_s{semillas[i]}_ProblemaAleatorio.png')
+        plt.show()
+        plt.close()
 
     # Generamos los datos obtenidos de la búsqueda
     for gr in range(3):
@@ -201,15 +216,33 @@ def graficas_enfriamiento_simulado(nv, m, p):
         # Mostramos los datos obtenidos
         print(f"Granularidad: {granularidades[gr]}")
         print(pd.DataFrame(data))
+    # Representa el enfriamiento de la temperatura
+    fig, ax = plt.subplots()
+    plt.title(f"Esquema de Enfriamiento")
+    ax.plot([j for j in range(len(temperatura_enfriamiento))], temperatura_enfriamiento, label="Temperatura")
+    plt.legend()
+    plt.xlabel("Iteraciones")
+    plt.ylabel("T")
+    # plt.yscale('log')
+    if not isRandom:
+        plt.savefig(f'.\\graficas\\ProblemaReal\\esquema-enfriamiento\\'
+                    f'simulated_anealing_ProblemaReal.png')
+    else:
+        plt.savefig(f'.\\graficas\\ProblemaAleatorio\\esquema-enfriamiento\\'
+                    f'simulated_anealing_ProblemaAleatorio.png')
+    plt.show()
+    plt.close()
 
 
 if __name__ == "__main__":
     if isRandom:
-        graficas_enfriamiento_simulado(30, 0.2, 0.3)
+        #experimentacion_parametros()
+        graficas_enfriamiento_simulado(30, 0.1, 0.1)
     else:
-        graficas_enfriamiento_simulado(30, 0.3, 0.3)
+        #experimentacion_parametros()
+        graficas_enfriamiento_simulado(30, 0.1, 0.1)
 
-    #experimentacion_parametros()
 
-    # 0.2 // 0.3 -> datos aleatorios
-    # 0.3 // 0.3 -> datos reales
+
+    # 0.1 // 0.1 -> datos aleatorios
+    # 0.1 // 0.1 -> datos reales

@@ -1,4 +1,5 @@
 import constantes
+import funciones_base as base
 import matplotlib.pyplot as plt
 import pandas as pd
 import statistics
@@ -30,7 +31,10 @@ desviacion_evaluaciones = statistics.stdev(evaluaciones)
 # implementar como algoritmo básico, un Greedy, siguiendo la heurística de guardar desde el principio
 # hasta que se llene y luego vender en el pico de precio del dia toda la energia. A partir de ese momento vender toda
 # la energia.
-def greedy():
+def greedy(israndom):
+
+    precio_venta, precio_compra, r = base.get_vectores(israndom)
+
     hora_venta = precio_venta.index(max(precio_venta))  # Obtiene la hora con el precio mas alto.
     bateria = 0
     dinero = 0
@@ -84,7 +88,7 @@ def grafica_greedy():
 
     # Llamamos a la funcion de búsqueda:
     for i in range(numero_repeticiones):
-        dinero_greedy, dinero_acumulado_gr, bateria_hora_gr, solucion = greedy()
+        dinero_greedy, dinero_acumulado_gr, bateria_hora_gr, solucion = greedy(isRandom)
         dinero[i] = dinero_greedy
 
     fig, ax = plt.subplots()
