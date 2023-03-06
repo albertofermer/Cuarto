@@ -162,15 +162,3 @@ def funcion_evaluacion(solucion, israndom):
 
     return dinero, dinero_acumulado, bateria_hora
 
-
-# Generador de Soluciones Vecinas
-def genera_vecinos(semilla, solucion, visitados):
-    vecino = solucion
-    random.seed(semilla)
-    for h in range(23):
-        # Aumentar o Disminuir el porcentaje en %granularidad%
-        if vecino not in visitados:
-            visitados.append(vecino)
-            return vecino
-        else:
-            continue
