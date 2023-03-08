@@ -81,8 +81,6 @@ def enfriamiento_simulado(semilla, granularidad, num_vecinos_, mu_, phi_):
 
             num_evaluaciones += 2
             dinero_candidato, dinero_hora, bateria_hora = base.funcion_evaluacion(solucion_candidata, isRandom)
-
-            # Como estamos maximizando, el delta se calcula al revés que en el ppt de teoría.
             delta = base.funcion_evaluacion(solucion_mejor, isRandom)[0] - dinero_candidato
 
             if delta < 0 or random.uniform(0, 1) < np.exp(-delta / t):  # Si es mejor la coge
@@ -253,10 +251,10 @@ def graficas_enfriamiento_simulado(nv, m, p):
 if __name__ == "__main__":
     if isRandom:
         experimentacion_parametros()
-        graficas_enfriamiento_simulado(100, 0.2, 0.3)
+        graficas_enfriamiento_simulado(20, 0.2, 0.3)
     else:
         experimentacion_parametros()
-        graficas_enfriamiento_simulado(100, 0.3, 0.2)
+        graficas_enfriamiento_simulado(20, 0.3, 0.2)
 
 
 

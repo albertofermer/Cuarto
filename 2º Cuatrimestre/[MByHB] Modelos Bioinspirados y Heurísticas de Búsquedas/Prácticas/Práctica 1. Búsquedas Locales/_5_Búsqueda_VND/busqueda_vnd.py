@@ -104,7 +104,7 @@ def busqueda_elmejor_vnd(semilla, granularidad):
     k = 0
 
     while k < len(estructura_entornos):  # Repetir, hasta que k=kmax, la siguiente secuencia:
-        print(f"K = {k}")
+        #print(f"K = {k}")
         # a) Exploración del entorno: Encontrar la mejor solución s' del k-ésimo entorno de s.
         dinero_obtenido, dinero_acumulado, bateria_hora, n_evaluaciones, solucion_obtenida = busqueda_elmejor(
             solucion_inicial, k, granularidad)

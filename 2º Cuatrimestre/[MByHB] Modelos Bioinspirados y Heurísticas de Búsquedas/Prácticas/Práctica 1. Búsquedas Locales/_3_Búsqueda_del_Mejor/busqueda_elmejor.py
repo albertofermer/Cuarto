@@ -60,21 +60,18 @@ def busqueda_elmejor(semilla, granularidad):
     max_dinero = 0
     num_evaluaciones = 0
 
-    while True:  # Repetir
+    while num_evaluaciones < 3000:  # Repetir
         mejor_vecino = solucion_actual
+        num_evaluaciones += 1
         dinero_vecino, dinero_acumulado_vecino, bateria_hora_vecino = base.funcion_evaluacion(mejor_vecino, isRandom)
-        if num_evaluaciones < 3000:
-            num_evaluaciones += 1
+        # todo: no guardar el entorno, sino generarlo directamente en el bucle
         for s_prima in entorno(solucion_actual, granularidad):  # Repetir para toda S' perteneciente a E(S_act)
 
-            if num_evaluaciones < 3000:
-                num_evaluaciones += 1
-                dinero_sprima, dinero_acumulado_sprima, bateria_hora_sprima = base.funcion_evaluacion(s_prima, isRandom)
-            else:
-                break
+            num_evaluaciones += 1
+            dinero_sprima, dinero_acumulado_sprima, bateria_hora_sprima = base.funcion_evaluacion(s_prima, isRandom)
 
             # Si el objetivo(s_prima) es mejor que objetivo(mejor_vecino)
-            if dinero_sprima > dinero_vecino and num_evaluaciones < 3000:
+            if dinero_sprima > dinero_vecino:
                 mejor_vecino = s_prima  # Actualizamos el mejor vecino
                 dinero_vecino, dinero_acumulado_vecino, bateria_hora_vecino = base.funcion_evaluacion(mejor_vecino,
                                                                                                       isRandom)
@@ -83,19 +80,17 @@ def busqueda_elmejor(semilla, granularidad):
                 best_bateria_hora = bateria_hora_vecino
                 max_dinero = dinero_vecino
 
-            if num_evaluaciones >= 3000:
-                break
-
         # Fin-Para
         # Si el objetivo(mejor_vecino) es mejor que objetivo(solucion_actual)
-        if dinero_vecino > base.funcion_evaluacion(solucion_actual, isRandom)[0] and num_evaluaciones < 3000:
+        if dinero_vecino > base.funcion_evaluacion(solucion_actual, isRandom)[0]:
             num_evaluaciones += 1
             solucion_actual = mejor_vecino  # Actualiza solucion_actual
 
+        # Condicion de salida
         if dinero_vecino <= base.funcion_evaluacion(solucion_actual, isRandom)[0]:
             break
 
-    print(num_evaluaciones)
+    #print(num_evaluaciones)
     return max_dinero, best_dinero_acumulado, best_bateria_hora, num_evaluaciones, solucion_actual  # Devuelve la solucion actual
 
 

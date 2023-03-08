@@ -127,7 +127,7 @@ def funcion_evaluacion(solucion, israndom):
 
     for hora in range(24):
         if solucion[hora] >= 0:
-
+            # Vende
             bateria, energia_disponible, dinero = vender(bateria, hora, solucion, dinero, israndom)
         else:
             # Comprar
