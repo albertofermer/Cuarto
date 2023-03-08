@@ -131,6 +131,7 @@ def grafica_elmejor_vnd():
         for g in range(len(granularidades)):
             dinero_mejor, dinero_acumulado, bateria_hora, num_evaluaciones_mejor, solucion = \
                 busqueda_elmejor_vnd(semillas[i], granularidades[g])
+
             ingresos_granularidad[g] = dinero_acumulado
 
             dinero[g, i] = dinero_mejor

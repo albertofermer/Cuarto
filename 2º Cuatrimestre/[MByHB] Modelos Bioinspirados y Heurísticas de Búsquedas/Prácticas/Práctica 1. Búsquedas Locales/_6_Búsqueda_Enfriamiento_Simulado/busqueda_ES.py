@@ -59,17 +59,19 @@ def seleccionar_solucion(solucion, granularidad, pos):
 def enfriamiento_simulado(semilla, granularidad, num_vecinos_, mu_, phi_):
     random.seed(semilla)
     solucion_actual = greedy.greedy(isRandom)[3]  # Solucion Greedy
+    solucion_mejor = solucion_actual
+    dinero_mejor = base.funcion_evaluacion(solucion_mejor, isRandom)[0]
     t0 = temperatura_inicial(mu_, phi_, solucion_actual)
     t = t0
     k = 0
 
-    max_dinero = 0
+    dinero_candidato = 0
     dinero_acumulado = []
     temperatura = [t]
     bateria_acumulada = []
     num_evaluaciones = 0
 
-    empeora = 0
+    acepta = 0
     total = 0
 
     while k < 8:  # El algoritmo finaliza cuando se alcance un num maximo de iteraciones
@@ -78,25 +80,31 @@ def enfriamiento_simulado(semilla, granularidad, num_vecinos_, mu_, phi_):
             solucion_candidata = seleccionar_solucion(solucion_actual, granularidad, random.randint(0, 23))
 
             num_evaluaciones += 2
-            max_dinero, dinero_hora, bateria_hora = base.funcion_evaluacion(solucion_candidata, isRandom)
+            dinero_candidato, dinero_hora, bateria_hora = base.funcion_evaluacion(solucion_candidata, isRandom)
 
             # Como estamos maximizando, el delta se calcula al revés que en el ppt de teoría.
-            delta = - max_dinero + base.funcion_evaluacion(solucion_actual, isRandom)[0]
-            # if delta > 0: print(np.exp(-delta / t))
+            delta = base.funcion_evaluacion(solucion_mejor, isRandom)[0] - dinero_candidato
 
             if delta < 0 or random.uniform(0, 1) < np.exp(-delta / t):  # Si es mejor la coge
                 solucion_actual = solucion_candidata
                 dinero_acumulado = dinero_hora
                 bateria_acumulada = bateria_hora
-                empeora += 1
+
+                acepta += 1
+
+            # Escogemos la mejor solucion
+            num_evaluaciones += 2
+            if base.funcion_evaluacion(solucion_candidata, isRandom)[0] > base.funcion_evaluacion(solucion_mejor, isRandom)[0]:
+                solucion_mejor = solucion_candidata
+                num_evaluaciones += 1
+                dinero_mejor, dinero_acumulado, bateria_acumulada = base.funcion_evaluacion(solucion_mejor, isRandom)
 
             total += 1
 
-        t = t / (1 + k)  # Esquema de Enfriamiento: Esquema de Cauchy
+        t = t0 / (1 + k)  # Esquema de Enfriamiento: Esquema de Cauchy
         k += 1
-        # print(t)
         temperatura.append(t)
-    return max_dinero, dinero_acumulado, bateria_acumulada, num_evaluaciones, temperatura, solucion_actual, 1 - empeora/total
+    return dinero_mejor, dinero_acumulado, bateria_acumulada, num_evaluaciones, temperatura, solucion_actual, 1 - acepta/total
 
 
 def experimentacion_parametros():
@@ -245,12 +253,12 @@ def graficas_enfriamiento_simulado(nv, m, p):
 if __name__ == "__main__":
     if isRandom:
         experimentacion_parametros()
-        graficas_enfriamiento_simulado(10, 0.1, 0.1)
+        graficas_enfriamiento_simulado(100, 0.2, 0.3)
     else:
         experimentacion_parametros()
-        graficas_enfriamiento_simulado(20, 0.3, 0.2)
+        graficas_enfriamiento_simulado(100, 0.3, 0.2)
 
 
 
-    # 0.3 // 0. -> datos aleatorios
+    # 0.2 // 0.3 -> datos aleatorios
     # 0.3 // 0.2 -> datos reales
