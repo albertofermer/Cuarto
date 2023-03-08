@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-isRandom = False
+isRandom = True
 numero_repeticiones = 5
 
 # Constantes
@@ -69,6 +69,9 @@ def enfriamiento_simulado(semilla, granularidad, num_vecinos_, mu_, phi_):
     bateria_acumulada = []
     num_evaluaciones = 0
 
+    empeora = 0
+    total = 0
+
     while k < 8:  # El algoritmo finaliza cuando se alcance un num maximo de iteraciones
         for i in range(num_vecinos_):  # Condicion de Enfriamiento: Cuando se hayan generado un num de vecinos.
 
@@ -80,16 +83,20 @@ def enfriamiento_simulado(semilla, granularidad, num_vecinos_, mu_, phi_):
             # Como estamos maximizando, el delta se calcula al revés que en el ppt de teoría.
             delta = - max_dinero + base.funcion_evaluacion(solucion_actual, isRandom)[0]
             # if delta > 0: print(np.exp(-delta / t))
-            if random.uniform(0, 1) < np.exp(-delta / t) or delta < 0:
+
+            if delta < 0 or random.uniform(0, 1) < np.exp(-delta / t):  # Si es mejor la coge
                 solucion_actual = solucion_candidata
                 dinero_acumulado = dinero_hora
                 bateria_acumulada = bateria_hora
+                empeora += 1
+
+            total += 1
 
         t = t / (1 + k)  # Esquema de Enfriamiento: Esquema de Cauchy
         k += 1
         # print(t)
         temperatura.append(t)
-    return max_dinero, dinero_acumulado, bateria_acumulada, num_evaluaciones, temperatura, solucion_actual
+    return max_dinero, dinero_acumulado, bateria_acumulada, num_evaluaciones, temperatura, solucion_actual, 1 - empeora/total
 
 
 def experimentacion_parametros():
@@ -103,7 +110,7 @@ def experimentacion_parametros():
             for nv in range(len(num_vecinos)):
                 for m in range(len(mu)):
                     for p in range(len(phi)):
-                        dinero_mejor, dinero_acumulado, bateria_hora, num_evaluaciones_mejor, temperatura, solucion = \
+                        dinero_mejor, dinero_acumulado, bateria_hora, num_evaluaciones_mejor, temperatura, solucion, cociente = \
                             enfriamiento_simulado(
                                 semillas[i],
                                 granularidades[g],
@@ -113,17 +120,18 @@ def experimentacion_parametros():
                         data = {
                             'mu': [mu[m]],
                             'phi': [phi[p]],
-                            'dinero': [dinero_mejor],
+                            'n_vecinos': [num_vecinos[nv]],
+                            'empeoramiento / total': [cociente],
                             'T0': [temperatura_inicial(mu[m], phi[p], greedy.greedy(isRandom)[3])]
                         }
 
-                        if dinero_mejor > max_dinero:
+                        if 0.2 < cociente < 0.21:
                             max_dinero = dinero_mejor
                             max_mu = mu[m]
                             max_phi = phi[p]
 
-                        print(data)
-    print(f"mu = {max_mu} \nphi = {max_phi} \ndinero = {max_dinero}")
+                            print(data)
+    # print(f"mu = {max_mu} \nphi = {max_phi} \ndinero = {max_dinero}")
 
 
 def graficas_enfriamiento_simulado(nv, m, p):
@@ -132,7 +140,7 @@ def graficas_enfriamiento_simulado(nv, m, p):
     for i in range(numero_repeticiones):
         ingresos_granularidad = np.tile(np.array([0 for _ in range(24)], dtype=np.float64), (3, 1))
         for g in range(len(granularidades)):
-            dinero_mejor, dinero_acumulado, bateria_hora, num_evaluaciones_mejor, temperatura, solucion = \
+            dinero_mejor, dinero_acumulado, bateria_hora, num_evaluaciones_mejor, temperatura, solucion, _ = \
                 enfriamiento_simulado(
                     semillas[i],
                     granularidades[g],
@@ -236,13 +244,13 @@ def graficas_enfriamiento_simulado(nv, m, p):
 
 if __name__ == "__main__":
     if isRandom:
-        #experimentacion_parametros()
-        graficas_enfriamiento_simulado(30, 0.1, 0.1)
+        experimentacion_parametros()
+        graficas_enfriamiento_simulado(10, 0.1, 0.1)
     else:
-        #experimentacion_parametros()
-        graficas_enfriamiento_simulado(30, 0.1, 0.1)
+        experimentacion_parametros()
+        graficas_enfriamiento_simulado(20, 0.3, 0.2)
 
 
 
-    # 0.1 // 0.1 -> datos aleatorios
-    # 0.1 // 0.1 -> datos reales
+    # 0.3 // 0. -> datos aleatorios
+    # 0.3 // 0.2 -> datos reales
