@@ -55,6 +55,22 @@ def entorno(solucion_actual, granularidad, k):
     return entorno_soluciones
 
 
+def generar_vecino(solucion_actual, granularidad, indices):
+    solucion_vecina = solucion_actual.copy()
+    for pos in indices:
+        suma = pos < 24
+        if not suma and solucion_vecina[pos % 24] - granularidad >= -100:
+            solucion_vecina[pos % 24] -= granularidad
+        elif not suma:
+            solucion_vecina[pos % 24] = -100
+        elif suma and solucion_vecina[pos % 24] + granularidad <= 100:
+            solucion_vecina[pos % 24] += granularidad
+        else:
+            solucion_vecina[pos % 24] = 100
+
+    return solucion_vecina
+
+
 def busqueda_elmejor(solucion_par, k, granularidad):
     solucion_inicial = solucion_par
     solucion_actual = solucion_inicial
@@ -67,9 +83,9 @@ def busqueda_elmejor(solucion_par, k, granularidad):
         mejor_vecino = solucion_actual
         dinero_vecino, dinero_acumulado_vecino, bateria_hora_vecino = base.funcion_evaluacion(mejor_vecino, isRandom)
 
-        for s_prima in entorno(solucion_actual, granularidad, k):  # Repetir para toda S' perteneciente a E(S_act)
+        for indices in combinations(range(48), estructura_entornos[k]):  # Repetir para toda S' perteneciente a E(S_act)
             # Si el objetivo(s_prima) es mejor que objetivo(mejor_vecino)
-
+            s_prima = generar_vecino(solucion_actual, granularidad, indices)
             dinero_sprima, dinero_acumulado_sprima, bateria_hora_sprima = base.funcion_evaluacion(s_prima, isRandom)
 
             if dinero_sprima > dinero_vecino:
@@ -104,7 +120,7 @@ def busqueda_elmejor_vnd(semilla, granularidad):
     k = 0
 
     while k < len(estructura_entornos):  # Repetir, hasta que k=kmax, la siguiente secuencia:
-        #print(f"K = {k}")
+        print(f"K = {k}")
         # a) Exploración del entorno: Encontrar la mejor solución s' del k-ésimo entorno de s.
         dinero_obtenido, dinero_acumulado, bateria_hora, n_evaluaciones, solucion_obtenida = busqueda_elmejor(
             solucion_inicial, k, granularidad)
@@ -139,7 +155,7 @@ def grafica_elmejor_vnd():
 
             # Dinero acumulado en cada hora
             fig, ax = plt.subplots()
-            plt.title(f"Búsqueda El Mejor. G = {granularidades[g]}, S = {semillas[i]}")
+            plt.title(f"Búsqueda El Mejor VND. G = {granularidades[g]}, S = {semillas[i]}")
             ax.set_xticks(range(0, 23, 1))
             ln0 = ax.plot([j for j in range(24)], [cent / 100 for cent in dinero_acumulado],
                           label="Dinero Acumulado")

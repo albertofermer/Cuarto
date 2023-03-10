@@ -50,6 +50,20 @@ def entorno(solucion_actual, granularidad):
     return entorno_soluciones
 
 
+def generar_vecino(solucion_actual, granularidad, pos, suma):
+    solucion_vecina = solucion_actual.copy()
+
+    if not suma and solucion_vecina[pos % 24] - granularidad >= -100:
+        solucion_vecina[pos % 24] -= granularidad
+    elif not suma:
+        solucion_vecina[pos % 24] = -100
+    elif suma and solucion_vecina[pos % 24] + granularidad <= 100:
+        solucion_vecina[pos % 24] += granularidad
+    else:
+        solucion_vecina[pos % 24] = 100
+
+    return solucion_vecina
+
 def busqueda_elmejor(semilla, granularidad):
     random.seed(semilla)
 
@@ -64,8 +78,10 @@ def busqueda_elmejor(semilla, granularidad):
         mejor_vecino = solucion_actual
         num_evaluaciones += 1
         dinero_vecino, dinero_acumulado_vecino, bateria_hora_vecino = base.funcion_evaluacion(mejor_vecino, isRandom)
-        # todo: no guardar el entorno, sino generarlo directamente en el bucle
-        for s_prima in entorno(solucion_actual, granularidad):  # Repetir para toda S' perteneciente a E(S_act)
+
+        for pos in range(48):  # Repetir para toda S' perteneciente a E(S_act)
+
+            s_prima = generar_vecino(solucion_actual, granularidad, pos, pos < 24)
 
             num_evaluaciones += 1
             dinero_sprima, dinero_acumulado_sprima, bateria_hora_sprima = base.funcion_evaluacion(s_prima, isRandom)

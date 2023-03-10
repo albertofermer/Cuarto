@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-isRandom = True
+isRandom = False
 numero_repeticiones = 5
 
 # Constantes
