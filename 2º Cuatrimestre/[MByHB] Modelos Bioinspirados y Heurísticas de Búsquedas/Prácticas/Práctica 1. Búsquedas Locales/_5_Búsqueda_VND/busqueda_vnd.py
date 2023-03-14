@@ -83,6 +83,7 @@ def busqueda_elmejor(solucion_par, k, granularidad):
         mejor_vecino = solucion_actual
         dinero_vecino, dinero_acumulado_vecino, bateria_hora_vecino = base.funcion_evaluacion(mejor_vecino, isRandom)
 
+        # TODO REVISAR!
         for indices in combinations(range(48), estructura_entornos[k]):  # Repetir para toda S' perteneciente a E(S_act)
             # Si el objetivo(s_prima) es mejor que objetivo(mejor_vecino)
             s_prima = generar_vecino(solucion_actual, granularidad, indices)
