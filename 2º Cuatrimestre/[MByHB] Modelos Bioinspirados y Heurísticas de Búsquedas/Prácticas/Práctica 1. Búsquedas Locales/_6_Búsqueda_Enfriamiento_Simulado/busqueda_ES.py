@@ -251,10 +251,10 @@ def graficas_enfriamiento_simulado(nv, m, p):
 if __name__ == "__main__":
     if isRandom:
         experimentacion_parametros()
-        graficas_enfriamiento_simulado(20, 0.2, 0.3)
+        graficas_enfriamiento_simulado(15, 0.2, 0.3)
     else:
         experimentacion_parametros()
-        graficas_enfriamiento_simulado(20, 0.3, 0.2)
+        graficas_enfriamiento_simulado(15, 0.3, 0.2)
 
 
 
