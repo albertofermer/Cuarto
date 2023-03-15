@@ -30,8 +30,13 @@ else:
 
 def genera_vecinos(solucion, granularidad, pos):
     solucion_vecina = solucion.copy()
-
     accion = random.randint(0, 1)  # Elige una accion (decrementar o incrementar)
+    if pos % 2 == 0:
+        accion = 0
+    elif pos % 2 == 1:
+        accion = 1
+
+    pos = int(np.floor(pos/2))
 
     if accion == 0:  # Incrementa
         solucion_vecina[pos] += granularidad
@@ -60,7 +65,7 @@ def busqueda_primero(semilla, granularidad):
             # o hasta que se haya generado el espacio de busqueda completo
             contador += 2
             if base.funcion_evaluacion(solucion_vecina, isRandom)[0] > base.funcion_evaluacion(mejor_vecino, isRandom)[0]\
-                    or pos > 23:
+                    or pos > 47:
 
                 break
             pos += 1

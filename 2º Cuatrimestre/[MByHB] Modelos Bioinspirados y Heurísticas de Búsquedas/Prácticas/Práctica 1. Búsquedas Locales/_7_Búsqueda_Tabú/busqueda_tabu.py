@@ -20,7 +20,6 @@ evaluaciones = np.tile(np.array([0 for _ in range(numero_repeticiones)], dtype=n
 dinero = np.tile(np.array([0 for _ in range(numero_repeticiones)], dtype=np.float64), (3, 1))
 
 # Parámetros Tabú:
-
 '''
 Memoria a Corto Plazo: def mov(pos, cantidad)
 · Orientado a Atributo: A pos le corresponde la nueva cantidad absoluta.
@@ -41,6 +40,7 @@ Generación de Vecinos:
 Generaremos un vecino incrementando o decrementando aleatoriamente una posición aleatoria 
 de la solución actual.
 '''
+
 
 
 def GenerarVecino(solucion, pos):
@@ -122,6 +122,11 @@ def CriterioDeAspiracion(coste_actual, coste_mejor):
     return coste_actual > coste_mejor
 
 
+def AddListaTabu(pos, lista_tabu, tenencia, indice):
+    if indice < tenencia:
+        lista_tabu.append(pos)
+    else:
+        lista_tabu[indice % tenencia] = pos
 
 
 '''
@@ -131,6 +136,8 @@ Selección de estrategias de reinicialización:
  · Memoria a Largo Plazo : 50%
  · Reinicialización desde la mejor solución : 25%
 '''
+
+
 def BusquedaTabu(semilla, iteraciones_maximas, numero_vecinos):
     random.seed(semilla)
     solucion_actual = base.generar_inicial(semilla, 24, 10)
@@ -138,7 +145,12 @@ def BusquedaTabu(semilla, iteraciones_maximas, numero_vecinos):
     coste_mejor = base.funcion_evaluacion(solucion_mejor, isRandom)[0]
     M = InicializarMemoriaDeFrecuencias()
     num_iteraciones = 0
+    '''
+    Lista Tabú
+    '''
     tenencia_tabu = 4
+    lista_tabu = []
+
     while(num_iteraciones < iteraciones_maximas):
         '''
         Estimar el número máximo de iteraciones en total. Se realizarán 4 reinicializaciones, es decir,
@@ -155,13 +167,31 @@ def BusquedaTabu(semilla, iteraciones_maximas, numero_vecinos):
                 tenencia_tabu -= tenencia_tabu*1/2
             else:
                 tenencia_tabu += tenencia_tabu*1/2
+            lista_tabu = []
+
+        hora = -1
         # Generamos numero_vecinos
         for nv in range(numero_vecinos):
-            solucion_actual = GenerarVecino(solucion_actual, random.randint(0, 23))
+            hora = random.randint(0, 23)
+            solucion_prima = GenerarVecino(solucion_actual, hora)
+
             # Si supera el criterio de aspiración
-            if CriterioDeAspiracion(base.funcion_evaluacion(solucion_actual,isRandom)[0], coste_mejor):
-                # TODO
-                break
+            if CriterioDeAspiracion(base.funcion_evaluacion(solucion_prima, isRandom)[0], coste_mejor)\
+                    or (hora, solucion_prima[hora]) in lista_tabu:
+                # Evaluar S'
+                coste_vecino = base.funcion_evaluacion(solucion_prima, isRandom)[0]
+
+                if coste_vecino > coste_mejor:
+                    coste_mejor = coste_vecino
+                    solucion_mejor = solucion_prima
+
+        # Realizar el movimiento elegido
+        solucion_actual = solucion_mejor
+        coste_actual = coste_mejor
+        lista_tabu = AddListaTabu((hora, solucion_actual[hora]),lista_tabu, tenencia_tabu)
+        IncrementarPosicion(M, (hora, solucion_actual[hora]))
+
+
 
 
 
