@@ -87,7 +87,7 @@ def enfriamiento_simulado(semilla, granularidad, num_vecinos_, mu_, phi_):
                 solucion_actual = solucion_candidata
                 dinero_acumulado = dinero_hora
                 bateria_acumulada = bateria_hora
-
+            else:
                 acepta += 1
 
             # Escogemos la mejor solucion
@@ -102,7 +102,7 @@ def enfriamiento_simulado(semilla, granularidad, num_vecinos_, mu_, phi_):
         t = t0 / (1 + k)  # Esquema de Enfriamiento: Esquema de Cauchy
         k += 1
         temperatura.append(t)
-    return dinero_mejor, dinero_acumulado, bateria_acumulada, num_evaluaciones, temperatura, solucion_actual, 1 - acepta/total
+    return dinero_mejor, dinero_acumulado, bateria_acumulada, num_evaluaciones, temperatura, solucion_mejor, acepta/total
 
 
 def experimentacion_parametros():
@@ -253,8 +253,12 @@ if __name__ == "__main__":
         experimentacion_parametros()
         graficas_enfriamiento_simulado(15, 0.2, 0.3)
     else:
-        experimentacion_parametros()
-        graficas_enfriamiento_simulado(15, 0.3, 0.2)
+        #experimentacion_parametros()
+        graficas_enfriamiento_simulado(20, 0.3, 0.3)
+        # dinero, _, _, _, _, s, _ = enfriamiento_simulado(123456, 1, 20, 0.3, 0.3)
+        # print(s)
+        # print(f"Dinero = {dinero}")
+        # print(f"F(s) = {base.funcion_evaluacion(s, isRandom)[0]}")
 
 
 

@@ -42,9 +42,8 @@ de la solución actual.
 '''
 
 
-
 def GenerarVecino(solucion, pos):
-    granularidad = 10   # En este algoritmo utilizaremos granularidad 10 fija.
+    granularidad = 10  # En este algoritmo utilizaremos granularidad 10 fija.
     solucion_vecina = solucion.copy()
     accion = random.randint(0, 1)  # Elige una accion (decrementar o incrementar)
 
@@ -75,14 +74,13 @@ def InicializarMemoriaDeFrecuencias():
     return np.ones((24, 21))
 
 
-def IncrementarPosicion(memoria_frecuencias, posicion):
-    fila, columna = posicion
-    memoria_frecuencias[fila, posicion] += 1
-    return memoria_frecuencias
+def IncrementarPosicion(memoria_frecuencias, solucion):
+    mf = memoria_frecuencias.copy()
+    valores = [i for i in range(-100, 110, 10)]
+    for h in range(len(solucion)):
+        mf[h][valores.index(solucion[h])] += 1
 
-
-def RuletaInversa():
-    return
+    return mf
 
 
 '''
@@ -97,14 +95,22 @@ greedy
 '''
 
 
-def GreedyProbabilistico(semilla, cromosoma, matrizProbabilidades):
+def GreedyProbabilistico(semilla, matrizProbabilidades):
+
     random.seed(semilla)
+    # Calcular Inversas:
+    M_invertida = 1 / matrizProbabilidades
+    suma_total = sum(np.transpose(M_invertida)) # Vector con la suma por filas
+    diag_suma = np.diag(1/suma_total)   # Diagonalizamos el vector para poder multiplicarlo
+    matriz_normalizada = diag_suma.dot(M_invertida)
+    valores = [i for i in range(-100, 110, 10)]
     solucion_greedy = []
-    for hora in cromosoma:
+    for hora in range(24):
         numero = random.random()
         suma = 0
         for i in range(-100, 110, 10):
-            suma += matrizProbabilidades(hora, i)
+
+            suma += matriz_normalizada[hora, valores.index(i)]
             if numero < suma:
                 solucion_greedy.append(i)
                 break
@@ -123,10 +129,12 @@ def CriterioDeAspiracion(coste_actual, coste_mejor):
 
 
 def AddListaTabu(pos, lista_tabu, tenencia, indice):
-    if indice < tenencia:
-        lista_tabu.append(pos)
+    lista = lista_tabu.copy()
+    if len(lista) < tenencia:
+        lista.append(pos)
     else:
-        lista_tabu[indice % tenencia] = pos
+        lista[indice % tenencia] = pos
+    return lista
 
 
 '''
@@ -144,55 +152,87 @@ def BusquedaTabu(semilla, iteraciones_maximas, numero_vecinos):
     solucion_mejor = solucion_actual
     coste_mejor = base.funcion_evaluacion(solucion_mejor, isRandom)[0]
     M = InicializarMemoriaDeFrecuencias()
-    num_iteraciones = 0
+    num_iteraciones = 1
     '''
     Lista Tabú
     '''
     tenencia_tabu = 4
     lista_tabu = []
 
-    while(num_iteraciones < iteraciones_maximas):
-        '''
-        Estimar el número máximo de iteraciones en total. Se realizarán 4 reinicializaciones, es decir,
-        una cada Numtotal-iteraciones/4. El tamaño inicial de cada lista tabú será n=4, estos valores
-        cambiarán después de las reinicializaciones según se ha comentado.
-        
-        Variar el tamaño de la lista tabú, incrementándola o reduciéndola en un 50% según una decisión
-        aleatoria uniforme, empezando la lista desde vacío en cada reinicialización
-        '''
-        if num_iteraciones % round(iteraciones_maximas/4):
-            # Reiniciar lista tabú
-            rand = random.random()
-            if rand < 0.5:
-                tenencia_tabu -= tenencia_tabu*1/2
-            else:
-                tenencia_tabu += tenencia_tabu*1/2
-            lista_tabu = []
-
+    while num_iteraciones <= iteraciones_maximas:
         hora = -1
+        valor = -1
         # Generamos numero_vecinos
         for nv in range(numero_vecinos):
             hora = random.randint(0, 23)
+            valor = solucion_actual[hora]
             solucion_prima = GenerarVecino(solucion_actual, hora)
 
             # Si supera el criterio de aspiración
-            if CriterioDeAspiracion(base.funcion_evaluacion(solucion_prima, isRandom)[0], coste_mejor)\
-                    or (hora, solucion_prima[hora]) in lista_tabu:
+            if CriterioDeAspiracion(base.funcion_evaluacion(solucion_prima, isRandom)[0], coste_mejor) \
+                    or (hora, solucion_prima[hora]) not in lista_tabu:
                 # Evaluar S'
                 coste_vecino = base.funcion_evaluacion(solucion_prima, isRandom)[0]
 
                 if coste_vecino > coste_mejor:
                     coste_mejor = coste_vecino
                     solucion_mejor = solucion_prima
-
+        # END-FOR
         # Realizar el movimiento elegido
         solucion_actual = solucion_mejor
         coste_actual = coste_mejor
-        lista_tabu = AddListaTabu((hora, solucion_actual[hora]),lista_tabu, tenencia_tabu)
-        IncrementarPosicion(M, (hora, solucion_actual[hora]))
+
+        lista_tabu = AddListaTabu((hora, valor), lista_tabu, tenencia_tabu, num_iteraciones)
+        M = IncrementarPosicion(M, solucion_actual)
+
+        #print(M)
+        '''
+        Estimar el número máximo de iteraciones en total. Se realizarán 4 reinicializaciones, es decir,
+        una cada Numtotal-iteraciones/4. El tamaño inicial de cada lista tabú será n=4, estos valores
+        cambiarán después de las reinicializaciones según se ha comentado. 
+        Variar el tamaño de la lista tabú, incrementándola o reduciéndola en un 50% según una decisión
+        aleatoria uniforme, empezando la lista desde vacío en cada reinicialización
+        '''
+        if num_iteraciones % round(iteraciones_maximas / 4) == 0:
+            # Reiniciar lista tabú
+            rand = random.random()
+            if rand < 0.5:
+                tenencia_tabu -= tenencia_tabu * 0.5
+            else:
+                tenencia_tabu += tenencia_tabu * 0.5
+            tenencia_tabu = int(np.ceil(tenencia_tabu))
+            print(f"T: {tenencia_tabu}")
+            lista_tabu = []
+
+            '''
+            Selección de estrategias de reinicialización:
+             · Reinicialización construyendo una solución inicial aleatoria : 25%
+             · Memoria a Largo Plazo : 50%
+             · Reinicialización desde la mejor solución : 25%
+            '''
+            num = random.random()
+            if num < 0.25:
+                print("Reinicializacion Aleatoria")
+                # Reinicialización construyendo una solución inicial aleatoria : 25%
+                solucion_actual = base.generar_inicial(semilla, 24, 10)
+
+            elif 0.25 <= num < 0.5:
+                print("Reinicializacion Mejor Solucion")
+                # Reinicialización desde la mejor solución : 25%
+                solucion_actual = solucion_mejor
+            else:
+                # Memoria a Largo Plazo : 50%
+                solucion_actual = GreedyProbabilistico(semilla, M)
+                print("MLP")
 
 
+        num_iteraciones += 1
+    #END-WHILE
+
+    return solucion_mejor
 
 
-
-
+if __name__ == "__main__":
+    s = BusquedaTabu(123456, 1000, 40)
+    print(s)
+    print(base.funcion_evaluacion(s, isRandom))
