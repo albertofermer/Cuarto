@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-isRandom = False
+isRandom = True
 numero_repeticiones = 5
 
 # Constantes
@@ -74,7 +74,7 @@ def enfriamiento_simulado(semilla, granularidad, num_vecinos_, mu_, phi_):
     acepta = 0
     total = 0
 
-    while k < 8:  # El algoritmo finaliza cuando se alcance un num maximo de iteraciones
+    while k < 300:  # El algoritmo finaliza cuando se alcance un num maximo de iteraciones
         for i in range(num_vecinos_):  # Condicion de Enfriamiento: Cuando se hayan generado un num de vecinos.
 
             solucion_candidata = seleccionar_solucion(solucion_actual, granularidad, random.randint(0, 23))
@@ -250,7 +250,7 @@ def graficas_enfriamiento_simulado(nv, m, p):
 
 if __name__ == "__main__":
     if isRandom:
-        experimentacion_parametros()
+        #experimentacion_parametros()
         graficas_enfriamiento_simulado(15, 0.2, 0.3)
     else:
         #experimentacion_parametros()
