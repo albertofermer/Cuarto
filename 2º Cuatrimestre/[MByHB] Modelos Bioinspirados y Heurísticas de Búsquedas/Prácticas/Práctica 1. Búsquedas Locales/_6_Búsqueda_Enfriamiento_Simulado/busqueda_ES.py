@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-isRandom = True
+isRandom = False
 numero_repeticiones = 5
 
 # Constantes
@@ -259,6 +259,9 @@ if __name__ == "__main__":
         # print(s)
         # print(f"Dinero = {dinero}")
         # print(f"F(s) = {base.funcion_evaluacion(s, isRandom)[0]}")
+        # print(f"D_acum(s) = {base.funcion_evaluacion(s, isRandom)[1]}")
+        # print(f"B_acum(s) = {base.funcion_evaluacion(s, isRandom)[2]}")
+
 
 
 
