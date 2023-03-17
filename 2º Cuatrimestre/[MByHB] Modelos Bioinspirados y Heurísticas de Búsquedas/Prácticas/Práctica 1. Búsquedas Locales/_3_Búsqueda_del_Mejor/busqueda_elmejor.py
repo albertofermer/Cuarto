@@ -98,11 +98,12 @@ def busqueda_elmejor(semilla, granularidad):
 
         # Fin-Para
         # Si el objetivo(mejor_vecino) es mejor que objetivo(solucion_actual)
+        num_evaluaciones += 1
         if dinero_vecino > base.funcion_evaluacion(solucion_actual, isRandom)[0]:
-            num_evaluaciones += 1
             solucion_actual = mejor_vecino  # Actualiza solucion_actual
 
         # Condicion de salida
+        num_evaluaciones += 1
         if dinero_vecino <= base.funcion_evaluacion(solucion_actual, isRandom)[0]:
             break
 

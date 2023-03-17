@@ -139,7 +139,7 @@ def funcion_evaluacion(solucion, israndom):
 
             # Compro un porcentaje de lo que me sobra de bateria. De esta forma no podemos sobrepasar el limite de la
             # bateria en ningun momento.
-            energia_comprada = solucion[hora] / 100 * (capacidad_bateria - bateria)  # (Sale negativo)
+            energia_comprada = (solucion[hora] / 100) * (capacidad_bateria - bateria)  # (Sale negativo)
             dinero += energia_comprada * precio_compra[hora]  # Como energia_comprada es < 0 entonces se resta.
 
             bateria += -energia_comprada
