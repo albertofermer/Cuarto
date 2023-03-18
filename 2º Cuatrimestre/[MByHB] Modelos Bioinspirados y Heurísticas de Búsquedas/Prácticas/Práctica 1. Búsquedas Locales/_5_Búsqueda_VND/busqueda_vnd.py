@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 from itertools import combinations
 
-isRandom = False
+isRandom = True
 numero_repeticiones = 5
 
 # Constantes
@@ -65,21 +65,25 @@ def generar_vecino(solucion_actual, granularidad, pos):
     return solucion_vecina
 
 
-def busqueda_elmejor(solucion_par, k, granularidad):
+def busqueda_elmejor(solucion_par, k):
     solucion_inicial = solucion_par
     solucion_actual = solucion_inicial
+    num_evaluaciones = 1
+    dinero_actual = base.funcion_evaluacion(solucion_actual, isRandom)[0]
     best_dinero_acumulado = []
     best_bateria_hora = []
     max_dinero = 0
-    num_evaluaciones = 0
+
 
     while True:  # Repetir
         mejor_vecino = solucion_actual
+        num_evaluaciones += 1
         dinero_vecino, dinero_acumulado_vecino, bateria_hora_vecino = base.funcion_evaluacion(mejor_vecino, isRandom)
 
         for vecino in range(48):  # Repetir para toda S' perteneciente a E(S_act)
             # Si el objetivo(s_prima) es mejor que objetivo(mejor_vecino)
             s_prima = generar_vecino(solucion_actual, estructura_entornos[k], vecino)
+            num_evaluaciones += 1
             dinero_sprima, dinero_acumulado_sprima, bateria_hora_sprima = base.funcion_evaluacion(s_prima, isRandom)
 
             if dinero_sprima > dinero_vecino:
@@ -93,10 +97,12 @@ def busqueda_elmejor(solucion_par, k, granularidad):
 
         # Fin-Para
         # Si el objetivo(mejor_vecino) es mejor que objetivo(solucion_actual)
-        if dinero_vecino > base.funcion_evaluacion(solucion_actual, isRandom)[0]:
+        if dinero_vecino > dinero_actual:
             solucion_actual = mejor_vecino  # Actualiza solucion_actual
+            num_evaluaciones += 1
+            dinero_actual = base.funcion_evaluacion(solucion_actual, isRandom)[0]
 
-        if dinero_vecino <= base.funcion_evaluacion(solucion_actual, isRandom)[0]:
+        if dinero_vecino <= dinero_actual:
             break
 
     return max_dinero, best_dinero_acumulado, best_bateria_hora, num_evaluaciones, solucion_actual  # Devuelve la solucion actual
@@ -107,23 +113,27 @@ def busqueda_elmejor_vnd(semilla):
 
     solucion_inicial = base.generar_inicial(semilla, 24, estructura_entornos[0])
     solucion_actual = solucion_inicial
+    num_evaluaciones = 1
+    dinero_actual = base.funcion_evaluacion(solucion_actual, isRandom)[0]
     best_dinero_acumulado = []
     best_bateria_hora = []
     max_dinero = 0
-    num_evaluaciones = 0
+
     k = 0
 
     while k < len(estructura_entornos):  # Repetir, hasta que k=kmax, la siguiente secuencia:
         print(f"K = {k}")
         # a) Exploración del entorno: Encontrar la mejor solución s' del k-ésimo entorno de s.
         dinero_obtenido, dinero_acumulado, bateria_hora, n_evaluaciones, solucion_obtenida = busqueda_elmejor(
-            solucion_inicial, k, estructura_entornos[k])
+            solucion_inicial, k)
 
         # b) Moverse o no: Si la solución obtenida s' es mejor que s, hacer s <- s' y k <- 1;
         #    en otro caso, hacer k <- k + 1
-        num_evaluaciones += n_evaluaciones + 1
-        if dinero_obtenido > base.funcion_evaluacion(solucion_actual, isRandom)[0]:
+        num_evaluaciones += n_evaluaciones
+        if dinero_obtenido > dinero_actual:
             solucion_actual = solucion_obtenida
+            num_evaluaciones += 1
+            dinero_actual = base.funcion_evaluacion(solucion_actual, isRandom)[0]
             max_dinero = dinero_obtenido
             best_dinero_acumulado = dinero_acumulado
             best_bateria_hora = bateria_hora
@@ -173,24 +183,24 @@ def grafica_elmejor_vnd():
         plt.close()
         print(solucion)
 
-        # Generamos los datos obtenidos de la búsqueda
-        data = {
-            'Media Evaluaciones': [statistics.mean(evaluaciones[:])],
-            'Mejor Evaluación': [min(evaluaciones[:])],
-            'Desviación Evaluaciones': [statistics.stdev(evaluaciones[:])],
-            'Media Dinero (€)': [round(statistics.mean(dinero[:]) / 100, 2)],
-            'Mejor Dinero (€)': [round(max(dinero[:]) / 100, 2)],
-            'Desviación Dinero (€)': [round(statistics.stdev(dinero[:]) / 100, 2)]
-        }
+    # Generamos los datos obtenidos de la búsqueda
+    data = {
+        'Media Evaluaciones': [statistics.mean(evaluaciones[:])],
+        'Mejor Evaluación': [min(evaluaciones[:])],
+        'Desviación Evaluaciones': [statistics.stdev(evaluaciones[:])],
+        'Media Dinero (€)': [round(statistics.mean(dinero[:]) / 100, 2)],
+        'Mejor Dinero (€)': [round(max(dinero[:]) / 100, 2)],
+        'Desviación Dinero (€)': [round(statistics.stdev(dinero[:]) / 100, 2)]
+    }
 
-        # Opciones de Pandas para mostrar la tabla completa en la consola
-        pd.set_option('display.max_rows', None)
-        pd.set_option('display.max_columns', None)
-        pd.set_option('display.width', None)
-        pd.set_option('display.max_colwidth', None)
+    # Opciones de Pandas para mostrar la tabla completa en la consola
+    pd.set_option('display.max_rows', None)
+    pd.set_option('display.max_columns', None)
+    pd.set_option('display.width', None)
+    pd.set_option('display.max_colwidth', None)
 
-        # Mostramos los datos obtenidos
-        print(pd.DataFrame(data))
+    # Mostramos los datos obtenidos
+    print(pd.DataFrame(data))
 
 
 grafica_elmejor_vnd()

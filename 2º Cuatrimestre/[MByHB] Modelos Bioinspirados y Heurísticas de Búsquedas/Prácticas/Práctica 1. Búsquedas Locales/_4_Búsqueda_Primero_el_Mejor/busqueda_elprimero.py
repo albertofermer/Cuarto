@@ -53,32 +53,34 @@ def genera_vecinos(solucion, granularidad, pos):
 # Algoritmo de busqueda el mejor vecino
 def busqueda_primero(semilla, granularidad):
     random.seed(semilla)
-    solucion_actual = base.generar_inicial(semilla, 24, granularidad)  # Genera la solucion inicial
     contador = 0
+    solucion_actual = base.generar_inicial(semilla, 24, granularidad)  # Genera la solucion inicial
+    contador += 1
+    dinero_actual = base.funcion_evaluacion(solucion_actual, isRandom)[0]
+
 
     while True:  # Repetir
         pos = 0
         while True:  # Repetir
             solucion_vecina = genera_vecinos(solucion_actual, granularidad, pos)  # Genera vecinos
+            contador += 1
+            dinero_vecina = base.funcion_evaluacion(solucion_vecina, isRandom)[0]
             # Hasta que la funcion de coste del vecino sea mejor que la del mejor vecino
             # o hasta que se haya generado el espacio de busqueda completo
-            contador += 2
-            if base.funcion_evaluacion(solucion_vecina, isRandom)[0] > base.funcion_evaluacion(solucion_actual, isRandom)[0]\
-                    or pos > 47:
+            if dinero_vecina > dinero_actual or pos > 47:
 
                 break
             pos += 1
 
         # Si el coste de la solucion vecina es mejor que el de la solucion actual, se actualiza
         # la solucion
-        contador += 2
-        if base.funcion_evaluacion(solucion_vecina, isRandom)[0] > base.funcion_evaluacion(solucion_actual, isRandom)[0]:
+        if dinero_vecina > dinero_actual:
             solucion_actual = solucion_vecina
+            contador += 1
+            dinero_actual = base.funcion_evaluacion(solucion_actual, isRandom)[0]
 
-
-        contador += 2
         # Hasta que el coste de la solucion vecina sea peor o igual que el coste de la solucion actual.
-        if base.funcion_evaluacion(solucion_vecina, isRandom)[0] <= base.funcion_evaluacion(solucion_actual, isRandom)[0]:
+        if dinero_vecina <= dinero_actual:
             break
 
     return base.funcion_evaluacion(solucion_actual, isRandom), contador, solucion_actual

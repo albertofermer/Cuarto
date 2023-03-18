@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-isRandom = True
+isRandom = False
 numero_repeticiones = 5
 
 # Constantes
@@ -26,8 +26,8 @@ else:
     precio_compra = constantes.precio_compra
     r = constantes.r
 
-evaluaciones = np.tile(np.array([0]*numero_repeticiones, dtype=np.float64), (3, 1))
-dinero = np.tile(np.array([0]*numero_repeticiones, dtype=np.float64), (3, 1))
+evaluaciones = np.tile(np.array([0] * numero_repeticiones, dtype=np.float64), (3, 1))
+dinero = np.tile(np.array([0] * numero_repeticiones, dtype=np.float64), (3, 1))
 
 # Hiperparámetros de Control
 mu = [0.1, 0.15, 0.2, 0.25, 0.3]
@@ -60,16 +60,15 @@ def enfriamiento_simulado(semilla, granularidad, num_vecinos_, mu_, phi_):
     random.seed(semilla)
     solucion_actual = greedy.greedy(isRandom)[3]  # Solucion Greedy
     solucion_mejor = solucion_actual
+    num_evaluaciones = 1
     dinero_mejor = base.funcion_evaluacion(solucion_mejor, isRandom)[0]
     t0 = temperatura_inicial(mu_, phi_, solucion_actual)
     t = t0
     k = 1
 
-    dinero_candidato = 0
     dinero_acumulado = []
     temperatura = [t]
     bateria_acumulada = []
-    num_evaluaciones = 0
 
     rechaza = 0
     total = 0
@@ -79,30 +78,29 @@ def enfriamiento_simulado(semilla, granularidad, num_vecinos_, mu_, phi_):
 
             solucion_candidata = seleccionar_solucion(solucion_actual, granularidad, random.randint(0, 23))
 
-            num_evaluaciones += 2
-            dinero_candidato, _, _ = base.funcion_evaluacion(solucion_candidata, isRandom)
-            delta = base.funcion_evaluacion(solucion_mejor, isRandom)[0] - dinero_candidato
+            num_evaluaciones += 1
+            dinero_candidato = base.funcion_evaluacion(solucion_candidata, isRandom)[0]
+            delta = dinero_mejor - dinero_candidato
 
             if delta < 0 or random.uniform(0, 1) < np.exp(-delta / t):  # Si es mejor la coge
                 solucion_actual = solucion_candidata
+                num_evaluaciones += 1
+                dinero_candidato = base.funcion_evaluacion(solucion_candidata, isRandom)[0]
                 # Escogemos la mejor solucion
-                num_evaluaciones += 2
-                if base.funcion_evaluacion(solucion_candidata, isRandom)[0] > \
-                        base.funcion_evaluacion(solucion_mejor, isRandom)[0]:
+                if dinero_candidato > dinero_mejor:
                     solucion_mejor = solucion_candidata
                     num_evaluaciones += 1
-                    dinero_mejor, dinero_acumulado, bateria_acumulada = base.funcion_evaluacion(solucion_mejor, isRandom)
+                    dinero_mejor, dinero_acumulado, bateria_acumulada = base.funcion_evaluacion(solucion_mejor,
+                                                                                                isRandom)
             else:
                 if k == 1: rechaza += 1
-
-
 
             if k == 1: total += 1
 
         t = t0 / (1 + k)  # Esquema de Enfriamiento: Esquema de Cauchy
         k += 1
         temperatura.append(t)
-    return dinero_mejor, dinero_acumulado, bateria_acumulada, num_evaluaciones, temperatura, solucion_mejor, rechaza/total
+    return dinero_mejor, dinero_acumulado, bateria_acumulada, num_evaluaciones, temperatura, solucion_mejor, rechaza / total
 
 
 def experimentacion_parametros():
@@ -125,7 +123,7 @@ def experimentacion_parametros():
                         'empeoramiento / total': [cociente],
                         'T0': [temperatura_inicial(mu[m], phi[p], greedy.greedy(isRandom)[3])]
                     }
-                    #print(cociente)
+                    # print(cociente)
                     if 0.2 <= cociente < 0.21:
                         max_dinero = dinero_mejor
                         max_mu = mu[m]
@@ -245,10 +243,10 @@ def graficas_enfriamiento_simulado(nv, m, p):
 
 if __name__ == "__main__":
     if isRandom:
-        #experimentacion_parametros()
+        # experimentacion_parametros()
         graficas_enfriamiento_simulado(15, 0.25, 0.3)
     else:
-        #experimentacion_parametros()
+        # experimentacion_parametros()
         graficas_enfriamiento_simulado(15, 0.3, 0.25)
         # dinero, _, _, _, _, s, _ = enfriamiento_simulado(123456, 1, 20, 0.3, 0.3)
         # print(s)

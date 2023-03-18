@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-isRandom = True
+isRandom = False
 numero_repeticiones = 5
 
 # Constantes
@@ -27,6 +27,7 @@ else:
 evaluaciones = np.tile(np.array([0 for _ in range(numero_repeticiones)], dtype=np.float64), (3, 1))
 dinero = np.tile(np.array([0 for _ in range(numero_repeticiones)], dtype=np.float64), (3, 1))
 
+
 def generar_vecino(solucion_actual, granularidad, pos, suma):
     solucion_vecina = solucion_actual.copy()
 
@@ -41,6 +42,7 @@ def generar_vecino(solucion_actual, granularidad, pos, suma):
 
     return solucion_vecina
 
+
 def busqueda_elmejor(semilla, granularidad):
     random.seed(semilla)
 
@@ -50,6 +52,7 @@ def busqueda_elmejor(semilla, granularidad):
     best_bateria_hora = []
     max_dinero = 0
     num_evaluaciones = 0
+    dinero_actual = base.funcion_evaluacion(solucion_actual, isRandom)[0]
 
     while num_evaluaciones < 3000:  # Repetir
         mejor_vecino = solucion_actual
@@ -75,16 +78,16 @@ def busqueda_elmejor(semilla, granularidad):
 
         # Fin-Para
         # Si el objetivo(mejor_vecino) es mejor que objetivo(solucion_actual)
-        num_evaluaciones += 1
-        if dinero_vecino > base.funcion_evaluacion(solucion_actual, isRandom)[0]:
+        if dinero_vecino > dinero_actual:
             solucion_actual = mejor_vecino  # Actualiza solucion_actual
+            num_evaluaciones += 1
+            dinero_actual = base.funcion_evaluacion(solucion_actual, isRandom)[0]
 
         # Condicion de salida
-        num_evaluaciones += 1
-        if dinero_vecino <= base.funcion_evaluacion(solucion_actual, isRandom)[0]:
+        if dinero_vecino <= dinero_actual:
             break
 
-    #print(num_evaluaciones)
+    # print(num_evaluaciones)
     return max_dinero, best_dinero_acumulado, best_bateria_hora, num_evaluaciones, solucion_actual  # Devuelve la solucion actual
 
 
@@ -116,7 +119,7 @@ def grafica_elmejor():
             ax.set_xlabel("Horas")
             ax.set_ylabel("Euros (€)")
             ax1.set_ylabel("MW")
-            #ax1.set(ylim=ax.get_ylim())
+            # ax1.set(ylim=ax.get_ylim())
             leg = ln0 + ln1
             labs = [legend.get_label() for legend in leg]
             plt.legend(leg, labs, loc='upper center', bbox_to_anchor=(0.5, 1.17), ncol=3)
@@ -149,7 +152,6 @@ def grafica_elmejor():
             plt.savefig(f'.\\graficas\\ProblemaAleatorio\\ingresos-granularidad\\'
                         f'best_search_s{semillas[i]}_ProblemaAleatorio.png')
 
-
         plt.show()
         plt.close()
 
@@ -175,5 +177,5 @@ def grafica_elmejor():
         print(pd.DataFrame(data))
 
 
-#print((busqueda_elmejor(123456, 1)[0]))
+# print((busqueda_elmejor(123456, 1)[0]))
 grafica_elmejor()

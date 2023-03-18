@@ -70,10 +70,6 @@ las veces que la variable i toma el valor k: M[i,k]
 '''
 
 
-def InicializarMemoriaDeFrecuencias():
-    return np.ones((24, 21))
-
-
 def IncrementarPosicion(memoria_frecuencias, solucion):
     mf = memoria_frecuencias.copy()
     valores = [i for i in range(-100, 110, 10)]
@@ -95,7 +91,7 @@ greedy
 '''
 
 
-def GreedyProbabilistico(semilla, matrizProbabilidades, granularidad):
+def GreedyProbabilistico(matrizProbabilidades, granularidad):
     # Calcular Inversas:
     M_invertida = 1 / matrizProbabilidades
     suma_total = sum(np.transpose(M_invertida))  # Vector con la suma por filas
@@ -113,17 +109,6 @@ def GreedyProbabilistico(semilla, matrizProbabilidades, granularidad):
                 solucion_greedy.append(i)
                 break
     return solucion_greedy
-
-
-'''
-Criterio de Aspiración:
-Criterio que permite saltarse el tabú.
-En nuestro caso será que la solución actual sea mejor que la solución mejor.
-'''
-
-
-def CriterioDeAspiracion(coste_actual, coste_mejor):
-    return coste_actual > coste_mejor
 
 
 def AddListaTabu(pos, lista_tabu, tenencia, indice):
@@ -149,7 +134,7 @@ def BusquedaTabu(semilla, iteraciones_maximas, numero_vecinos, granularidad):
     solucion_actual = base.generar_inicial(semilla, 24, granularidad)
     solucion_mejor = solucion_actual
     coste_mejor = base.funcion_evaluacion(solucion_mejor, isRandom)[0]
-    M = InicializarMemoriaDeFrecuencias()
+    M = np.ones((24, 21))
     num_iteraciones = 1
     '''
     Variables de Evaluación
@@ -174,7 +159,7 @@ def BusquedaTabu(semilla, iteraciones_maximas, numero_vecinos, granularidad):
 
             # Si supera el criterio de aspiración
             num_evaluaciones += 1
-            if CriterioDeAspiracion(base.funcion_evaluacion(solucion_prima, isRandom)[0], coste_mejor) \
+            if base.funcion_evaluacion(solucion_prima, isRandom)[0] > coste_mejor \
                     or (hora, solucion_prima[hora]) not in lista_tabu:
                 # Evaluar S'
                 num_evaluaciones += 1
@@ -193,7 +178,6 @@ def BusquedaTabu(semilla, iteraciones_maximas, numero_vecinos, granularidad):
         lista_tabu = AddListaTabu((hora, valor), lista_tabu, tenencia_tabu, num_iteraciones)
         M = IncrementarPosicion(M, solucion_actual)
 
-        # print(M)
         '''
         Estimar el número máximo de iteraciones en total. Se realizarán 4 reinicializaciones, es decir,
         una cada Numtotal-iteraciones/4. El tamaño inicial de cada lista tabú será n=4, estos valores
@@ -229,7 +213,7 @@ def BusquedaTabu(semilla, iteraciones_maximas, numero_vecinos, granularidad):
                 solucion_actual = solucion_mejor
             else:
                 # Memoria a Largo Plazo : 50%
-                solucion_actual = GreedyProbabilistico(semilla, M, granularidad)
+                solucion_actual = GreedyProbabilistico(M, granularidad)
                 print("MLP")
 
         num_iteraciones += 1
