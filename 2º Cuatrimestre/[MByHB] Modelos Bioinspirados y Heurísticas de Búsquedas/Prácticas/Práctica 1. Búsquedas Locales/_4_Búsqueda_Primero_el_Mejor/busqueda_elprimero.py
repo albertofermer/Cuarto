@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-isRandom = True
+isRandom = False
 numero_repeticiones = 5
 
 # Constantes
@@ -15,8 +15,8 @@ capacidad_bateria = constantes.capacidad_bateria
 granularidades = constantes.granularidad
 semillas = constantes.semillas
 
-evaluaciones = np.tile(np.array([0 for _ in range(numero_repeticiones)], dtype=np.float64), (3, 1))
-dinero = np.tile(np.array([0 for _ in range(numero_repeticiones)], dtype=np.float64), (3, 1))
+evaluaciones = np.tile(np.array([0]*numero_repeticiones, dtype=np.float64), (3, 1))
+dinero = np.tile(np.array([0]*numero_repeticiones, dtype=np.float64), (3, 1))
 
 if isRandom:
     precio_venta = constantes.precio_venta_random
@@ -54,7 +54,6 @@ def genera_vecinos(solucion, granularidad, pos):
 def busqueda_primero(semilla, granularidad):
     random.seed(semilla)
     solucion_actual = base.generar_inicial(semilla, 24, granularidad)  # Genera la solucion inicial
-    mejor_vecino = solucion_actual
     contador = 0
 
     while True:  # Repetir
@@ -64,7 +63,7 @@ def busqueda_primero(semilla, granularidad):
             # Hasta que la funcion de coste del vecino sea mejor que la del mejor vecino
             # o hasta que se haya generado el espacio de busqueda completo
             contador += 2
-            if base.funcion_evaluacion(solucion_vecina, isRandom)[0] > base.funcion_evaluacion(mejor_vecino, isRandom)[0]\
+            if base.funcion_evaluacion(solucion_vecina, isRandom)[0] > base.funcion_evaluacion(solucion_actual, isRandom)[0]\
                     or pos > 47:
 
                 break
@@ -73,10 +72,8 @@ def busqueda_primero(semilla, granularidad):
         # Si el coste de la solucion vecina es mejor que el de la solucion actual, se actualiza
         # la solucion
         contador += 2
-
         if base.funcion_evaluacion(solucion_vecina, isRandom)[0] > base.funcion_evaluacion(solucion_actual, isRandom)[0]:
             solucion_actual = solucion_vecina
-            mejor_vecino = solucion_actual
 
 
         contador += 2
@@ -84,7 +81,6 @@ def busqueda_primero(semilla, granularidad):
         if base.funcion_evaluacion(solucion_vecina, isRandom)[0] <= base.funcion_evaluacion(solucion_actual, isRandom)[0]:
             break
 
-    #print(contador)
     return base.funcion_evaluacion(solucion_actual, isRandom), contador, solucion_actual
 
 
@@ -103,7 +99,7 @@ def graficas_primero():
             # Dinero acumulado en cada hora
             fig, ax = plt.subplots()
             plt.title(f"Búsqueda Primero El Mejor. G = {granularidades[g]}, S = {semillas[i]}")
-            ax.set_xticks(range(0, 23, 1))
+            ax.set_xticks(range(0, 24, 1))
             ln0 = ax.plot([j for j in range(24)], [cent / 100 for cent in dinero_acumulado],
                           label="Dinero Acumulado")
             ax.scatter([j for j in range(24)], [cent / 100 for cent in dinero_acumulado])

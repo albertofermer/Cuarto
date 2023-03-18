@@ -16,8 +16,8 @@ capacidad_bateria = constantes.capacidad_bateria
 semillas = constantes.semillas
 precio_venta, precio_compra, r = base.get_vectores(isRandom)
 
-evaluaciones = np.array([0 for _ in range(numero_repeticiones)], dtype=np.float64)
-dinero = np.array([0 for _ in range(numero_repeticiones)], dtype=np.float64)
+evaluaciones = np.array([0]*numero_repeticiones, dtype=np.float64)
+dinero = np.array([0]*numero_repeticiones, dtype=np.float64)
 
 # Parámetros Tabú:
 '''
@@ -42,7 +42,7 @@ de la solución actual.
 '''
 
 
-def GenerarVecino(solucion, pos):
+def GenerarVecino(semilla, solucion, pos):
     granularidad = 10  # En este algoritmo utilizaremos granularidad 10 fija.
     solucion_vecina = solucion.copy()
     accion = random.randint(0, 1)  # Elige una accion (decrementar o incrementar)
@@ -96,7 +96,6 @@ greedy
 
 
 def GreedyProbabilistico(semilla, matrizProbabilidades, granularidad):
-    random.seed(semilla)
     # Calcular Inversas:
     M_invertida = 1 / matrizProbabilidades
     suma_total = sum(np.transpose(M_invertida))  # Vector con la suma por filas
@@ -171,7 +170,7 @@ def BusquedaTabu(semilla, iteraciones_maximas, numero_vecinos, granularidad):
         for nv in range(numero_vecinos):
             hora = random.randint(0, 23)
             valor = solucion_actual[hora]
-            solucion_prima = GenerarVecino(solucion_actual, hora)
+            solucion_prima = GenerarVecino(semilla, solucion_actual, hora)
 
             # Si supera el criterio de aspiración
             num_evaluaciones += 1
@@ -179,11 +178,13 @@ def BusquedaTabu(semilla, iteraciones_maximas, numero_vecinos, granularidad):
                     or (hora, solucion_prima[hora]) not in lista_tabu:
                 # Evaluar S'
                 num_evaluaciones += 1
-                coste_vecino, dinero_acumulado, bateria_acumulada = base.funcion_evaluacion(solucion_prima, isRandom)
+                coste_vecino, dinero_acumulado_vecino, bateria_acumulada_vecino = base.funcion_evaluacion(solucion_prima, isRandom)
 
                 if coste_vecino > coste_mejor:
                     coste_mejor = coste_vecino
                     solucion_mejor = solucion_prima
+                    dinero_acumulado = dinero_acumulado_vecino
+                    bateria_acumulada = bateria_acumulada_vecino
 
         # END-FOR
         # Realizar el movimiento elegido
@@ -248,7 +249,7 @@ def GraficaBusquedaTabu():
         # Dinero acumulado en cada hora
         fig, ax = plt.subplots()
         plt.title(f"Búsqueda Tabú. G = {10}, S = {semillas[i]}")
-        ax.set_xticks(range(0, 23, 1))
+        ax.set_xticks(range(0, 24, 1))
         ln0 = ax.plot([j for j in range(24)], [cent / 100 for cent in dinero_acumulado],
                       label="Dinero Acumulado")
         ax.scatter([j for j in range(24)], [cent / 100 for cent in dinero_acumulado])

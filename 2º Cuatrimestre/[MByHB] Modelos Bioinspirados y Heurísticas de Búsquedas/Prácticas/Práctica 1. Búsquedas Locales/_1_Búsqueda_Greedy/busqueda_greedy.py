@@ -20,7 +20,7 @@ else:
     precio_compra = constantes.precio_compra
     r = constantes.r
 
-evaluaciones = [0 for _ in range(numero_repeticiones)]
+evaluaciones = [0]*numero_repeticiones
 media_evaluaciones = statistics.mean(evaluaciones)
 mejor_evaluacion = evaluaciones.index(min(evaluaciones))
 desviacion_evaluaciones = statistics.stdev(evaluaciones)
@@ -38,10 +38,10 @@ def greedy(israndom):
     hora_venta = precio_venta.index(max(precio_venta))  # Obtiene la hora con el precio mas alto.
     bateria = 0
     dinero = 0
-    solucion = [0 for _ in range(24)]
+    solucion = [0]*24
     # Listas para sacar los datos de las graficas
-    dinero_acumulado = [0 for _ in range(24)]
-    bateria_hora = [0 for _ in range(24)]
+    dinero_acumulado = [0]*24
+    bateria_hora = [0]*24
 
     for hora in range(24):
         # Cuando llegue la hora en la que hay que vender, se vende toda la energia que hay en la bateria + la que se
@@ -82,9 +82,9 @@ def greedy(israndom):
 
 def grafica_greedy():
     # Inicialización de las variables
-    dinero = [0 for _ in range(numero_repeticiones)]
+    dinero = [0]*numero_repeticiones
     dinero_acumulado_gr = 0
-    bateria_hora_gr = [0 for _ in range(24)]
+    bateria_hora_gr = [0]*24
 
     # Llamamos a la funcion de búsqueda:
     for i in range(numero_repeticiones):

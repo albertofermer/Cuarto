@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-isRandom = False
+isRandom = True
 numero_repeticiones = 5
 
 # Constantes
@@ -26,12 +26,12 @@ else:
     precio_compra = constantes.precio_compra
     r = constantes.r
 
-evaluaciones = np.tile(np.array([0 for _ in range(numero_repeticiones)], dtype=np.float64), (3, 1))
-dinero = np.tile(np.array([0 for _ in range(numero_repeticiones)], dtype=np.float64), (3, 1))
+evaluaciones = np.tile(np.array([0]*numero_repeticiones, dtype=np.float64), (3, 1))
+dinero = np.tile(np.array([0]*numero_repeticiones, dtype=np.float64), (3, 1))
 
 # Hiperparámetros de Control
-mu = [0.1, 0.2, 0.3]
-phi = [0.1, 0.2, 0.3]
+mu = [0.1, 0.15, 0.2, 0.25, 0.3]
+phi = [0.1, 0.15, 0.2, 0.25, 0.3]
 num_vecinos = [5, 10, 15, 20]
 
 
@@ -63,7 +63,7 @@ def enfriamiento_simulado(semilla, granularidad, num_vecinos_, mu_, phi_):
     dinero_mejor = base.funcion_evaluacion(solucion_mejor, isRandom)[0]
     t0 = temperatura_inicial(mu_, phi_, solucion_actual)
     t = t0
-    k = 0
+    k = 1
 
     dinero_candidato = 0
     dinero_acumulado = []
@@ -80,23 +80,24 @@ def enfriamiento_simulado(semilla, granularidad, num_vecinos_, mu_, phi_):
             solucion_candidata = seleccionar_solucion(solucion_actual, granularidad, random.randint(0, 23))
 
             num_evaluaciones += 2
-            dinero_candidato, dinero_hora, bateria_hora = base.funcion_evaluacion(solucion_candidata, isRandom)
+            dinero_candidato, _, _ = base.funcion_evaluacion(solucion_candidata, isRandom)
             delta = base.funcion_evaluacion(solucion_mejor, isRandom)[0] - dinero_candidato
 
             if delta < 0 or random.uniform(0, 1) < np.exp(-delta / t):  # Si es mejor la coge
                 solucion_actual = solucion_candidata
-
+                # Escogemos la mejor solucion
+                num_evaluaciones += 2
+                if base.funcion_evaluacion(solucion_candidata, isRandom)[0] > \
+                        base.funcion_evaluacion(solucion_mejor, isRandom)[0]:
+                    solucion_mejor = solucion_candidata
+                    num_evaluaciones += 1
+                    dinero_mejor, dinero_acumulado, bateria_acumulada = base.funcion_evaluacion(solucion_mejor, isRandom)
             else:
-                rechaza += 1
+                if k == 1: rechaza += 1
 
-            # Escogemos la mejor solucion
-            num_evaluaciones += 2
-            if base.funcion_evaluacion(solucion_candidata, isRandom)[0] > base.funcion_evaluacion(solucion_mejor, isRandom)[0]:
-                solucion_mejor = solucion_candidata
-                num_evaluaciones += 1
-                dinero_mejor, dinero_acumulado, bateria_acumulada = base.funcion_evaluacion(solucion_mejor, isRandom)
 
-            total += 1
+
+            if k == 1: total += 1
 
         t = t0 / (1 + k)  # Esquema de Enfriamiento: Esquema de Cauchy
         k += 1
@@ -105,37 +106,32 @@ def enfriamiento_simulado(semilla, granularidad, num_vecinos_, mu_, phi_):
 
 
 def experimentacion_parametros():
-    max_dinero = 0
-    max_mu = 0
-    max_phi = 0
     # Llamamos a la funcion de búsqueda:
     for i in range(numero_repeticiones):
-        ingresos_granularidad = np.tile(np.array([0 for _ in range(24)], dtype=np.float64), (3, 1))
         for g in range(len(granularidades)):
-            for nv in range(len(num_vecinos)):
-                for m in range(len(mu)):
-                    for p in range(len(phi)):
-                        dinero_mejor, dinero_acumulado, bateria_hora, num_evaluaciones_mejor, temperatura, solucion, cociente = \
-                            enfriamiento_simulado(
-                                semillas[i],
-                                granularidades[g],
-                                num_vecinos[nv],
-                                mu[m],
-                                phi[p])
-                        data = {
-                            'mu': [mu[m]],
-                            'phi': [phi[p]],
-                            'n_vecinos': [num_vecinos[nv]],
-                            'empeoramiento / total': [cociente],
-                            'T0': [temperatura_inicial(mu[m], phi[p], greedy.greedy(isRandom)[3])]
-                        }
+            for m in range(len(mu)):
+                for p in range(len(phi)):
+                    dinero_mejor, dinero_acumulado, bateria_hora, num_evaluaciones_mejor, temperatura, solucion, cociente = \
+                        enfriamiento_simulado(
+                            semillas[i],
+                            granularidades[g],
+                            100,
+                            mu[m],
+                            phi[p])
+                    # print(cociente)
+                    data = {
+                        'mu': [mu[m]],
+                        'phi': [phi[p]],
+                        'empeoramiento / total': [cociente],
+                        'T0': [temperatura_inicial(mu[m], phi[p], greedy.greedy(isRandom)[3])]
+                    }
+                    #print(cociente)
+                    if 0.2 <= cociente < 0.21:
+                        max_dinero = dinero_mejor
+                        max_mu = mu[m]
+                        max_phi = phi[p]
 
-                        if 0.2 < cociente < 0.21:
-                            max_dinero = dinero_mejor
-                            max_mu = mu[m]
-                            max_phi = phi[p]
-
-                            print(data)
+                        print(data)
     # print(f"mu = {max_mu} \nphi = {max_phi} \ndinero = {max_dinero}")
 
 
@@ -161,7 +157,7 @@ def graficas_enfriamiento_simulado(nv, m, p):
             # Dinero acumulado en cada hora
             fig, ax = plt.subplots()
             plt.title(f"Búsqueda Enfriamiento Simulado. G = {granularidades[g]}, S = {semillas[i]}")
-            ax.set_xticks(range(0, 23, 1))
+            ax.set_xticks(range(0, 24, 1))
             ln0 = ax.plot([j for j in range(24)], [cent / 100 for cent in dinero_acumulado],
                           label="Dinero Acumulado")
             ax.scatter([j for j in range(24)], [cent / 100 for cent in dinero_acumulado])
@@ -250,19 +246,16 @@ def graficas_enfriamiento_simulado(nv, m, p):
 if __name__ == "__main__":
     if isRandom:
         #experimentacion_parametros()
-        graficas_enfriamiento_simulado(15, 0.2, 0.3)
+        graficas_enfriamiento_simulado(15, 0.25, 0.3)
     else:
-        experimentacion_parametros()
-        graficas_enfriamiento_simulado(20, 0.3, 0.3)
+        #experimentacion_parametros()
+        graficas_enfriamiento_simulado(15, 0.3, 0.25)
         # dinero, _, _, _, _, s, _ = enfriamiento_simulado(123456, 1, 20, 0.3, 0.3)
         # print(s)
         # print(f"Dinero = {dinero}")
         # print(f"F(s) = {base.funcion_evaluacion(s, isRandom)[0]}")
         # print(f"D_acum(s) = {base.funcion_evaluacion(s, isRandom)[1]}")
         # print(f"B_acum(s) = {base.funcion_evaluacion(s, isRandom)[2]}")
-
-
-
 
     # 0.2 // 0.3 -> datos aleatorios
     # 0.3 // 0.2 -> datos reales

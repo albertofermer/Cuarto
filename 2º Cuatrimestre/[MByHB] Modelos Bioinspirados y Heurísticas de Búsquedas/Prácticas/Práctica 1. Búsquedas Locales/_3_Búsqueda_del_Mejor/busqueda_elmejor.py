@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-isRandom = False
+isRandom = True
 numero_repeticiones = 5
 
 # Constantes
@@ -26,29 +26,6 @@ else:
 
 evaluaciones = np.tile(np.array([0 for _ in range(numero_repeticiones)], dtype=np.float64), (3, 1))
 dinero = np.tile(np.array([0 for _ in range(numero_repeticiones)], dtype=np.float64), (3, 1))
-
-
-def entorno(solucion_actual, granularidad):
-    entorno_soluciones = []
-    for i in range(24):
-        solucion_candidata = solucion_actual.copy()
-
-        if solucion_candidata[i] + granularidad <= 100:
-            solucion_candidata[i] += granularidad
-        else:
-            solucion_candidata[i] = 100
-        entorno_soluciones.append(solucion_candidata)
-    for j in range(23, -1, -1):
-        solucion_candidata = solucion_actual.copy()
-        if solucion_candidata[j] - granularidad >= -100:
-            solucion_candidata[j] -= granularidad
-        else:
-            solucion_candidata[j] = -100
-
-        entorno_soluciones.append(solucion_candidata)
-    #print(f"Num_Vecinos: {len(entorno_soluciones)}")
-    return entorno_soluciones
-
 
 def generar_vecino(solucion_actual, granularidad, pos, suma):
     solucion_vecina = solucion_actual.copy()
@@ -127,7 +104,7 @@ def grafica_elmejor():
             # Dinero acumulado en cada hora
             fig, ax = plt.subplots()
             plt.title(f"Búsqueda El Mejor. G = {granularidades[g]}, S = {semillas[i]}")
-            ax.set_xticks(range(0, 23, 1))
+            ax.set_xticks(range(0, 24, 1))
             ln0 = ax.plot([j for j in range(24)], [cent / 100 for cent in dinero_acumulado],
                           label="Dinero Acumulado")
             ax.scatter([j for j in range(24)], [cent / 100 for cent in dinero_acumulado])
@@ -139,7 +116,7 @@ def grafica_elmejor():
             ax.set_xlabel("Horas")
             ax.set_ylabel("Euros (€)")
             ax1.set_ylabel("MW")
-            ax1.set(ylim=ax.get_ylim())
+            #ax1.set(ylim=ax.get_ylim())
             leg = ln0 + ln1
             labs = [legend.get_label() for legend in leg]
             plt.legend(leg, labs, loc='upper center', bbox_to_anchor=(0.5, 1.17), ncol=3)

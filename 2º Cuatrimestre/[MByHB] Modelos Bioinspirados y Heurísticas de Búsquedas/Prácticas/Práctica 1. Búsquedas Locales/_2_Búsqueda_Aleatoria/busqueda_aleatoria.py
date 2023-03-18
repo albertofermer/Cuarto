@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-isRandom = False
+isRandom = True
 numero_repeticiones = 5
 
 # Constantes
@@ -82,7 +82,7 @@ def grafica_aleatoria():
             # Dinero acumulado en cada hora
             fig, ax = plt.subplots()
             plt.title(f"Búsqueda Aleatoria. G = {granularidades[g]}, S = {semillas[i]}")
-            ax.set_xticks(range(0, 23, 1))
+            ax.set_xticks(range(0, 24, 1))
             ln0 = ax.plot([j for j in range(24)], [cent/100 for cent in dinero_acumulado_aleatorio], label="Dinero Acumulado")
             ax.scatter([j for j in range(24)], [cent/100 for cent in dinero_acumulado_aleatorio])
 

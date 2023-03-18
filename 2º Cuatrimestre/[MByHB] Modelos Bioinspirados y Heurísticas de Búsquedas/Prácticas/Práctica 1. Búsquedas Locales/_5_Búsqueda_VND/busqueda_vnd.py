@@ -16,12 +16,7 @@ capacidad_bateria = constantes.capacidad_bateria
 granularidades = constantes.granularidad
 semillas = constantes.semillas
 
-# Numero de Individuos que Cambia la busqueda cada vez que aumente el k:
-#   k = 1 : Cambia 1 individuo
-#   k = 2 : Cambia 2 individuos
-#   k = 3 : Cambia 4 individuos
-#   k = 4 : Cambia 6 individuos
-#   k = 5 : Cambia 8 individuos
+# Granularidades:
 estructura_entornos = [1, 5, 10, 15, 20]
 
 if isRandom:
@@ -33,8 +28,8 @@ else:
     precio_compra = constantes.precio_compra
     r = constantes.r
 
-evaluaciones = np.array([0 for _ in range(numero_repeticiones)], dtype=np.float64)
-dinero = np.array([0 for _ in range(numero_repeticiones)], dtype=np.float64)
+evaluaciones = np.array([0]*numero_repeticiones, dtype=np.float64)
+dinero = np.array([0]*numero_repeticiones, dtype=np.float64)
 
 
 def entorno(solucion_actual, granularidad, k):
@@ -152,7 +147,7 @@ def grafica_elmejor_vnd():
         # Dinero acumulado en cada hora
         fig, ax = plt.subplots()
         plt.title(f"Búsqueda El Mejor VND. S = {semillas[i]}")
-        ax.set_xticks(range(0, 23, 1))
+        ax.set_xticks(range(0, 24, 1))
         ln0 = ax.plot([j for j in range(24)], [cent / 100 for cent in dinero_acumulado],
                       label="Dinero Acumulado")
         ax.scatter([j for j in range(24)], [cent / 100 for cent in dinero_acumulado])
@@ -164,7 +159,7 @@ def grafica_elmejor_vnd():
         ax.set_xlabel("Horas")
         ax.set_ylabel("Euros (€)")
         ax1.set_ylabel("MW")
-        ax1.set(ylim=ax.get_ylim())
+        #ax1.set(ylim=ax.get_ylim())
         leg = ln0 + ln1
         labs = [legend.get_label() for legend in leg]
         plt.legend(leg, labs, loc='upper center', bbox_to_anchor=(0.5, 1.17), ncol=3)
