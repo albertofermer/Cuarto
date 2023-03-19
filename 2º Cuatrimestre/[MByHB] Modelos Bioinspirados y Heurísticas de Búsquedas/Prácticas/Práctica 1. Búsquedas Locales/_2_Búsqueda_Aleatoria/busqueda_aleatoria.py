@@ -14,15 +14,7 @@ numero_repeticiones = 5
 capacidad_bateria = constantes.capacidad_bateria
 granularidades = constantes.granularidad
 semillas = constantes.semillas
-
-if isRandom:
-    precio_venta = constantes.precio_venta_random
-    precio_compra = constantes.precio_compra_random
-    r = constantes.r_random
-else:
-    precio_venta = constantes.precio_venta
-    precio_compra = constantes.precio_compra
-    r = constantes.r
+precio_venta, precio_compra, r = base.get_vectores(isRandom)
 
 # Valores de estudio para rellenar la tabla.
 evaluaciones = np.tile(np.array([0 for _ in range(numero_repeticiones)], dtype=np.float64), (3, 1))
@@ -31,7 +23,8 @@ dinero = np.tile(np.array([0 for _ in range(numero_repeticiones)], dtype=np.floa
 
 # El Algoritmo de Búsqueda Aleatoria (BA) consistirá en generar aleatoriamente una solución en cada
 # iteración debiéndose ejecutar 100 iteraciones con cada semilla devolviendo la mejor de las iteraciones.
-def busqueda_aleatoria(semilla, granularidad):
+def busqueda_aleatoria(isRandom, semilla, granularidad):
+
     # Inicializacion de variables
     random.seed(semilla)  # Semilla
     best_dinero_acumulado = []
@@ -73,7 +66,7 @@ def grafica_aleatoria():
         ingresos_granularidad = np.tile(np.array([0 for _ in range(24)], dtype=np.float64), (3, 1))
         for g in range(len(granularidades)):
             dinero_aleatorio, dinero_acumulado_aleatorio, bateria_hora_aleatorio, num_evaluaciones, solucion = \
-                busqueda_aleatoria(semillas[i], granularidades[g])
+                busqueda_aleatoria(isRandom, semillas[i], granularidades[g])
             ingresos_granularidad[g] = dinero_acumulado_aleatorio
 
             dinero[g, i] = dinero_aleatorio
@@ -151,5 +144,5 @@ def grafica_aleatoria():
         print(pd.DataFrame(data))
 
 
-grafica_aleatoria()
-#print(busqueda_aleatoria(123456, 1)[0])
+if __name__ == "__main__":
+    grafica_aleatoria()

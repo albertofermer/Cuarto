@@ -128,7 +128,7 @@ Selección de estrategias de reinicialización:
 '''
 
 
-def BusquedaTabu(semilla, iteraciones_maximas, numero_vecinos, granularidad):
+def BusquedaTabu(isRandom, semilla, iteraciones_maximas, numero_vecinos, granularidad):
     random.seed(semilla)
     solucion_actual = base.generar_inicial(semilla, 24, granularidad)
     solucion_mejor = solucion_actual
@@ -192,7 +192,7 @@ def BusquedaTabu(semilla, iteraciones_maximas, numero_vecinos, granularidad):
             else:
                 tenencia_tabu += tenencia_tabu * 0.5
             tenencia_tabu = int(np.ceil(tenencia_tabu))
-            print(f"T: {tenencia_tabu}")
+            #print(f"T: {tenencia_tabu}")
             lista_tabu = []
 
             '''
@@ -203,17 +203,17 @@ def BusquedaTabu(semilla, iteraciones_maximas, numero_vecinos, granularidad):
             '''
             num = random.random()
             if num < 0.25:
-                print("Reinicializacion Aleatoria")
+                #print("Reinicializacion Aleatoria")
                 # Reinicialización construyendo una solución inicial aleatoria : 25%
                 solucion_actual = base.generar_inicial(semilla, 24, granularidad)
             elif 0.25 <= num < 0.5:
-                print("Reinicializacion Mejor Solucion")
+                #print("Reinicializacion Mejor Solucion")
                 # Reinicialización desde la mejor solución : 25%
                 solucion_actual = solucion_mejor
             else:
                 # Memoria a Largo Plazo : 50%
                 solucion_actual = GreedyProbabilistico(M, granularidad)
-                print("MLP")
+                #print("MLP")
 
         num_iteraciones += 1
     # END-WHILE

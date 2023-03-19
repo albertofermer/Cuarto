@@ -43,9 +43,9 @@ def generar_vecino(solucion_actual, granularidad, pos, suma):
     return solucion_vecina
 
 
-def busqueda_elmejor(semilla, granularidad):
+def busqueda_elmejor(isRandom, semilla, granularidad):
     random.seed(semilla)
-
+    precio_venta,precio_compra,r = base.get_vectores(isRandom)
     solucion_inicial = base.generar_inicial(semilla, 24, granularidad)
     solucion_actual = solucion_inicial
     best_dinero_acumulado = []
@@ -177,5 +177,5 @@ def grafica_elmejor():
         print(pd.DataFrame(data))
 
 
-# print((busqueda_elmejor(123456, 1)[0]))
-grafica_elmejor()
+if __name__ == "__main__":
+    grafica_elmejor()

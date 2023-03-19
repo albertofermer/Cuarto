@@ -38,7 +38,7 @@ def genera_vecinos(solucion, granularidad, pos):
 
 
 # Algoritmo de busqueda el mejor vecino
-def busqueda_primero(semilla, granularidad):
+def busqueda_primero(isRandom, semilla, granularidad):
     random.seed(semilla)
     contador = 0
     solucion_actual = base.generar_inicial(semilla, 24, granularidad)  # Genera la solucion inicial
@@ -78,7 +78,8 @@ def graficas_primero():
     for i in range(numero_repeticiones):
         ingresos_granularidad = np.tile(np.array([0 for _ in range(24)], dtype=np.float64), (3, 1))
         for g in range(len(granularidades)):
-            (dinero_mejor, dinero_acumulado, bateria_hora), num_evaluaciones, solucion = busqueda_primero(semillas[i],
+            (dinero_mejor, dinero_acumulado, bateria_hora), num_evaluaciones, solucion = busqueda_primero(isRandom,
+                                                                                                          semillas[i],
                                                                                                           granularidades[g])
 
             ingresos_granularidad[g] = dinero_acumulado

@@ -54,7 +54,7 @@ def seleccionar_solucion(solucion, granularidad, pos):
     return solucion_vecina
 
 
-def enfriamiento_simulado(semilla, granularidad, num_vecinos_, mu_, phi_):
+def enfriamiento_simulado(isRandom, semilla, granularidad, num_vecinos_, mu_, phi_):
     random.seed(semilla)
     solucion_actual = greedy.greedy(isRandom)[3]  # Solucion Greedy
     solucion_mejor = solucion_actual
@@ -108,7 +108,7 @@ def experimentacion_parametros():
             for m in range(len(mu)):
                 for p in range(len(phi)):
                     dinero_mejor, dinero_acumulado, bateria_hora, num_evaluaciones_mejor, temperatura, solucion, cociente = \
-                        enfriamiento_simulado(
+                        enfriamiento_simulado( isRandom,
                             semillas[i],
                             granularidades[g],
                             100,
@@ -138,7 +138,7 @@ def graficas_enfriamiento_simulado(nv, m, p):
         ingresos_granularidad = np.tile(np.array([0 for _ in range(24)], dtype=np.float64), (3, 1))
         for g in range(len(granularidades)):
             dinero_mejor, dinero_acumulado, bateria_hora, num_evaluaciones_mejor, temperatura, solucion, _ = \
-                enfriamiento_simulado(
+                enfriamiento_simulado( isRandom,
                     semillas[i],
                     granularidades[g],
                     nv,
@@ -244,7 +244,7 @@ if __name__ == "__main__":
         # experimentacion_parametros()
         graficas_enfriamiento_simulado(15, 0.25, 0.3)
     else:
-        # experimentacion_parametros()
+        #experimentacion_parametros()
         graficas_enfriamiento_simulado(15, 0.3, 0.25)
         # dinero, _, _, _, _, s, _ = enfriamiento_simulado(123456, 1, 20, 0.3, 0.3)
         # print(s)

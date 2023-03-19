@@ -6,7 +6,6 @@ import statistics
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-from itertools import combinations
 
 isRandom = True
 numero_repeticiones = 5
@@ -17,19 +16,12 @@ granularidades = constantes.granularidad
 semillas = constantes.semillas
 
 # Granularidades:
-estructura_entornos = [1, 5, 10, 15, 20]
+# estructura_entornos = [1, 5, 10, 15, 20]
 
-if isRandom:
-    precio_venta = constantes.precio_venta_random
-    precio_compra = constantes.precio_compra_random
-    r = constantes.r_random
-else:
-    precio_venta = constantes.precio_venta
-    precio_compra = constantes.precio_compra
-    r = constantes.r
+precio_venta, precio_compra, r = base.get_vectores(isRandom)
 
-evaluaciones = np.array([0]*numero_repeticiones, dtype=np.float64)
-dinero = np.array([0]*numero_repeticiones, dtype=np.float64)
+evaluaciones = np.array([0] * numero_repeticiones, dtype=np.float64)
+dinero = np.array([0] * numero_repeticiones, dtype=np.float64)
 
 
 def generar_vecino(solucion_actual, granularidad, pos):
@@ -47,7 +39,7 @@ def generar_vecino(solucion_actual, granularidad, pos):
     return solucion_vecina
 
 
-def busqueda_elmejor(solucion_par, k):
+def busqueda_elmejor(isRandom, solucion_par, k, estructura_entornos):
     solucion_inicial = solucion_par
     solucion_actual = solucion_inicial
     num_evaluaciones = 1
@@ -55,7 +47,6 @@ def busqueda_elmejor(solucion_par, k):
     best_dinero_acumulado = []
     best_bateria_hora = []
     max_dinero = 0
-
 
     while True:  # Repetir
         mejor_vecino = solucion_actual
@@ -90,7 +81,7 @@ def busqueda_elmejor(solucion_par, k):
     return max_dinero, best_dinero_acumulado, best_bateria_hora, num_evaluaciones, solucion_actual  # Devuelve la solucion actual
 
 
-def busqueda_elmejor_vnd(semilla):
+def busqueda_elmejor_vnd(isRandom, semilla, estructura_entornos):
     random.seed(semilla)
 
     solucion_inicial = base.generar_inicial(semilla, 24, estructura_entornos[0])
@@ -104,21 +95,20 @@ def busqueda_elmejor_vnd(semilla):
     k = 0
 
     while k < len(estructura_entornos):  # Repetir, hasta que k=kmax, la siguiente secuencia:
-        print(f"K = {k}")
+        #print(f"K = {k}")
         # a) Exploración del entorno: Encontrar la mejor solución s' del k-ésimo entorno de s.
         dinero_obtenido, dinero_acumulado, bateria_hora, n_evaluaciones, solucion_obtenida = busqueda_elmejor(
-            solucion_inicial, k)
-
+            isRandom, solucion_actual, k, estructura_entornos)
+        # print(f"dinero_btenido = {dinero_obtenido}")
+        # print(f"dinero_actual = {dinero_actual}")
         # b) Moverse o no: Si la solución obtenida s' es mejor que s, hacer s <- s' y k <- 1;
         #    en otro caso, hacer k <- k + 1
         num_evaluaciones += n_evaluaciones
         if dinero_obtenido > dinero_actual:
             solucion_actual = solucion_obtenida
             num_evaluaciones += 1
-            dinero_actual = base.funcion_evaluacion(solucion_actual, isRandom)[0]
+            dinero_actual, best_dinero_acumulado, best_bateria_hora = base.funcion_evaluacion(solucion_actual, isRandom)
             max_dinero = dinero_obtenido
-            best_dinero_acumulado = dinero_acumulado
-            best_bateria_hora = bateria_hora
             k = 0
         else:
             k += 1
@@ -131,7 +121,7 @@ def grafica_elmejor_vnd():
     for i in range(numero_repeticiones):
         ingresos_granularidad = np.tile(np.array([0 for _ in range(24)], dtype=np.float64), (3, 1))
         dinero_mejor, dinero_acumulado, bateria_hora, num_evaluaciones_mejor, solucion = \
-                busqueda_elmejor_vnd(semillas[i])
+            busqueda_elmejor_vnd(isRandom, semillas[i], [1, 5, 10, 15, 20])
 
         dinero[i] = dinero_mejor
         evaluaciones[i] = num_evaluaciones_mejor
@@ -151,7 +141,7 @@ def grafica_elmejor_vnd():
         ax.set_xlabel("Horas")
         ax.set_ylabel("Euros (€)")
         ax1.set_ylabel("MW")
-        #ax1.set(ylim=ax.get_ylim())
+        # ax1.set(ylim=ax.get_ylim())
         leg = ln0 + ln1
         labs = [legend.get_label() for legend in leg]
         plt.legend(leg, labs, loc='upper center', bbox_to_anchor=(0.5, 1.17), ncol=3)
@@ -185,4 +175,5 @@ def grafica_elmejor_vnd():
     print(pd.DataFrame(data))
 
 
-grafica_elmejor_vnd()
+if __name__ == "__main__":
+    grafica_elmejor_vnd()
