@@ -71,10 +71,7 @@ La granularidad será el paso de cada porcentaje. Estudiaremos tres tipos:
 
 # Generador de la solucion Inicial
 def generar_inicial(semilla, longitud_vector, granularidad):
-    random.seed(semilla)
-    solucion_inicial = [random.randrange(-100, 101, granularidad) for _ in range(longitud_vector)]
-
-    return solucion_inicial
+    return [random.randrange(-100, 101, granularidad) for _ in range(longitud_vector)]
 
 
 def vender(bateria, hora, solucion, dinero, israndom):

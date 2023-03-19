@@ -32,24 +32,6 @@ evaluaciones = np.array([0]*numero_repeticiones, dtype=np.float64)
 dinero = np.array([0]*numero_repeticiones, dtype=np.float64)
 
 
-def entorno(solucion_actual, granularidad, k):
-    entorno_soluciones = []
-    n = len(solucion_actual)
-    for indices in combinations(range(n), estructura_entornos[k]):
-        new_vector_suma = solucion_actual[:]
-        new_vector_resta = solucion_actual[:]
-        for i in indices:
-            new_vector_suma[i] += granularidad
-            if new_vector_suma[i] > 100:
-                new_vector_suma[i] = 100
-            new_vector_resta[i] -= granularidad
-            if new_vector_resta[i] < -100:
-                new_vector_resta[i] = -100
-        yield new_vector_suma
-        yield new_vector_resta
-    return entorno_soluciones
-
-
 def generar_vecino(solucion_actual, granularidad, pos):
     solucion_vecina = solucion_actual.copy()
     suma = pos < 24

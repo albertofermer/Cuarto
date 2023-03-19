@@ -17,25 +17,12 @@ semillas = constantes.semillas
 
 evaluaciones = np.tile(np.array([0]*numero_repeticiones, dtype=np.float64), (3, 1))
 dinero = np.tile(np.array([0]*numero_repeticiones, dtype=np.float64), (3, 1))
-
-if isRandom:
-    precio_venta = constantes.precio_venta_random
-    precio_compra = constantes.precio_compra_random
-    r = constantes.r_random
-else:
-    precio_venta = constantes.precio_venta
-    precio_compra = constantes.precio_compra
-    r = constantes.r
+precio_venta, precio_compra, r = base.get_vectores(isRandom)
 
 
 def genera_vecinos(solucion, granularidad, pos):
     solucion_vecina = solucion.copy()
-    accion = random.randint(0, 1)  # Elige una accion (decrementar o incrementar)
-    if pos % 2 == 0:
-        accion = 0
-    elif pos % 2 == 1:
-        accion = 1
-
+    accion = pos % 2
     pos = int(np.floor(pos/2))
 
     if accion == 0:  # Incrementa

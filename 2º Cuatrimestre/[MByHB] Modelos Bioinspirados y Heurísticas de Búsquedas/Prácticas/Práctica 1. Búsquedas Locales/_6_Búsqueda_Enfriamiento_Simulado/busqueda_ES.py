@@ -41,9 +41,7 @@ def temperatura_inicial(mu_, phi_, s0):
 
 def seleccionar_solucion(solucion, granularidad, pos):
     solucion_vecina = solucion.copy()
-
     accion = random.randint(0, 1)  # Elige una accion (decrementar o incrementar)
-
     if accion == 0:  # Incrementa
         solucion_vecina[pos] += granularidad
         if solucion_vecina[pos] > 100:

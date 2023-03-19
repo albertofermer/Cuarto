@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-isRandom = False
+isRandom = not False
 numero_repeticiones = 5
 
 # Constantes
@@ -103,7 +103,6 @@ def GreedyProbabilistico(matrizProbabilidades, granularidad):
         numero = random.random()
         suma = 0
         for i in range(-100, 110, granularidad):
-
             suma += matriz_normalizada[hora, valores.index(i)]
             if numero < suma:
                 solucion_greedy.append(i)
@@ -187,7 +186,7 @@ def BusquedaTabu(semilla, iteraciones_maximas, numero_vecinos, granularidad):
         '''
         if num_iteraciones % round(iteraciones_maximas / 4) == 0:
             # Reiniciar lista tabú
-            rand = random.random()
+            rand = random.uniform(0, 1)
             if rand < 0.5:
                 tenencia_tabu -= tenencia_tabu * 0.5
             else:
@@ -218,7 +217,6 @@ def BusquedaTabu(semilla, iteraciones_maximas, numero_vecinos, granularidad):
 
         num_iteraciones += 1
     # END-WHILE
-
     return coste_mejor, dinero_acumulado, bateria_acumulada, num_evaluaciones, solucion_mejor
 
 
