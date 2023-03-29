@@ -9,7 +9,7 @@ MAX_POS = 10
 MIN_POS = -MAX_POS
 
 # Constantes para PSO
-NUM_PARTICLES = 1000
+NUM_PARTICLES = 10
 VECINDAD = 2
 OMEGA = 0.729
 PHI_1 = 1.49445
@@ -22,12 +22,11 @@ NUM_VECINOS = 10
 
 
 def RosenbrockFunction(x):
-    return (1 - x[0])**2 + 100*(x[1] - x[0]**2)**2
+    return (1 - x[0]) ** 2 + 100 * (x[1] - x[0] ** 2) ** 2
 
 
-def RastriginFunction(*X, **kwargs):
-    A = kwargs.get('A', 10)
-    return A + sum([(x ** 2 - A * np.cos(2 * math.pi * x)) for x in X])
+def RastriginFunction(x):
+    return 20 + x[0] ** 2 + x[1] ** 2 - 10 * (np.cos(2 * math.pi * x[0]) + np.cos(2 * math.pi * x[1]))
 
 
 '''
@@ -39,7 +38,8 @@ def GetNextPositionAndSpeed(omega, v, phi_1, pbest, phi_2, g, pos):
     next_pos = np.zeros(len(pos))
     next_v = np.zeros(len(pos))
     for i in range(len(pos)):  # Para cada dimension del vector posicion,
-        next_v[i] = omega * v[i] + phi_1 * np.random.random() * (pbest[i] - pos[i]) + phi_2 * np.random.random() * (g[i] - pos[i])
+        next_v[i] = omega * v[i] + phi_1 * np.random.random() * (pbest[i] - pos[i]) + phi_2 * np.random.random() * (
+                g[i] - pos[i])
 
         if next_v[i] >= MAX_VEL:
             next_v[i] = MAX_VEL
@@ -53,7 +53,7 @@ def GetNextPositionAndSpeed(omega, v, phi_1, pbest, phi_2, g, pos):
         elif next_pos[i] <= MIN_POS:
             next_pos[i] = MIN_POS
 
-    #print(next_pos)
+    # print(next_pos)
     return next_pos, next_v
 
 
@@ -61,5 +61,35 @@ def GetEntorno(indice_particula):
     return [(indice_particula + i) % NUM_PARTICLES for i in range(-VECINDAD, VECINDAD + 1) if i != 0]
 
 
+'''
+x -> [float, float]
+suma -> [bool, bool]
+
+Si suma[i] -> x[i] += granularidad
+sino: x[i] -= granularidad
+
+'''
+
+
+def GenerarVecino(x, suma):
+    vecino = x.copy()
+    for i in range(len(suma)):
+        if suma[i]:
+            vecino[i] += GRANULARIDAD
+            if vecino[i] > MAX_POS:
+                vecino[i] = MAX_POS
+        else:
+            vecino[i] -= GRANULARIDAD
+            if vecino[i] < MIN_POS:
+                vecino[i] = MIN_POS
+    return vecino
+
+
 if __name__ == "__main__":
-    print(GetEntorno(0))
+    # sol_inicial = np.array([1, 1], dtype=float)
+    # s_act = sol_inicial
+    # for _ in range(10):
+    #     # TODO: for para sacar todas las combinaciones de suma -> [bool, bool]
+    #     s_act = GenerarVecino(s_act, [True, True])
+    #     print(s_act)
+    print(RastriginFunction(np.array([0, 0])))
