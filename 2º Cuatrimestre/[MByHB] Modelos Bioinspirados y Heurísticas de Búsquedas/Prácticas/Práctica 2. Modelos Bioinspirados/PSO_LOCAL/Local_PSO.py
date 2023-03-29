@@ -1,6 +1,6 @@
 import numpy as np
 import Utils
-
+import matplotlib.pyplot as plt
 
 def Local_PSO(semilla, dimensiones, funcion):
     np.random.seed(semilla)
@@ -11,7 +11,7 @@ def Local_PSO(semilla, dimensiones, funcion):
     v = (np.random.random(size=(Utils.NUM_PARTICLES, dimensiones))) * (Utils.MAX_VEL - Utils.MIN_VEL) + Utils.MIN_VEL
     pbest = x.copy()  # Al principio, cada particula tiene como mejor posición ella misma.
     best_valores = np.apply_along_axis(funcion, 1, pbest)  # Aplica la funcion por filas a la matriz.
-    lbest = np.zeros((Utils.NUM_PARTICLES, dimensiones))
+    lbest = np.ones((Utils.NUM_PARTICLES, dimensiones))*float('inf')
 
     mejor_valor = float("inf")
     mejor_posicion = np.ones(dimensiones)
@@ -22,15 +22,18 @@ def Local_PSO(semilla, dimensiones, funcion):
         t += 1
         for i in range(Utils.NUM_PARTICLES):
             valor = funcion(x[i, :])
+
             if valor < funcion(pbest[i, :]): # Encontrar el mínimo
                 pbest[i, :] = x[i, :]
                 best_valores[i] = valor
 
             if funcion(pbest[i, :]) < mejor_valor:
                 mejor_valor = funcion(pbest[i, :])
-                mejor_posicion = x[i, :]
+                mejor_posicion = x[i, :]    # TODO: mejor_posicion -> matriz
                 print(mejor_valor)
                 print(mejor_posicion)
+                #Utils.DrawParticle(mejor_posicion)
+
 
         for i in range(Utils.NUM_PARTICLES):
             # Escoger lbest[i], la partícula con mejor fitness del entorno de x[i]
@@ -42,4 +45,4 @@ def Local_PSO(semilla, dimensiones, funcion):
     return x
 
 
-x = Local_PSO(123456, 2, Utils.RastriginFunction)
+x = Local_PSO(123456, 2, Utils.RosenbrockFunction)

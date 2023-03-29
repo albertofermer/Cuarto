@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import matplotlib.pyplot as plt
 
 '''
 Valores que se utilizarán en el algoritmo PSO
@@ -48,12 +49,12 @@ def GetNextPositionAndSpeed(omega, v, phi_1, pbest, phi_2, g, pos):
 
         next_pos[i] = pos[i] + next_v[i]
 
+        # Si se sale de los límites del tablero
         if next_pos[i] >= MAX_POS:
             next_pos[i] = MAX_POS
         elif next_pos[i] <= MIN_POS:
             next_pos[i] = MIN_POS
 
-    # print(next_pos)
     return next_pos, next_v
 
 
@@ -84,6 +85,10 @@ def GenerarVecino(x, suma):
                 vecino[i] = MIN_POS
     return vecino
 
+def DrawParticle(x):
+    fig, ax = plt.plot()
+    ax.scatter(x[0],x[1])
+    plt.draw()
 
 if __name__ == "__main__":
     # sol_inicial = np.array([1, 1], dtype=float)
@@ -92,4 +97,4 @@ if __name__ == "__main__":
     #     # TODO: for para sacar todas las combinaciones de suma -> [bool, bool]
     #     s_act = GenerarVecino(s_act, [True, True])
     #     print(s_act)
-    print(RastriginFunction(np.array([0, 0])))
+    print(GetEntorno(2))

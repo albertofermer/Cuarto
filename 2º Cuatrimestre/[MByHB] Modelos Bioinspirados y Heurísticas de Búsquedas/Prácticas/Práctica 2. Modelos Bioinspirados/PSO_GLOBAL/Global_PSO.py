@@ -10,7 +10,7 @@ def Global_PSO(semilla, dimensiones, funcion):
     v = (np.random.random(size=(Utils.NUM_PARTICLES, dimensiones))) * (Utils.MAX_VEL - Utils.MIN_VEL) + Utils.MIN_VEL
     pbest = x.copy()  # Al principio, cada particula tiene como mejor posición ella misma.
     best_valores = np.apply_along_axis(funcion, 1, pbest)  # Aplica la funcion por filas a la matriz.
-    gbest = np.zeros((Utils.NUM_PARTICLES, dimensiones))
+    gbest = np.ones((Utils.NUM_PARTICLES, dimensiones))*float('inf')
     mejor_valor = float("inf")
     mejor_posicion = np.ones(dimensiones)
 
@@ -23,7 +23,7 @@ def Global_PSO(semilla, dimensiones, funcion):
                 best_valores[i] = valor
 
             if funcion(pbest[i, :]) < funcion(gbest[i, :]):
-                gbest = pbest
+                gbest[i, :] = pbest[i, :]
 
             if funcion(pbest[i, :]) < mejor_valor:
                 mejor_valor = funcion(pbest[i, :])
@@ -42,4 +42,4 @@ def Global_PSO(semilla, dimensiones, funcion):
     return x
 
 
-x = Global_PSO(123456, 2, Utils.RastriginFunction)
+x = Global_PSO(123456, 2, Utils.RosenbrockFunction)
