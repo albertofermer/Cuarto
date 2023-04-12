@@ -2,17 +2,21 @@ import numpy as np
 import Utils
 import matplotlib.pyplot as plt
 
-
+'''
+Particle Swarm Optimization con vecindad local.
+'''
 def Local_PSO(semilla, funcion, vel, iteraciones_sin_mejora):
-    np.random.seed(semilla)
-    idfun = 0 if funcion == Utils.RosenbrockFunction else 1
-    t = 0
-    # Inicializar X y V (Valores aleatorios entre MAX y MIN)
-    if funcion == Utils.RosenbrockFunction:
+    np.random.seed(semilla) # Inicializa la semilla
+    idfun = 0 if funcion == Utils.RosenbrockFunction else 1 # Detecta qué función de evaluación tiene que utilizar
+    t = 0   # Inicializamos el contador de iteraciones a 0
+    #  Inicializamos X y V (Valores aleatorios entre MAX y MIN)
+    # Dependiendo de la función de evaluación, las gráficas tendrán unos límites
+    # u otros.
+    if idfun == 0:  # Si la funci
         _x = (np.random.uniform(Utils.MIN_POS_ROS_X, Utils.MAX_POS_ROS_X, Utils.NUM_PARTICLES))
         y = (np.random.uniform(Utils.MIN_POS_ROS_Y, Utils.MAX_POS_ROS_Y, Utils.NUM_PARTICLES))
         x = np.column_stack((_x, y))
-    else:
+    else: # Si la funcion es Rastrigin
         x = np.random.uniform(Utils.MIN_POS_RAS, Utils.MAX_POS_RAS, (Utils.NUM_PARTICLES, Utils.DIMENSION))
 
     v = np.random.uniform(vel[0], vel[1], (Utils.NUM_PARTICLES, Utils.DIMENSION))
