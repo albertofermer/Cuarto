@@ -38,6 +38,7 @@ def cruce(individuo1, individuo2):
                                                               individuo1[max_pos:len(individuo1)].copy()))
     hijo2 = np.append(individuo2[0:min_pos].copy(), np.append(individuo1[min_pos:max_pos].copy(),
                                                               individuo2[max_pos:len(individuo2)].copy()))
+    print(f"Cruce: {individuo1} + {individuo2} =\n {hijo1} y {hijo2}")
     return hijo1, hijo2
 
 
@@ -86,7 +87,7 @@ if __name__ == "__main__":
     # h1, h2 = cruce(np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]), np.array([10, 11, 12, 13, 14, 15, 16, 17, 18, 19]))
     # print(h1)
     # print(h2)
-    np.random.seed(123456)
+    #np.random.seed(123456)
     poblacion = inicializar_poblacion(Utils.POBLACION_INICIAL)
     # Evaluar P(t)
     valores_poblacion = np.apply_along_axis(fitness, 1, poblacion)
@@ -94,14 +95,15 @@ if __name__ == "__main__":
     padres = np.zeros(shape=(Utils.POBLACION_INICIAL,2), dtype=int)
     for i in range(Utils.POBLACION_INICIAL):
         padres[i] = h[i][np.argsort(valores_poblacion[h[i]])[-2:]]
-    print(poblacion[padres[0]])
+
     hijos = np.zeros(shape=(Utils.POBLACION_INICIAL,24), dtype=int)
-    print(hijos)
     for i in range(0, Utils.POBLACION_INICIAL,2):
         print(i)
         if i < Utils.POBLACION_INICIAL-1:
-            h1, h2 = cruce(poblacion[padres[i][0]], poblacion[padres[i][1]])
+            # print(f"Padres: {poblacion[padres[i][0]]} -- {poblacion[padres][i][1]}")
+            print(type(poblacion[padres[i][1]]))
+            h1, h2 = cruce(poblacion[padres[i][0].copy()].copy(), poblacion[padres[i][1].copy()].copy())
+            # print(f"Hijos: {h1} -- {h2}")
             hijos[i] = h1
             hijos[i+1] = h2
-    print(hijos)
 

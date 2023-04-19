@@ -24,7 +24,6 @@ VECINDAD = 2
 OMEGA = 0.729
 PHI_1 = 1.49445
 PHI_2 = 1.49445
-MAX_VEL = 0.1
 # Rosenbrock
 MAX_POS_ROS_X = 2
 MIN_POS_ROS_X = -2
@@ -85,9 +84,11 @@ def GetNextPositionAndSpeed(omega, v, phi_1, pbest, phi_2, g, pos, vel, function
     next_pos = np.zeros(len(pos))
     next_v = np.zeros(len(pos))
     # Para cada dimensión del vector posición
+    # TODO un numero aleatorio solamente.
+    num_aleatorio = np.random.random()
     for i in range(len(pos)):
         # Calculamos la siguiente velocidad aplicando la fórmula
-        next_v[i] = omega * v[i] + phi_1 * np.random.random() * (pbest[i] - pos[i]) + phi_2 * np.random.random() * (
+        next_v[i] = omega * v[i] + phi_1 * num_aleatorio * (pbest[i] - pos[i]) + phi_2 * num_aleatorio * (
                 g[i] - pos[i])
         # Controlamos que la componente de cada velocidad no supere la velocidad máxima
         if next_v[i] >= vel[1]:
