@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import numpy as np
 
 import Utils
@@ -9,22 +10,22 @@ Función de mutación del algoritmo genético.
 
 
 def mutacion(individuo):
-    # Obtiene el valor de la posición asignada
-    posicion = np.random.uniform(0, 23)
-    valor = individuo[posicion] * np.random.uniform(0, 10) / 100
     ind_mutado = individuo.copy()
-    # Sumar o Restar
-    if np.random.uniform() < 0.5:
-        ind_mutado[posicion] += valor
-    else:
-        ind_mutado[posicion] -= valor
+    if np.random.random() <= Utils.PORCENTAJE_MUTACION:
+        # Obtiene el valor de la posición asignada
+        posicion = np.random.randint(0, 24)
+        valor = individuo[posicion] * np.random.uniform(0, 10) / 100
+        # Sumar o Restar
+        if np.random.uniform() < 0.5:
+            ind_mutado[posicion] += valor
+        else:
+            ind_mutado[posicion] -= valor
 
-    # Comprobamos que no supere los límites
-    if ind_mutado[posicion] > 100:
-        ind_mutado[posicion] = 100
-    elif ind_mutado[posicion] < -100:
-        ind_mutado[posicion] = -100
-
+        # Comprobamos que no supere los límites
+        if ind_mutado[posicion] > 100:
+            ind_mutado[posicion] = 100
+        elif ind_mutado[posicion] < -100:
+            ind_mutado[posicion] = -100
     return ind_mutado
 
 
@@ -41,14 +42,17 @@ def cruce(individuo1, individuo2):
     # print(f"Cruce: {individuo1} + {individuo2} =\n {hijo1} y {hijo2}")
     return hijo1, hijo2
 
+def fitness(poblacion):
+    dinero = np.zeros(len(poblacion), dtype=float)
+    dinero_acumulado = np.zeros((len(poblacion),24), dtype=float)
+    bateria_hora = np.zeros((len(poblacion),24), dtype=float)
+    for i in range(len(poblacion)):
+        dinero[i], dinero_acumulado[i], bateria_hora[i] = Utils.fitness(poblacion[i])
+    return dinero, dinero_acumulado, bateria_hora
 
 def inicializar_poblacion(size):
-    pob = np.random.randint(0, 23, (size, 24))
+    pob = np.random.randint(0, 23, (size, 24), dtype=int)
     return pob
-
-
-def fitness(cromosoma):
-    return sum(cromosoma)
 
 
 def torneo(valores_cromosomas, k):
@@ -61,7 +65,7 @@ def torneo(valores_cromosomas, k):
 
 def elitismo(poblacion, k):
     # Escoge los 5 mejores individuos.
-    valores = np.apply_along_axis(fitness, 1, poblacion)
+    valores, _, _ = fitness(poblacion)
     # Obtener los índices que ordenan el vector de forma descendente
     indices_descendentes = np.argsort(-valores)
     # Obtener los 5 primeros índices (los índices de los 5 mayores números)
@@ -76,59 +80,85 @@ def algoritmo_genetico(semilla):
     # Inicializar P(t)
     poblacion = inicializar_poblacion(Utils.POBLACION_INICIAL)
     # Evaluar P(t)
-    valores_poblacion = np.apply_along_axis(fitness, 1, poblacion)
+    #print(poblacion[0])
+    valores_poblacion, dinero_acumulado, bateria_acumulada = fitness(poblacion)
+    indice_maximo = np.argmax(valores_poblacion)
+    indice_minimo = np.argmin(valores_poblacion)
+
+
+    # Obtenemos el mejor individuo de la población inicial.
+    mejor_individuo = poblacion[indice_maximo]
+    mejor_valor = valores_poblacion[indice_maximo]
+    historicoMejor = [mejor_valor]
+
+    # Obtenemos el peor individuo de la poblacion inicial
+    peor_individuo = poblacion[indice_minimo]
+    peor_valor = valores_poblacion[indice_minimo]
+    historicoPeor = [peor_valor]
+
     while t < Utils.NUM_ITERACIONES:
         t = t + 1
-        # Seleccionar los índices de los padres
+        # Seleccionamos la élite de la población:
+        elite = elitismo(poblacion, Utils.ELITE)
+
+        # Seleccionar los índices de los padres (K=3)
         candidatos = np.array([torneo(valores_poblacion, int(Utils.K * Utils.POBLACION_INICIAL)) for _ in
                                range(Utils.POBLACION_INICIAL)])
 
         # Elegimos a los L=2 mejores de cada trío de padres
-        padres = np.zeros(shape=(Utils.POBLACION_INICIAL, 2), dtype=int)
-        for i in range(Utils.POBLACION_INICIAL):
+        padres = np.zeros(shape=(Utils.POBLACION_INICIAL-Utils.ELITE, 2), dtype=int)
+        # Generamos el numero de la población menos el número de individuos
+        # de la élite parejas.
+        for i in range(Utils.POBLACION_INICIAL-Utils.ELITE):
             padres[i] = candidatos[i][np.argsort(valores_poblacion[candidatos[i]])[-2:]]
 
-        elite = elitismo(padres,5)
-        # Cruce
+        # Recombinar P(t)
         hijos = np.zeros(shape=(Utils.POBLACION_INICIAL, 24), dtype=int)
-        for i in range(0, Utils.POBLACION_INICIAL, 2):
-            if i < Utils.POBLACION_INICIAL - 1:
-                # print(f"Padres: {poblacion[padres[i][0]]} -- {poblacion[padres][i][1]}")
-                # print(type(poblacion[padres[i][1]]))
-                h1, h2 = cruce(poblacion[padres[i][0].copy()].copy(), poblacion[padres[i][1].copy()].copy())
-                # print(f"Hijos: {h1} -- {h2}")
-                hijos[i] = h1
-                hijos[i + 1] = h2
-
-        #elitismo(hijos, 5)
-# Mutar
-
-# Evaluar
-
-
-if __name__ == "__main__":
-    # h1, h2 = cruce(np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]), np.array([10, 11, 12, 13, 14, 15, 16, 17, 18, 19]))
-    # print(h1)
-    # print(h2)
-    # np.random.seed(123456)
-    poblacion = inicializar_poblacion(Utils.POBLACION_INICIAL)
-    # Evaluar P(t)
-    valores_poblacion = np.apply_along_axis(fitness, 1, poblacion)
-    h = np.array(
-        [torneo(valores_poblacion, int(Utils.K * Utils.POBLACION_INICIAL)) for _ in range(Utils.POBLACION_INICIAL)])
-    padres = np.zeros(shape=(Utils.POBLACION_INICIAL, 2), dtype=int)
-    for i in range(Utils.POBLACION_INICIAL):
-        padres[i] = h[i][np.argsort(valores_poblacion[h[i]])[-2:]]
-
-    hijos = np.zeros(shape=(Utils.POBLACION_INICIAL, 24), dtype=int)
-    for i in range(0, Utils.POBLACION_INICIAL, 2):
-        # print(i)
-        if i < Utils.POBLACION_INICIAL - 1:
-            # print(f"Padres: {poblacion[padres[i][0]]} -- {poblacion[padres][i][1]}")
-            # print(type(poblacion[padres[i][1]]))
-            h1, h2 = cruce(poblacion[padres[i][0].copy()].copy(), poblacion[padres[i][1].copy()].copy())
-            # print(f"Hijos: {h1} -- {h2}")
+        # Añado la élite a la siguiente generación:
+        hijos[0:Utils.ELITE, :] = elite
+        for i in range(Utils.ELITE, Utils.POBLACION_INICIAL, 2):
+            h1, h2 = cruce(poblacion[padres[i-Utils.ELITE][0].copy()].copy(),
+                           poblacion[padres[Utils.ELITE][1].copy()].copy())
             hijos[i] = h1
             hijos[i + 1] = h2
-    print(hijos)
-    elitismo(hijos, 5)
+
+        # Mutar P(t)
+        hijos_mutados = np.apply_along_axis(mutacion, 1, hijos.copy())
+        poblacion = hijos_mutados
+
+        # Evaluar P(t)
+        valores_poblacion, dinero_acumulado, bateria_acumulada = fitness(poblacion)
+
+        indice_maximo = np.argmax(valores_poblacion)
+        indice_minimo = np.argmin(valores_poblacion)
+
+        # Obtenemos el mejor individuo de la población.
+        if mejor_valor < valores_poblacion[indice_maximo]:
+            mejor_individuo = poblacion[indice_maximo].copy()
+            mejor_valor = valores_poblacion[indice_maximo].copy()
+
+            # print(mejor_individuo)
+
+        if peor_valor < valores_poblacion[indice_minimo]:
+            # Obtenemos el peor individuo de la poblacion
+            peor_individuo = poblacion[indice_minimo].copy()
+            peor_valor = valores_poblacion[indice_minimo].copy()
+
+        # print(f"Mejor Valor : {mejor_valor}")
+        # print(f"Peor Valor : {peor_valor}")
+        historicoMejor.append(mejor_valor)
+        historicoPeor.append(peor_valor)
+    return mejor_valor, (historicoMejor, historicoPeor)
+
+if __name__ == "__main__":
+    # poblacion = inicializar_poblacion(24)
+    # fitness(poblacion)
+
+    _, historico = algoritmo_genetico(123456)
+
+    fig, ax = plt.subplots()
+    ax.plot([i for i in range(len(historico[0]))], historico[0])
+    #ax.scatter([i for i in range(len(historico[1]))], historico[1], s=0.5)
+    plt.show()
+
+
