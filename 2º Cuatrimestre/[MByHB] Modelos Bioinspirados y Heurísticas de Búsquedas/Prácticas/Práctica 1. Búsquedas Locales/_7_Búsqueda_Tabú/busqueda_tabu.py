@@ -223,7 +223,7 @@ def BusquedaTabu(isRandom, semilla, iteraciones_maximas, numero_vecinos, granula
 def GraficaBusquedaTabu():
     # Llamamos a la funcion de búsqueda:
     for i in range(numero_repeticiones):
-        dinero_mejor, dinero_acumulado, bateria_hora, num_evaluaciones_mejor, solucion = BusquedaTabu(semillas[i], 1000,
+        dinero_mejor, dinero_acumulado, bateria_hora, num_evaluaciones_mejor, solucion = BusquedaTabu(False,semillas[i], 1000,
                                                                                                       40, 10)
         dinero[i] = dinero_mejor
         evaluaciones[i] = num_evaluaciones_mejor

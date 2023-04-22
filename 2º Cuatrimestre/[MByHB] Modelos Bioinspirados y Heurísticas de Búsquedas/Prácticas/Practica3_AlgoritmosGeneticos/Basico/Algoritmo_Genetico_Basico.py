@@ -51,7 +51,7 @@ def fitness(poblacion):
     return dinero, dinero_acumulado, bateria_hora
 
 def inicializar_poblacion(size):
-    pob = np.random.randint(0, 23, (size, 24), dtype=int)
+    pob = np.random.randint(-100, 100, (size, 24), dtype=int)
     return pob
 
 
@@ -80,7 +80,6 @@ def algoritmo_genetico_generacional(semilla):
     # Inicializar P(t)
     poblacion = inicializar_poblacion(Utils.POBLACION_INICIAL)
     # Evaluar P(t)
-    #print(poblacion[0])
     valores_poblacion, dinero_acumulado, bateria_acumulada = fitness(poblacion)
     indice_maximo = np.argmax(valores_poblacion)
     indice_minimo = np.argmin(valores_poblacion)
@@ -117,8 +116,8 @@ def algoritmo_genetico_generacional(semilla):
         # Añado la élite a la siguiente generación:
         hijos[0:Utils.ELITE, :] = elite
         for i in range(Utils.ELITE, Utils.POBLACION_INICIAL, 2):
-            h1, h2 = cruce(poblacion[padres[i-Utils.ELITE][0].copy()].copy(),
-                           poblacion[padres[Utils.ELITE][1].copy()].copy())
+            h1, h2 = cruce(poblacion[padres[i-Utils.ELITE][0].copy()],
+                           poblacion[padres[Utils.ELITE][1].copy()])
             hijos[i] = h1
             hijos[i + 1] = h2
 
@@ -136,6 +135,7 @@ def algoritmo_genetico_generacional(semilla):
         if mejor_valor < valores_poblacion[indice_maximo]:
             mejor_individuo = poblacion[indice_maximo].copy()
             mejor_valor = valores_poblacion[indice_maximo].copy()
+            historicoMejor.append(mejor_valor)
 
             # print(mejor_individuo)
 
@@ -143,24 +143,30 @@ def algoritmo_genetico_generacional(semilla):
             # Obtenemos el peor individuo de la poblacion
             peor_individuo = poblacion[indice_minimo].copy()
             peor_valor = valores_poblacion[indice_minimo].copy()
+            historicoPeor.append(peor_valor)
 
         # print(f"Mejor Valor : {mejor_valor}")
         # print(f"Peor Valor : {peor_valor}")
-        historicoMejor.append(mejor_valor)
-        historicoPeor.append(peor_valor)
+        # historicoMejor.append(Utils.fitness(poblacion[indice_maximo])[0])
+        # historicoPeor.append(Utils.fitness(poblacion[indice_minimo])[0])
     return mejor_valor, (historicoMejor, historicoPeor)
 
 if __name__ == "__main__":
     # poblacion = inicializar_poblacion(24)
     # fitness(poblacion)
 
-    _, historico = algoritmo_genetico(123456)
+    _, historico = algoritmo_genetico_generacional(654321)
 
 
 
     fig, ax = plt.subplots()
-    ax.plot([i for i in range(len(historico[0]))], historico[0])
-    #ax.scatter([i for i in range(len(historico[1]))], historico[1], s=0.5)
+    ax.plot([i for i in range(len(historico[0]))], historico[0], label="Mejor Individuo")
+    ax.scatter([i for i in range(len(historico[0]))], historico[0])
+    ax.plot([i for i in range(len(historico[1]))], historico[1], label="Peor Individuo")
+    ax.scatter([i for i in range(len(historico[1]))], historico[1])
+    plt.legend()
+    plt.xlabel("Veces que mejora o empeora")
+    plt.ylabel("Dinero (€)")
     plt.show()
 
 
