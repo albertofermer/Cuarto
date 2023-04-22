@@ -74,7 +74,7 @@ def elitismo(poblacion, k):
     return poblacion[top_5_indices].copy()
 
 
-def algoritmo_genetico(semilla):
+def algoritmo_genetico_generacional(semilla):
     np.random.seed(semilla)
     t = 0
     # Inicializar P(t)
@@ -155,6 +155,8 @@ if __name__ == "__main__":
     # fitness(poblacion)
 
     _, historico = algoritmo_genetico(123456)
+
+
 
     fig, ax = plt.subplots()
     ax.plot([i for i in range(len(historico[0]))], historico[0])
