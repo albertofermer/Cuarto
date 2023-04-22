@@ -5,7 +5,7 @@ SEMILLAS = [123456, 654321, 456789]
 POBLACION_INICIAL = 15  # EXP
 PORCENTAJE_MUTACION = 0.01  # EXP
 K = 0.2
-NUM_ITERACIONES = 10000   # EXP
+NUM_ITERACIONES = 2000   # EXP
 ELITE = 5
 
 # Problema
@@ -74,8 +74,7 @@ def vender(bateria, hora, solucion, dinero, israndom):
 
     return bateria, energia_disponible, dinero
 
-def fitness(solucion):
-    israndom = False
+def fitness(solucion, israndom):
 
     precio_venta, precio_compra, r = get_vectores(israndom)
     bateria = 0  # 1 -- 300 kWh

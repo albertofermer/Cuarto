@@ -42,12 +42,12 @@ def cruce(individuo1, individuo2):
     # print(f"Cruce: {individuo1} + {individuo2} =\n {hijo1} y {hijo2}")
     return hijo1, hijo2
 
-def fitness(poblacion):
+def fitness(poblacion, isRandom):
     dinero = np.zeros(len(poblacion), dtype=float)
     dinero_acumulado = np.zeros((len(poblacion),24), dtype=float)
     bateria_hora = np.zeros((len(poblacion),24), dtype=float)
     for i in range(len(poblacion)):
-        dinero[i], dinero_acumulado[i], bateria_hora[i] = Utils.fitness(poblacion[i])
+        dinero[i], dinero_acumulado[i], bateria_hora[i] = Utils.fitness(poblacion[i], isRandom)
     return dinero, dinero_acumulado, bateria_hora
 
 def inicializar_poblacion(size):
@@ -63,9 +63,9 @@ def torneo(valores_cromosomas, k):
     return list(indices)
 
 
-def elitismo(poblacion, k):
+def elitismo(poblacion, k, isRandom):
     # Escoge los 5 mejores individuos.
-    valores, _, _ = fitness(poblacion)
+    valores, _, _ = fitness(poblacion, isRandom)
     # Obtener los índices que ordenan el vector de forma descendente
     indices_descendentes = np.argsort(-valores)
     # Obtener los 5 primeros índices (los índices de los 5 mayores números)
@@ -74,13 +74,13 @@ def elitismo(poblacion, k):
     return poblacion[top_5_indices].copy()
 
 
-def algoritmo_genetico_generacional(semilla):
+def algoritmo_genetico_generacional(semilla, isRandom):
     np.random.seed(semilla)
     t = 0
     # Inicializar P(t)
     poblacion = inicializar_poblacion(Utils.POBLACION_INICIAL)
     # Evaluar P(t)
-    valores_poblacion, dinero_acumulado, bateria_acumulada = fitness(poblacion)
+    valores_poblacion, dinero_acumulado, bateria_acumulada = fitness(poblacion, isRandom)
     indice_maximo = np.argmax(valores_poblacion)
     indice_minimo = np.argmin(valores_poblacion)
 
@@ -89,6 +89,7 @@ def algoritmo_genetico_generacional(semilla):
     mejor_individuo = poblacion[indice_maximo]
     mejor_valor = valores_poblacion[indice_maximo]
     historicoMejor = [mejor_valor]
+    mejorValor = [mejor_valor]
 
     # Obtenemos el peor individuo de la poblacion inicial
     peor_individuo = poblacion[indice_minimo]
@@ -98,7 +99,7 @@ def algoritmo_genetico_generacional(semilla):
     while t < Utils.NUM_ITERACIONES:
         t = t + 1
         # Seleccionamos la élite de la población:
-        elite = elitismo(poblacion, Utils.ELITE)
+        elite = elitismo(poblacion, Utils.ELITE, isRandom)
 
         # Seleccionar los índices de los padres (K=3)
         candidatos = np.array([torneo(valores_poblacion, int(Utils.K * Utils.POBLACION_INICIAL)) for _ in
@@ -126,8 +127,7 @@ def algoritmo_genetico_generacional(semilla):
         poblacion = hijos_mutados
 
         # Evaluar P(t)
-        valores_poblacion, dinero_acumulado, bateria_acumulada = fitness(poblacion)
-
+        valores_poblacion, dinero_acumulado, bateria_acumulada = fitness(poblacion, isRandom)
         indice_maximo = np.argmax(valores_poblacion)
         indice_minimo = np.argmin(valores_poblacion)
 
@@ -136,8 +136,10 @@ def algoritmo_genetico_generacional(semilla):
             mejor_individuo = poblacion[indice_maximo].copy()
             mejor_valor = valores_poblacion[indice_maximo].copy()
             historicoMejor.append(mejor_valor)
+            t = 0
 
             # print(mejor_individuo)
+        mejorValor.append(mejor_valor)
 
         if peor_valor < valores_poblacion[indice_minimo]:
             # Obtenemos el peor individuo de la poblacion
@@ -149,23 +151,28 @@ def algoritmo_genetico_generacional(semilla):
         # print(f"Peor Valor : {peor_valor}")
         # historicoMejor.append(Utils.fitness(poblacion[indice_maximo])[0])
         # historicoPeor.append(Utils.fitness(poblacion[indice_minimo])[0])
-    return mejor_valor, (historicoMejor, historicoPeor)
+    return mejor_valor, (historicoMejor, historicoPeor), mejorValor
 
 if __name__ == "__main__":
     # poblacion = inicializar_poblacion(24)
     # fitness(poblacion)
-
-    _, historico = algoritmo_genetico_generacional(654321)
+    datosAleatorios = False
+    _, historico, mejorValor = algoritmo_genetico_generacional(123456, datosAleatorios)
 
 
 
     fig, ax = plt.subplots()
     ax.plot([i for i in range(len(historico[0]))], historico[0], label="Mejor Individuo")
-    ax.scatter([i for i in range(len(historico[0]))], historico[0])
     ax.plot([i for i in range(len(historico[1]))], historico[1], label="Peor Individuo")
-    ax.scatter([i for i in range(len(historico[1]))], historico[1])
     plt.legend()
     plt.xlabel("Veces que mejora o empeora")
+    plt.ylabel("Dinero (€)")
+    plt.show()
+
+    fig2, ax = plt.subplots()
+    ax.plot([i for i in range(len(mejorValor))], mejorValor, label="Mejor Individuo")
+    plt.legend()
+    plt.xlabel("Iteraciones")
     plt.ylabel("Dinero (€)")
     plt.show()
 
