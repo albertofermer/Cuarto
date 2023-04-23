@@ -136,9 +136,8 @@ def algoritmo_genetico_generacional(semilla, isRandom):
             mejor_individuo = poblacion[indice_maximo].copy()
             mejor_valor = valores_poblacion[indice_maximo].copy()
             historicoMejor.append(mejor_valor)
-            t = 0
+            t = 0   # Cuando mejora, reiniciamos el contador de iteraciones.
 
-            # print(mejor_individuo)
         mejorValor.append(mejor_valor)
 
         if peor_valor < valores_poblacion[indice_minimo]:
@@ -147,10 +146,6 @@ def algoritmo_genetico_generacional(semilla, isRandom):
             peor_valor = valores_poblacion[indice_minimo].copy()
             historicoPeor.append(peor_valor)
 
-        # print(f"Mejor Valor : {mejor_valor}")
-        # print(f"Peor Valor : {peor_valor}")
-        # historicoMejor.append(Utils.fitness(poblacion[indice_maximo])[0])
-        # historicoPeor.append(Utils.fitness(poblacion[indice_minimo])[0])
     return mejor_valor, (historicoMejor, historicoPeor), mejorValor
 
 if __name__ == "__main__":

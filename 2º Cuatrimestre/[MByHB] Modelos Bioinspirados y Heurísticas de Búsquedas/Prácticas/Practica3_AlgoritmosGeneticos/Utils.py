@@ -22,8 +22,8 @@ precio_compra_random = [7, 7, 50, 25, 11, 26, 48, 45, 10, 14, 42, 14, 42, 22, 40
 precio_venta_random = [1, 3, 21, 1, 10, 7, 44, 35, 4, 1, 23, 12, 30, 7, 30, 4, 9, 10, 6, 9, 8, 27, 7, 10]
 r_random = [274, 345, 605, 810, 252, 56, 964, 98, 77, 816, 68, 261, 841, 897, 75, 489, 833, 96, 117, 956, 970, 255, 74, 926]
 
-# Funciones
 
+# Funciones
 def get_vectores(israndom):
     if israndom:
         precio_venta = precio_venta_random
@@ -34,6 +34,7 @@ def get_vectores(israndom):
         precio_compra = precio_compra_real
         r = r_real
     return precio_venta, precio_compra, r
+
 
 def almacenar_bateria(bateria, energia_generada, dinero, i, israndom):
     precio_venta, precio_compra, r = get_vectores(israndom)
@@ -73,6 +74,7 @@ def vender(bateria, hora, solucion, dinero, israndom):
     bateria, energia_disponible, dinero = almacenar_bateria(bateria, energia_disponible - bateria, dinero, hora, israndom)
 
     return bateria, energia_disponible, dinero
+
 
 def fitness(solucion, israndom):
 
@@ -119,3 +121,8 @@ def fitness(solucion, israndom):
     bateria_hora[23] = bateria
     #dinero_acumulado, bateria_hora
     return dinero, dinero_acumulado, bateria_hora
+
+
+def grafica(funcion, israndom):
+    for semilla in SEMILLAS:
+        funcion(semilla, israndom)
