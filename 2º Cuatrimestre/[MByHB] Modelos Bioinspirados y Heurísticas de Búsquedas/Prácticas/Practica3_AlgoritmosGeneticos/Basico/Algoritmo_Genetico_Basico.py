@@ -42,18 +42,6 @@ def cruce(individuo1, individuo2):
     # print(f"Cruce: {individuo1} + {individuo2} =\n {hijo1} y {hijo2}")
     return hijo1, hijo2
 
-def fitness(poblacion, isRandom):
-    dinero = np.zeros(len(poblacion), dtype=float)
-    dinero_acumulado = np.zeros((len(poblacion),24), dtype=float)
-    bateria_hora = np.zeros((len(poblacion),24), dtype=float)
-    for i in range(len(poblacion)):
-        dinero[i], dinero_acumulado[i], bateria_hora[i] = Utils.fitness(poblacion[i], isRandom)
-    return dinero, dinero_acumulado, bateria_hora
-
-def inicializar_poblacion(size):
-    pob = np.random.randint(-100, 100, (size, 24), dtype=int)
-    return pob
-
 
 def torneo(valores_cromosomas, k):
     probabilidades = valores_cromosomas / sum(valores_cromosomas)
@@ -65,7 +53,7 @@ def torneo(valores_cromosomas, k):
 
 def elitismo(poblacion, k, isRandom):
     # Escoge los 5 mejores individuos.
-    valores, _, _ = fitness(poblacion, isRandom)
+    valores, _, _ = Utils.fitnessPoblacion(poblacion, isRandom)
     # Obtener los índices que ordenan el vector de forma descendente
     indices_descendentes = np.argsort(-valores)
     # Obtener los 5 primeros índices (los índices de los 5 mayores números)
@@ -78,18 +66,17 @@ def algoritmo_genetico_generacional(semilla, isRandom):
     np.random.seed(semilla)
     t = 0
     # Inicializar P(t)
-    poblacion = inicializar_poblacion(Utils.POBLACION_INICIAL)
+    poblacion = Utils.inicializar_poblacion(Utils.POBLACION_INICIAL)
     # Evaluar P(t)
-    valores_poblacion, dinero_acumulado, bateria_acumulada = fitness(poblacion, isRandom)
+    valores_poblacion, dinero_acumulado, bateria_acumulada = Utils.fitnessPoblacion(poblacion, isRandom)
     indice_maximo = np.argmax(valores_poblacion)
     indice_minimo = np.argmin(valores_poblacion)
-
 
     # Obtenemos el mejor individuo de la población inicial.
     mejor_individuo = poblacion[indice_maximo]
     mejor_valor = valores_poblacion[indice_maximo]
     historicoMejor = [mejor_valor]
-    mejorValor = [mejor_valor]
+    mejorValorAcumulado = [mejor_valor]
 
     # Obtenemos el peor individuo de la poblacion inicial
     peor_individuo = poblacion[indice_minimo]
@@ -127,7 +114,7 @@ def algoritmo_genetico_generacional(semilla, isRandom):
         poblacion = hijos_mutados
 
         # Evaluar P(t)
-        valores_poblacion, dinero_acumulado, bateria_acumulada = fitness(poblacion, isRandom)
+        valores_poblacion, dinero_acumulado, bateria_acumulada = Utils.fitnessPoblacion(poblacion, isRandom)
         indice_maximo = np.argmax(valores_poblacion)
         indice_minimo = np.argmin(valores_poblacion)
 
@@ -138,7 +125,7 @@ def algoritmo_genetico_generacional(semilla, isRandom):
             historicoMejor.append(mejor_valor)
             t = 0   # Cuando mejora, reiniciamos el contador de iteraciones.
 
-        mejorValor.append(mejor_valor)
+        mejorValorAcumulado.append(mejor_valor)
 
         if peor_valor < valores_poblacion[indice_minimo]:
             # Obtenemos el peor individuo de la poblacion
@@ -146,29 +133,11 @@ def algoritmo_genetico_generacional(semilla, isRandom):
             peor_valor = valores_poblacion[indice_minimo].copy()
             historicoPeor.append(peor_valor)
 
-    return mejor_valor, (historicoMejor, historicoPeor), mejorValor
+    return mejor_valor, (historicoMejor, historicoPeor), mejorValorAcumulado, mejor_individuo
+
 
 if __name__ == "__main__":
-    # poblacion = inicializar_poblacion(24)
-    # fitness(poblacion)
-    datosAleatorios = False
-    _, historico, mejorValor = algoritmo_genetico_generacional(123456, datosAleatorios)
+    Utils.grafica(algoritmo_genetico_generacional, israndom=False)
 
-
-
-    fig, ax = plt.subplots()
-    ax.plot([i for i in range(len(historico[0]))], historico[0], label="Mejor Individuo")
-    ax.plot([i for i in range(len(historico[1]))], historico[1], label="Peor Individuo")
-    plt.legend()
-    plt.xlabel("Veces que mejora o empeora")
-    plt.ylabel("Dinero (€)")
-    plt.show()
-
-    fig2, ax = plt.subplots()
-    ax.plot([i for i in range(len(mejorValor))], mejorValor, label="Mejor Individuo")
-    plt.legend()
-    plt.xlabel("Iteraciones")
-    plt.ylabel("Dinero (€)")
-    plt.show()
 
 
