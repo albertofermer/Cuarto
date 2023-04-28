@@ -36,6 +36,33 @@ def blx_alpha(parent_1, parent_2, alpha):
     return child_1, child_2
 
 
+def seleccionar(poblacion, hijos):
+    # Concatenar población y hijos
+    poblacion_total = np.vstack((poblacion, hijos))
+    valores_poblacion_total = Utils.fitnessPoblacion(poblacion_total, isRandom=False)[0]
+
+    # Ordenar de forma descendente según los valores de fitness
+    orden = np.argsort(-valores_poblacion_total)
+    poblacion_total = poblacion_total[orden]
+
+    # Eliminar individuos duplicados
+    _, unique_indices = np.unique(poblacion_total, axis=0, return_index=True)
+    poblacion_total = poblacion_total[unique_indices]
+
+    # Seleccionar los primeros n individuos únicos, donde n es el tamaño de la población original
+    poblacion_nueva = poblacion_total[:len(poblacion)]
+
+    return poblacion_nueva
+
+def diverge(poblacion, hijos):
+    # Reemplaza P(t) con M copias del mejor miembro de P(t-1)
+
+    # Para todos los cromosomas, excepto uno:
+        # Intercambia valores aleatoriamente
+        # Evaluar la estructura
+    pass
+
+
 def CHC(semilla, israndom):
     np.random.seed(semilla)
 
@@ -52,6 +79,7 @@ def CHC(semilla, israndom):
     mejor_valor = valores_poblacion[indice_maximo]
     # Mientras no se cumpla la condicion
     while t < Utils.NUM_ITERACIONES:
+        #print(f"Iteracion: {t}")
         t += 1
         # Seleccionar_r
         parejas = poblacion.copy()
@@ -60,7 +88,7 @@ def CHC(semilla, israndom):
         # Cruzar
         hijos = np.empty_like(poblacion)
         for i in range(0, len(parejas), 2):
-            hijo1, hijo2 = blx_alpha(pob[i], pob[i + 1], Utils.ALPHA)
+            hijo1, hijo2 = blx_alpha(parejas[i], parejas[i + 1], Utils.ALPHA)
             hijos[i] = hijo1
             hijos[i + 1] = hijo2
 
@@ -74,18 +102,19 @@ def CHC(semilla, israndom):
             mejor_valor = valores_poblacion[indice_maximo]
 
         # Seleccionar
-
+        poblacion = seleccionar(poblacion, hijos)
         # Si P(t) == P(t-1)
-        # d--
+        if np.array_equal(poblacion, hijos):
+            d -= 1
+            print("Iguales")
 
-        # Si d < 0 -> diverge P(t) y actualiza d
+        # Si d < 0 -> diverge P(t) y d = 24/4
+        if d < 0:
+            #diverge(poblacion, hijos)
+            d = 24/4
+            print("Reinicio")
 
+    return mejor_valor
 
 if __name__ == "__main__":
-    pob = Utils.inicializar_poblacion(16)
-    hijos = np.zeros(shape=(16, 24), dtype=int)
-    for i in range(0, len(pob), 2):
-        print(i)
-        hijo1, hijo2 = blx_alpha(pob[i], pob[i + 1], Utils.ALPHA)
-        hijos[i] = hijo1
-        hijos[i + 1] = hijo2
+    print(CHC(123456, israndom=False))
