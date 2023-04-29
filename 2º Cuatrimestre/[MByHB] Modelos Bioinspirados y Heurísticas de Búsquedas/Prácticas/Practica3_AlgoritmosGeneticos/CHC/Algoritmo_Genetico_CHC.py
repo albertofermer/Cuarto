@@ -97,9 +97,10 @@ def CHC(semilla, israndom):
         indice_maximo = np.argmax(valores_poblacion)
         indice_minimo = np.argmin(valores_poblacion)
 
-        if valores_poblacion[indice_maximo] > mejor_valor:
+        if valores_poblacion[indice_maximo] > mejor_valor:  # Actualizamos el mejor valor de toda la historia
             mejor_individuo = poblacion[indice_maximo]
             mejor_valor = valores_poblacion[indice_maximo]
+            t = 0
 
         # Seleccionar
         poblacion = seleccionar(poblacion, hijos)
@@ -117,4 +118,5 @@ def CHC(semilla, israndom):
     return mejor_valor
 
 if __name__ == "__main__":
+    print(np.array_equal())
     print(CHC(123456, israndom=False))
