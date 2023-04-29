@@ -45,6 +45,7 @@ def seleccionar(poblacion, hijos):
     orden = np.argsort(-valores_poblacion_total)
     poblacion_total = poblacion_total[orden]
 
+
     # Eliminar individuos duplicados
     _, unique_indices = np.unique(poblacion_total, axis=0, return_index=True)
     poblacion_total = poblacion_total[unique_indices]
@@ -53,6 +54,50 @@ def seleccionar(poblacion, hijos):
     poblacion_nueva = poblacion_total[:len(poblacion)]
 
     return poblacion_nueva
+
+
+def hayAlgunMiembroMejor(padres, hijos, isRandom):
+    """
+    Comprueba si existe algún valor en hijos que sea mejor que algún valor de padres.
+
+    Args:
+        padres (numpy.ndarray): La primera matriz de valores.
+        hijos (numpy.ndarray): La segunda matriz de valores.
+
+    Returns:
+        bool: True si existe algún valor en hijos que es mayor que algún valor de padres, False en caso contrario.
+    """
+
+    fitness_padres = Utils.fitnessPoblacion(padres, isRandom)[0]
+    fitness_hijos = Utils.fitnessPoblacion(hijos,isRandom)[0]
+    return np.any(fitness_hijos > fitness_padres)
+
+def select_s(padres, hijos, isRandom):
+    """
+    Reemplaza los peores miembros de padres por los mejores miembros de hijos mientras haya algún miembro en hijos mejor que en padres.
+
+    Args:
+        padres (numpy.ndarray): La matriz de padres.
+        hijos (numpy.ndarray): La matriz de hijos.
+
+    Returns:
+        numpy.ndarray: La matriz de padres actualizada.
+    """
+    valores_padres = Utils.fitnessPoblacion(padres, isRandom)[0]
+    valores_hijos = Utils.fitnessPoblacion(hijos, isRandom)[0]
+
+    while np.any(valores_hijos > valores_padres):
+        indices_padres = np.argsort(valores_padres)
+        indices_hijos = np.argsort(valores_hijos)[::-1]
+        for i in range(len(indices_hijos)):
+            if valores_hijos[indices_hijos[i]] > valores_padres[indices_padres[i]]:
+                padres[indices_padres[i]] = hijos[indices_hijos[i]]
+                valores_padres[indices_padres[i]] = valores_hijos[indices_hijos[i]]
+
+    return padres
+
+
+
 
 def diverge(poblacion, hijos):
     # Reemplaza P(t) con M copias del mejor miembro de P(t-1)
@@ -75,11 +120,24 @@ def CHC(semilla, israndom):
     indice_maximo = np.argmax(valores_poblacion)
     indice_minimo = np.argmin(valores_poblacion)
 
+    # Mejor Valor Inicial
     mejor_individuo = poblacion[indice_maximo]
     mejor_valor = valores_poblacion[indice_maximo]
+
+    # Peor Individuo Inicial
+    peor_individuo = poblacion[indice_minimo]
+    peor_valor = valores_poblacion[indice_minimo]
+
+    # Graficas:
+    mejorValorAcumulado = [mejor_valor]
+    historicoPeor = [peor_valor]
+    historicoMejor = [mejor_valor]
+    mejorIndividuoGenAnterior = mejor_individuo.copy()
+    evaluaciones = len(poblacion) # Inicializamos al numero de individuos porque hemos calculado el fitness anteriormente.
+    numero_reinicios = 0
+
     # Mientras no se cumpla la condicion
-    while t < Utils.NUM_ITERACIONES:
-        #print(f"Iteracion: {t}")
+    while t < Utils.NUM_ITERACIONES_CHC:
         t += 1
         # Seleccionar_r
         parejas = poblacion.copy()
@@ -93,30 +151,51 @@ def CHC(semilla, israndom):
             hijos[i + 1] = hijo2
 
         # Evaluar Poblacion
-        valores_poblacion, _, _ = Utils.fitnessPoblacion(hijos, israndom)
+        # valores_poblacion, _, _ = Utils.fitnessPoblacion(hijos, israndom)
+
+        # Seleccionar
+        poblacion = select_s(parejas, hijos, israndom)
+        valores_poblacion, _, _ = Utils.fitnessPoblacion(poblacion, israndom)
         indice_maximo = np.argmax(valores_poblacion)
         indice_minimo = np.argmin(valores_poblacion)
 
         if valores_poblacion[indice_maximo] > mejor_valor:  # Actualizamos el mejor valor de toda la historia
-            mejor_individuo = poblacion[indice_maximo]
-            mejor_valor = valores_poblacion[indice_maximo]
+            mejor_individuo = poblacion[indice_maximo].copy()
+            mejor_valor = valores_poblacion[indice_maximo].copy()
+            historicoPeor.append(peor_valor)
+            # print(f"Maximo valor: {mejor_valor}")
+            # print(f"Minimo valor: {peor_valor}")
             t = 0
+            historicoMejor.append(mejor_valor)
+            # print("Mejora")
+        mejorValorAcumulado.append(mejor_valor)
 
-        # Seleccionar
-        poblacion = seleccionar(poblacion, hijos)
+        # Obtenemos el mejor individuo de la generación
+        mejorIndividuoGenAnterior = poblacion[indice_maximo].copy()
+
+        if peor_valor < valores_poblacion[indice_minimo]:
+            # Obtenemos el peor individuo de la poblacion
+            peor_valor = valores_poblacion[indice_minimo].copy()
+            # historicoPeor.append(peor_valor)
+
         # Si P(t) == P(t-1)
         if np.array_equal(poblacion, hijos):
             d -= 1
-            print("Iguales")
 
         # Si d < 0 -> diverge P(t) y d = 24/4
         if d < 0:
             #diverge(poblacion, hijos)
+            # En el arranque los valores de un cromosoma corresponden al mejor individuo de la generación anterior y el resto serán
+            # aleatorios
             d = 24/4
-            print("Reinicio")
+            poblacion = Utils.inicializar_poblacion(Utils.POBLACION_INICIAL - 1)
+            poblacion[0] = mejorIndividuoGenAnterior.copy()
+            # print(poblacion)
+            numero_reinicios += 1
+            print(f"Reincios: {numero_reinicios}")
 
-    return mejor_valor
+    return mejor_valor, (historicoMejor, historicoPeor), mejorValorAcumulado, mejor_individuo
+
 
 if __name__ == "__main__":
-    print(np.array_equal())
-    print(CHC(123456, israndom=False))
+    Utils.grafica(CHC, israndom=False)

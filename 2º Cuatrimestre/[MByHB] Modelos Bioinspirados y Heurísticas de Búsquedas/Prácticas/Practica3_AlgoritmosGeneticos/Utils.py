@@ -1,17 +1,28 @@
+import math
+import statistics
+
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 
 # Constantes
 SEMILLAS = [123456, 654321, 456789]
-POBLACION_INICIAL = 15  # EXP
+POBLACION_INICIAL = 17  # EXP
 PORCENTAJE_MUTACION = 0.01  # EXP
 K = 0.2
-NUM_ITERACIONES = 1000   # EXP
+NUM_ITERACIONES = 500   # EXP
+
 ELITE = 5
 
 # CHC
 ALPHA = 0.01
+NUM_ITERACIONES_CHC = 2000
+
+# Multimodal
+NUMERO_GENERACIONES_CLEARING = 10
+RADIO_CLEARING = 5
+KAPPA = 2
 
 # Problema
 capacidad_bateria = 300  # Capacidad total de la bateria
@@ -29,6 +40,13 @@ r_random = [274, 345, 605, 810, 252, 56, 964, 98, 77, 816, 68, 261, 841, 897, 75
 
 
 # Funciones
+
+def distanciaEuclidea(vector1, vector2):
+    # Calcula la distancia euclidea entre los valores de vector1 y vector2
+    d = math.sqrt(sum((vector1[i] - vector2[i])**2 for i in range(len(vector1))))
+    return d
+
+
 def get_vectores(israndom):
     if israndom:
         precio_venta = precio_venta_random
@@ -140,17 +158,19 @@ def inicializar_poblacion(size):
     return pob
 
 def grafica(funcion, israndom):
-    for semilla in SEMILLAS:
-        _, historico, mejor_valor_acumulado, mejor_individuo = funcion(semilla, israndom)
+    dinero = [0 for i in range(len(SEMILLAS))]
+    for i in range(len(SEMILLAS)):
+        mejor_valor, historico, mejor_valor_acumulado, mejor_individuo = funcion(SEMILLAS[i], israndom)
+        dinero[i] = mejor_valor
         # Convergencia de los individuos
         fig, ax = plt.subplots()
         ax.plot([i for i in range(len(historico[0]))], [i/100 for i in historico[0]], label="Fitness Mejor Individuo")
         ax.plot([i for i in range(len(historico[1]))], [i/100 for i in historico[1]], label="Fitness Peor Individuo")
         plt.legend()
-        plt.xlabel("Veces que mejora o empeora")
+        plt.xlabel("Veces que mejora")
         plt.ylabel("Dinero (€)")
-        plt.title(f"Convergencia del Mejor Individuo y el Peor.\n Semilla: {semilla}")
-        plt.savefig(f"./Graficas/Convergencia/{semilla}_{'Datos_Aleatorios' if israndom else 'Datos_Reales'}.png")
+        plt.title(f"Convergencia del Mejor Individuo y el Peor.\n Semilla: {SEMILLAS[i]}")
+        plt.savefig(f"./Graficas/Convergencia/{SEMILLAS[i]}_{'Datos_Aleatorios' if israndom else 'Datos_Reales'}.png")
         plt.show()
 
         # Fitness
@@ -159,8 +179,8 @@ def grafica(funcion, israndom):
         plt.legend()
         plt.xlabel("Iteraciones")
         plt.ylabel("Dinero (€)")
-        plt.title(f"Fitness del Mejor Individuo.\n Semilla: {semilla}")
-        plt.savefig(f"./Graficas/Fitness/{semilla}_{'Datos_Aleatorios' if israndom else 'Datos_Reales'}.png")
+        plt.title(f"Fitness del Mejor Individuo.\n Semilla: {SEMILLAS[i]}")
+        plt.savefig(f"./Graficas/Fitness/{SEMILLAS[i]}_{'Datos_Aleatorios' if israndom else 'Datos_Reales'}.png")
         plt.show()
 
         # Simulación
@@ -168,7 +188,7 @@ def grafica(funcion, israndom):
         # Dinero acumulado en cada hora
 
         fig, ax = plt.subplots()
-        plt.title(f"Simulación del Mejor Individuo.\n Semilla: {semilla}")
+        plt.title(f"Simulación del Mejor Individuo.\n Semilla: {SEMILLAS[i]}")
         ax.set_xticks(range(0, 24, 1))
         ln0 = ax.plot([j for j in range(24)], [cent / 100 for cent in dinero_acumulado],
                       label="Dinero Acumulado")
@@ -185,5 +205,23 @@ def grafica(funcion, israndom):
         leg = ln0 + ln1
         labs = [legend.get_label() for legend in leg]
         plt.legend(leg, labs, loc='upper center', bbox_to_anchor=(0.5, 1.0), ncol=3)
-        plt.savefig(f"./Graficas/Simulacion/{semilla}_{'Datos_Aleatorios' if israndom else 'Datos_Reales'}.png")
+        plt.savefig(f"./Graficas/Simulacion/{SEMILLAS[i]}_{'Datos_Aleatorios' if israndom else 'Datos_Reales'}.png")
         plt.show()
+
+    data = {
+        # 'Media Evaluaciones': [statistics.mean(evaluaciones[:])],
+        # 'Mejor Evaluación': [min(evaluaciones[:])],
+        # 'Desviación Evaluaciones': [statistics.stdev(evaluaciones[:])],
+        'Media Dinero (€)': [round(statistics.mean(dinero[:]) / 100, 2)],
+        'Mejor Dinero (€)': [round(max(dinero[:]) / 100, 2)],
+        'Desviación Dinero (€)': [round(statistics.stdev(dinero[:]) / 100, 2)]
+    }
+
+    # Opciones de Pandas para mostrar la tabla completa en la consola
+    pd.set_option('display.max_rows', None)
+    pd.set_option('display.max_columns', None)
+    pd.set_option('display.width', None)
+    pd.set_option('display.max_colwidth', None)
+
+    # Mostramos los datos obtenidos
+    print(pd.DataFrame(data))

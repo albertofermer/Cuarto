@@ -1,13 +1,5 @@
-import matplotlib.pyplot as plt
 import numpy as np
-
 import Utils
-
-'''
-Función de mutación del algoritmo genético.
-
-'''
-
 
 def mutacion(individuo):
     ind_mutado = individuo.copy()
@@ -62,7 +54,7 @@ def elitismo(poblacion, k, isRandom):
     return poblacion[top_5_indices].copy()
 
 
-def algoritmo_genetico_generacional(semilla, isRandom):
+def algoritmo_genetico_generacional_multimodal(semilla, isRandom):
     np.random.seed(semilla)
     t = 0
     # Inicializar P(t)
@@ -83,12 +75,15 @@ def algoritmo_genetico_generacional(semilla, isRandom):
     peor_valor = valores_poblacion[indice_minimo]
     historicoPeor = [peor_valor]
 
+    # Multimodal
+    P = 0   # Numero de generaciones que han transcurrido.
     while t < Utils.NUM_ITERACIONES:
         t = t + 1
         # Seleccionamos la élite de la población:
         elite = elitismo(poblacion, Utils.ELITE, isRandom)
 
         # Seleccionar los índices de los padres (K=3)
+        
         candidatos = np.array([torneo(valores_poblacion, int(Utils.K * Utils.POBLACION_INICIAL)) for _ in
                                range(Utils.POBLACION_INICIAL)])
 
@@ -104,8 +99,12 @@ def algoritmo_genetico_generacional(semilla, isRandom):
         # Añado la élite a la siguiente generación:
         hijos[0:Utils.ELITE, :] = elite
         for i in range(Utils.ELITE, Utils.POBLACION_INICIAL, 2):
-            h1, h2 = cruce(poblacion[padres[i-Utils.ELITE][0].copy()],
-                           poblacion[padres[Utils.ELITE][1].copy()])
+            if np.random.random_integers(0, 100) < 80: # Probabilidad de cruce del 80%
+                h1, h2 = cruce(poblacion[padres[i-Utils.ELITE][0].copy()],
+                               poblacion[padres[Utils.ELITE][1].copy()])
+            else:   # Si no, se copian como hijos.
+                h1 = poblacion[padres[i-Utils.ELITE][0].copy()]
+                h2 = poblacion[padres[Utils.ELITE][0].copy()]
             hijos[i] = h1
             hijos[i + 1] = h2
 
@@ -136,7 +135,7 @@ def algoritmo_genetico_generacional(semilla, isRandom):
 
 
 if __name__ == "__main__":
-    Utils.grafica(algoritmo_genetico_generacional, israndom=False)
+    Utils.grafica(algoritmo_genetico_generacional_multimodal, israndom=False)
 
 
 
