@@ -198,4 +198,4 @@ def CHC(semilla, israndom):
 
 
 if __name__ == "__main__":
-    Utils.grafica(CHC, israndom=False)
+    Utils.grafica(CHC, israndom=True)
