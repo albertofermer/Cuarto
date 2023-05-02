@@ -20,9 +20,9 @@ ALPHA = 0.01
 NUM_ITERACIONES_CHC = 2000
 
 # Multimodal
-NUMERO_GENERACIONES_CLEARING = 10
-RADIO_CLEARING = 5
-KAPPA = 2
+NUMERO_GENERACIONES_CLEARING = 100
+RADIO_CLEARING = 200
+KAPPA = 6
 
 # Problema
 capacidad_bateria = 300  # Capacidad total de la bateria
@@ -159,9 +159,12 @@ def inicializar_poblacion(size):
 
 def grafica(funcion, israndom):
     dinero = [0 for i in range(len(SEMILLAS))]
+    evaluaciones = [0 for i in range(len(SEMILLAS))]
     for i in range(len(SEMILLAS)):
-        mejor_valor, historico, mejor_valor_acumulado, mejor_individuo = funcion(SEMILLAS[i], israndom)
+        mejor_valor, historico, mejor_valor_acumulado, mejor_individuo, numEvaluaciones = funcion(SEMILLAS[i], israndom)
+
         dinero[i] = mejor_valor
+        evaluaciones[i] = numEvaluaciones
         # Convergencia de los individuos
         fig, ax = plt.subplots()
         ax.plot([i for i in range(len(historico[0]))], [i/100 for i in historico[0]], label="Fitness Mejor Individuo")
@@ -209,9 +212,9 @@ def grafica(funcion, israndom):
         plt.show()
 
     data = {
-        # 'Media Evaluaciones': [statistics.mean(evaluaciones[:])],
-        # 'Mejor Evaluación': [min(evaluaciones[:])],
-        # 'Desviación Evaluaciones': [statistics.stdev(evaluaciones[:])],
+        'Media Evaluaciones': [statistics.mean(evaluaciones[:])],
+        'Mejor Evaluación': [min(evaluaciones[:])],
+        'Desviación Evaluaciones': [statistics.stdev(evaluaciones[:])],
         'Media Dinero (€)': [round(statistics.mean(dinero[:]) / 100, 2)],
         'Mejor Dinero (€)': [round(max(dinero[:]) / 100, 2)],
         'Desviación Dinero (€)': [round(statistics.stdev(dinero[:]) / 100, 2)]

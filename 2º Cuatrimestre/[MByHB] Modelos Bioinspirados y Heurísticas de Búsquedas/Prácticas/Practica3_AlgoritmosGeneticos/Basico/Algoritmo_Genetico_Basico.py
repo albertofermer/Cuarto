@@ -3,11 +3,6 @@ import numpy as np
 
 import Utils
 
-'''
-Función de mutación del algoritmo genético.
-
-'''
-
 
 def mutacion(individuo):
     ind_mutado = individuo.copy()
@@ -15,6 +10,7 @@ def mutacion(individuo):
         # Obtiene el valor de la posición asignada
         posicion = np.random.randint(0, 24)
         valor = individuo[posicion] * np.random.uniform(0, 10) / 100
+        valor = 10
         # Sumar o Restar
         if np.random.uniform() < 0.5:
             ind_mutado[posicion] += valor
@@ -39,7 +35,6 @@ def cruce(individuo1, individuo2):
                                                               individuo1[max_pos:len(individuo1)].copy()))
     hijo2 = np.append(individuo2[0:min_pos].copy(), np.append(individuo1[min_pos:max_pos].copy(),
                                                               individuo2[max_pos:len(individuo2)].copy()))
-    # print(f"Cruce: {individuo1} + {individuo2} =\n {hijo1} y {hijo2}")
     return hijo1, hijo2
 
 
@@ -83,10 +78,15 @@ def algoritmo_genetico_generacional(semilla, isRandom):
     peor_valor = valores_poblacion[indice_minimo]
     historicoPeor = [peor_valor]
 
+    # Evaluaciones
+    # Inicializamos el numero de evaluaciones a la longitud de la poblacion porque la hemos evaluado inicialmente.
+    numero_evaluaciones = len(poblacion)
+
     while t < Utils.NUM_ITERACIONES:
         t = t + 1
         # Seleccionamos la élite de la población:
         elite = elitismo(poblacion, Utils.ELITE, isRandom)
+        numero_evaluaciones += len(poblacion) # Evaluamos a toda la poblacion para escoger la élite.
 
         # Seleccionar los índices de los padres (K=3)
         candidatos = np.array([torneo(valores_poblacion, int(Utils.K * Utils.POBLACION_INICIAL)) for _ in
@@ -115,6 +115,7 @@ def algoritmo_genetico_generacional(semilla, isRandom):
 
         # Evaluar P(t)
         valores_poblacion, dinero_acumulado, bateria_acumulada = Utils.fitnessPoblacion(poblacion, isRandom)
+        numero_evaluaciones += len(poblacion)
         indice_maximo = np.argmax(valores_poblacion)
         indice_minimo = np.argmin(valores_poblacion)
 
@@ -132,11 +133,11 @@ def algoritmo_genetico_generacional(semilla, isRandom):
             # Obtenemos el peor individuo de la poblacion
             peor_valor = valores_poblacion[indice_minimo].copy()
 
-    return mejor_valor, (historicoMejor, historicoPeor), mejorValorAcumulado, mejor_individuo
+    return mejor_valor, (historicoMejor, historicoPeor), mejorValorAcumulado, mejor_individuo, numero_evaluaciones
 
 
 if __name__ == "__main__":
-    Utils.grafica(algoritmo_genetico_generacional, israndom=True)
+    Utils.grafica(algoritmo_genetico_generacional, israndom=False)
 
 
 

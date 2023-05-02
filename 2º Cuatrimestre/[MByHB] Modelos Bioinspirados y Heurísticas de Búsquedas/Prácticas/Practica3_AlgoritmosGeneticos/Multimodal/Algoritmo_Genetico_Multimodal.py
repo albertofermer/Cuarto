@@ -6,7 +6,7 @@ def mutacion(individuo):
     if np.random.random() <= Utils.PORCENTAJE_MUTACION:
         # Obtiene el valor de la posición asignada
         posicion = np.random.randint(0, 24)
-        valor = individuo[posicion] * np.random.uniform(0, 10) / 100
+        valor = 10
         # Sumar o Restar
         if np.random.uniform() < 0.5:
             ind_mutado[posicion] += valor
@@ -37,6 +37,9 @@ def cruce(individuo1, individuo2):
 
 def torneo(valores_cromosomas, k):
     probabilidades = valores_cromosomas / sum(valores_cromosomas)
+    # print("\n")
+    # print(k)
+    # print(len(valores_cromosomas))
     indices = np.random.choice(a=np.array([i for i in range(len(valores_cromosomas))]),
                                size=k, replace=False,
                                p=probabilidades)
@@ -53,7 +56,30 @@ def elitismo(poblacion, k, isRandom):
 
     return poblacion[top_5_indices].copy()
 
-
+def clearing(poblacion, israndom):
+    # Realizamos la seleccion sobre los individuos dominantes, por tanto, hay que limpiar a los individuos de cada nicho.
+    # Obtenemos los valores del fitness de la poblacion
+    fitness_poblacion = Utils.fitnessPoblacion(poblacion,israndom)[0]
+    # Clasificación de la población de forma descendente
+    indices_ordenados = np.argsort(-fitness_poblacion)
+    # Se escoge al mejor individuo y se compara con el resto de forma descendente. Aquellos individuos que estén dentro de
+    # su radio, quedan eliminados.
+    for i in range(len(fitness_poblacion)):
+        if fitness_poblacion[indices_ordenados[i]] > 0:
+            numGanadores = 1
+            # print(fitness_poblacion[indices_ordenados[i]])
+            # print(f"i={i}")
+            for j in range(i+1,len(fitness_poblacion)):
+                print(Utils.distanciaEuclidea(poblacion[indices_ordenados[i]], poblacion[indices_ordenados[j]]))
+                if fitness_poblacion[indices_ordenados[j]] > 0 and \
+                        Utils.distanciaEuclidea(poblacion[indices_ordenados[i]], poblacion[indices_ordenados[j]]) < Utils.RADIO_CLEARING:
+                    if numGanadores < Utils.KAPPA:
+                        numGanadores += 1
+                    else:
+                        fitness_poblacion[indices_ordenados[j]] = 0
+    print(fitness_poblacion)
+    print("\n")
+    return poblacion[fitness_poblacion[indices_ordenados] != 0] # Devuelve los individos que no han sido eliminados.
 def algoritmo_genetico_generacional_multimodal(semilla, isRandom):
     np.random.seed(semilla)
     t = 0
@@ -75,16 +101,28 @@ def algoritmo_genetico_generacional_multimodal(semilla, isRandom):
     peor_valor = valores_poblacion[indice_minimo]
     historicoPeor = [peor_valor]
 
+    numero_evaluaciones = len(poblacion)
+
     # Multimodal
     P = 0   # Numero de generaciones que han transcurrido.
     while t < Utils.NUM_ITERACIONES:
         t = t + 1
         # Seleccionamos la élite de la población:
         elite = elitismo(poblacion, Utils.ELITE, isRandom)
+        numero_evaluaciones += len(poblacion)
+
+        # Realizamos CLEARING:
+        if P >= Utils.NUMERO_GENERACIONES_CLEARING:
+            # print(f"Antes: {len(poblacion)}")
+            P = 0
+            numero_evaluaciones += len(poblacion)
+            poblacion = clearing(poblacion, isRandom)
+
+            valores_poblacion = Utils.fitnessPoblacion(poblacion, isRandom)[0]
+            numero_evaluaciones += len(poblacion)
 
         # Seleccionar los índices de los padres (K=3)
-        
-        candidatos = np.array([torneo(valores_poblacion, int(Utils.K * Utils.POBLACION_INICIAL)) for _ in
+        candidatos = np.array([torneo(valores_poblacion, 3) for _ in
                                range(Utils.POBLACION_INICIAL)])
 
         # Elegimos a los L=2 mejores de cada trío de padres
@@ -99,7 +137,7 @@ def algoritmo_genetico_generacional_multimodal(semilla, isRandom):
         # Añado la élite a la siguiente generación:
         hijos[0:Utils.ELITE, :] = elite
         for i in range(Utils.ELITE, Utils.POBLACION_INICIAL, 2):
-            if np.random.random_integers(0, 100) < 80: # Probabilidad de cruce del 80%
+            if np.random.uniform() < 0.8: # Probabilidad de cruce del 80%
                 h1, h2 = cruce(poblacion[padres[i-Utils.ELITE][0].copy()],
                                poblacion[padres[Utils.ELITE][1].copy()])
             else:   # Si no, se copian como hijos.
@@ -111,9 +149,10 @@ def algoritmo_genetico_generacional_multimodal(semilla, isRandom):
         # Mutar P(t)
         hijos_mutados = np.apply_along_axis(mutacion, 1, hijos.copy())
         poblacion = hijos_mutados
-
+        # print(f"Nueva Pob. {len(poblacion)}")
         # Evaluar P(t)
         valores_poblacion, dinero_acumulado, bateria_acumulada = Utils.fitnessPoblacion(poblacion, isRandom)
+        numero_evaluaciones += len(poblacion)
         indice_maximo = np.argmax(valores_poblacion)
         indice_minimo = np.argmin(valores_poblacion)
 
@@ -131,11 +170,14 @@ def algoritmo_genetico_generacional_multimodal(semilla, isRandom):
             # Obtenemos el peor individuo de la poblacion
             peor_valor = valores_poblacion[indice_minimo].copy()
 
-    return mejor_valor, (historicoMejor, historicoPeor), mejorValorAcumulado, mejor_individuo
+        P += 1 # Aumentamos una generación
+
+    return mejor_valor, (historicoMejor, historicoPeor), mejorValorAcumulado, mejor_individuo, numero_evaluaciones
 
 
 if __name__ == "__main__":
     Utils.grafica(algoritmo_genetico_generacional_multimodal, israndom=False)
-
+    # clearing(Utils.inicializar_poblacion(Utils.POBLACION_INICIAL),israndom=False)
+    # print(algoritmo_genetico_generacional_multimodal(123456, isRandom=False)[0])
 
 

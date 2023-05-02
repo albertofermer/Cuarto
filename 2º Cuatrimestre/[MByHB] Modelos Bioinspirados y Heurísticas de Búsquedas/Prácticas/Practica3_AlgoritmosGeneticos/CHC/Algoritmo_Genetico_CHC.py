@@ -133,7 +133,10 @@ def CHC(semilla, israndom):
     historicoPeor = [peor_valor]
     historicoMejor = [mejor_valor]
     mejorIndividuoGenAnterior = mejor_individuo.copy()
-    evaluaciones = len(poblacion) # Inicializamos al numero de individuos porque hemos calculado el fitness anteriormente.
+
+    # Inicializamos al numero de individuos porque hemos calculado el fitness anteriormente.
+    numero_evaluaciones = len(poblacion)
+
     numero_reinicios = 0
 
     # Mientras no se cumpla la condicion
@@ -156,6 +159,7 @@ def CHC(semilla, israndom):
         # Seleccionar
         poblacion = select_s(parejas, hijos, israndom)
         valores_poblacion, _, _ = Utils.fitnessPoblacion(poblacion, israndom)
+        numero_evaluaciones += len(poblacion)
         indice_maximo = np.argmax(valores_poblacion)
         indice_minimo = np.argmin(valores_poblacion)
 
@@ -194,8 +198,8 @@ def CHC(semilla, israndom):
             numero_reinicios += 1
             print(f"Reincios: {numero_reinicios}")
 
-    return mejor_valor, (historicoMejor, historicoPeor), mejorValorAcumulado, mejor_individuo
+    return mejor_valor, (historicoMejor, historicoPeor), mejorValorAcumulado, mejor_individuo, numero_evaluaciones
 
 
 if __name__ == "__main__":
-    Utils.grafica(CHC, israndom=True)
+    Utils.grafica(CHC, israndom=False)
