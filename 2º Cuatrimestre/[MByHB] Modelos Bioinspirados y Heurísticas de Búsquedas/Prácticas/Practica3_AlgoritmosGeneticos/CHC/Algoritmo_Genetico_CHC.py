@@ -96,18 +96,6 @@ def select_s(padres, hijos, isRandom):
 
     return padres
 
-
-
-
-def diverge(poblacion, hijos):
-    # Reemplaza P(t) con M copias del mejor miembro de P(t-1)
-
-    # Para todos los cromosomas, excepto uno:
-        # Intercambia valores aleatoriamente
-        # Evaluar la estructura
-    pass
-
-
 def CHC(semilla, israndom):
     np.random.seed(semilla)
 
