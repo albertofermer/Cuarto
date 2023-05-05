@@ -21,7 +21,7 @@ NUM_ITERACIONES_CHC = 2000
 
 # Multimodal
 NUMERO_GENERACIONES_CLEARING = 100
-RADIO_CLEARING = 200
+RADIO_CLEARING = 50
 KAPPA = 6
 
 # Problema
@@ -123,7 +123,7 @@ def fitness(solucion, israndom):
             # Compro un porcentaje de lo que me sobra de bateria. De esta forma no podemos sobrepasar el limite de la
             # bateria en ningun momento.
             energia_comprada = (solucion[hora] / 100) * (capacidad_bateria - bateria)  # (Sale negativo)
-            dinero += energia_comprada * precio_compra[hora]  # Como energia_comprada es < 0 entonces se resta.
+            dinero += energia_comprada * precio_compra[hora]  # Como energia_comprada es < 0 entonc es se resta.
 
             bateria += -energia_comprada
 
