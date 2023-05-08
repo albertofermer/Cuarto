@@ -1,3 +1,5 @@
+import statistics
+import pandas as pd
 import Utils
 import numpy as np
 
@@ -95,6 +97,123 @@ def select_s(padres, hijos, isRandom):
                 valores_padres[indices_padres[i]] = valores_hijos[indices_hijos[i]]
 
     return padres
+def CHC_exp(semilla, alpha, iteraciones, israndom):
+    np.random.seed(semilla)
+
+    t = 0
+    d = 24 / 4
+    # Inicializar Poblacion
+    poblacion = Utils.inicializar_poblacion(Utils.POBLACION_INICIAL - 1)
+    # Evaluar Poblacion
+    valores_poblacion, dinero_acumulado, bateria_acumulada = Utils.fitnessPoblacion(poblacion, israndom)
+    indice_maximo = np.argmax(valores_poblacion)
+    indice_minimo = np.argmin(valores_poblacion)
+
+    # Mejor Valor Inicial
+    mejor_individuo = poblacion[indice_maximo]
+    mejor_valor = valores_poblacion[indice_maximo]
+
+    # Peor Individuo Inicial
+    peor_individuo = poblacion[indice_minimo]
+    peor_valor = valores_poblacion[indice_minimo]
+
+    # Graficas:
+    mejorValorAcumulado = [mejor_valor]
+    historicoPeor = [peor_valor]
+    historicoMejor = [mejor_valor]
+    mejorIndividuoGenAnterior = mejor_individuo.copy()
+
+    # Inicializamos al numero de individuos porque hemos calculado el fitness anteriormente.
+    numero_evaluaciones = len(poblacion)
+
+    numero_reinicios = 0
+
+    # Mientras no se cumpla la condicion
+    while t < iteraciones:
+        t += 1
+        # Seleccionar_r
+        parejas = poblacion.copy()
+        np.random.shuffle(parejas)
+
+        # Cruzar
+        hijos = np.empty_like(poblacion)
+        for i in range(0, len(parejas), 2):
+            hijo1, hijo2 = blx_alpha(parejas[i], parejas[i + 1], alpha)
+            hijos[i] = hijo1
+            hijos[i + 1] = hijo2
+
+        # Evaluar Poblacion
+        # valores_poblacion, _, _ = Utils.fitnessPoblacion(hijos, israndom)
+
+        # Seleccionar
+        poblacion = select_s(parejas, hijos, israndom)
+        valores_poblacion, _, _ = Utils.fitnessPoblacion(poblacion, israndom)
+        numero_evaluaciones += len(poblacion)
+        indice_maximo = np.argmax(valores_poblacion)
+        indice_minimo = np.argmin(valores_poblacion)
+
+        if valores_poblacion[indice_maximo] > mejor_valor:  # Actualizamos el mejor valor de toda la historia
+            mejor_individuo = poblacion[indice_maximo].copy()
+            mejor_valor = valores_poblacion[indice_maximo].copy()
+            historicoPeor.append(peor_valor)
+            # print(f"Maximo valor: {mejor_valor}")
+            # print(f"Minimo valor: {peor_valor}")
+            t = 0
+            historicoMejor.append(mejor_valor)
+            # print("Mejora")
+        mejorValorAcumulado.append(mejor_valor)
+
+        # Obtenemos el mejor individuo de la generación
+        mejorIndividuoGenAnterior = poblacion[indice_maximo].copy()
+
+        if peor_valor < valores_poblacion[indice_minimo]:
+            # Obtenemos el peor individuo de la poblacion
+            peor_valor = valores_poblacion[indice_minimo].copy()
+            # historicoPeor.append(peor_valor)
+
+        # Si P(t) == P(t-1)
+        if np.array_equal(poblacion, hijos):
+            d -= 1
+
+        # Si d < 0 -> diverge P(t) y d = 24/4
+        if d < 0:
+            #diverge(poblacion, hijos)
+            # En el arranque los valores de un cromosoma corresponden al mejor individuo de la generación anterior y el resto serán
+            # aleatorios
+            d = 24/4
+            poblacion = Utils.inicializar_poblacion(Utils.POBLACION_INICIAL - 1)
+            poblacion[0] = mejorIndividuoGenAnterior.copy()
+            # print(poblacion)
+            numero_reinicios += 1
+
+    print(f"Reinicios: {numero_reinicios}")
+
+    return mejor_valor, (historicoMejor, historicoPeor), mejorValorAcumulado, mejor_individuo, numero_evaluaciones
+
+def experimentar():
+    mejor_valor = 0
+    for alpha in Utils.ALPHA_EXP:
+        for iteraciones in Utils.ITERACIONESCHC_EXP:
+                valores = [0 for i in range(len(Utils.SEMILLAS))]
+                for semilla in range(len(Utils.SEMILLAS)):
+                    valor = CHC_exp(Utils.SEMILLAS[semilla], alpha, iteraciones, israndom=False)[0]
+                    valores[semilla] = valor
+                    media_valores = statistics.mean(valores)
+                    print("-----------") if semilla >= 2 else print()
+
+                    if semilla >= 2 and media_valores > mejor_valor:
+                        mejor_valor = valor
+                        data = { "Alpha" : [alpha],
+                                "Iteraciones": [iteraciones],
+                                "Valor Obtenido": [mejor_valor]}
+                        # Opciones de Pandas para mostrar la tabla completa en la consola
+                        pd.set_option('display.max_rows', None)
+                        pd.set_option('display.max_columns', None)
+                        pd.set_option('display.width', None)
+                        pd.set_option('display.max_colwidth', None)
+
+                        # Mostramos los datos obtenidos
+                        print(pd.DataFrame(data))
 
 def CHC(semilla, israndom):
     np.random.seed(semilla)
@@ -184,10 +303,11 @@ def CHC(semilla, israndom):
             poblacion[0] = mejorIndividuoGenAnterior.copy()
             # print(poblacion)
             numero_reinicios += 1
-            print(f"Reincios: {numero_reinicios}")
+    print(f"Reinicios: {numero_reinicios}")
 
     return mejor_valor, (historicoMejor, historicoPeor), mejorValorAcumulado, mejor_individuo, numero_evaluaciones
 
 
 if __name__ == "__main__":
     Utils.grafica(CHC, israndom=False)
+    # experimentar()
