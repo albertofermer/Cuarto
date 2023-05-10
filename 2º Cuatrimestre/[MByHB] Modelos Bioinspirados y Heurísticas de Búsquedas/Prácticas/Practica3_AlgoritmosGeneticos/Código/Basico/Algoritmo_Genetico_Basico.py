@@ -90,6 +90,7 @@ def algoritmo_genetico_generacional_exp(semilla, poblacion_inicial, numIteracion
         numero_evaluaciones += len(poblacion) # Evaluamos a toda la poblacion para escoger la élite.
 
         # Seleccionar los índices de los padres (K=3)
+        # 2 veces torneo
         candidatos = np.array([torneo(valores_poblacion, int(Utils.K * poblacion_inicial)) for _ in
                                range(poblacion_inicial)])
 

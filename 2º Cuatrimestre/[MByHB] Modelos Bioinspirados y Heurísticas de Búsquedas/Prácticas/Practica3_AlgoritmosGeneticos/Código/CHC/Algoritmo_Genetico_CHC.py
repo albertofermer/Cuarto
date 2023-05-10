@@ -221,7 +221,7 @@ def CHC(semilla, israndom):
     t = 0
     d = 24 / 4
     # Inicializar Poblacion
-    poblacion = Utils.inicializar_poblacion(Utils.POBLACION_INICIAL - 1)
+    poblacion = Utils.inicializar_poblacion(Utils.POBLACION_CHC)
     # Evaluar Poblacion
     valores_poblacion, dinero_acumulado, bateria_acumulada = Utils.fitnessPoblacion(poblacion, israndom)
     indice_maximo = np.argmax(valores_poblacion)
@@ -262,25 +262,18 @@ def CHC(semilla, israndom):
 
         # Evaluar Poblacion
         # valores_poblacion, _, _ = Utils.fitnessPoblacion(hijos, israndom)
-
         # Seleccionar
         poblacion = select_s(parejas, hijos, israndom)
         valores_poblacion, _, _ = Utils.fitnessPoblacion(poblacion, israndom)
         numero_evaluaciones += len(poblacion)
-        indice_maximo = np.argmax(valores_poblacion)
-        indice_minimo = np.argmin(valores_poblacion)
 
         if valores_poblacion[indice_maximo] > mejor_valor:  # Actualizamos el mejor valor de toda la historia
+            t = 0
             mejor_individuo = poblacion[indice_maximo].copy()
             mejor_valor = valores_poblacion[indice_maximo].copy()
-            historicoPeor.append(peor_valor)
-            # print(f"Maximo valor: {mejor_valor}")
-            # print(f"Minimo valor: {peor_valor}")
-            t = 0
-            historicoMejor.append(mejor_valor)
             # print("Mejora")
-        mejorValorAcumulado.append(mejor_valor)
 
+        mejorValorAcumulado.append(mejor_valor)
         # Obtenemos el mejor individuo de la generación
         mejorIndividuoGenAnterior = poblacion[indice_maximo].copy()
 
@@ -293,16 +286,27 @@ def CHC(semilla, israndom):
         if np.array_equal(poblacion, hijos):
             d -= 1
 
+
+
         # Si d < 0 -> diverge P(t) y d = 24/4
         if d < 0:
             #diverge(poblacion, hijos)
             # En el arranque los valores de un cromosoma corresponden al mejor individuo de la generación anterior y el resto serán
             # aleatorios
             d = 24/4
-            poblacion = Utils.inicializar_poblacion(Utils.POBLACION_INICIAL - 1)
+            poblacion = Utils.inicializar_poblacion(Utils.POBLACION_CHC)
             poblacion[0] = mejorIndividuoGenAnterior.copy()
             # print(poblacion)
             numero_reinicios += 1
+
+        valores_poblacion = Utils.fitnessPoblacion(poblacion, israndom)[0]
+        indice_maximo = np.argmax(valores_poblacion)
+        indice_minimo = np.argmin(valores_poblacion)
+        mejor_individuo = poblacion[indice_maximo].copy()
+        mejor_valor = valores_poblacion[indice_maximo].copy()
+        peor_valor = valores_poblacion[indice_minimo].copy()
+        historicoPeor.append(peor_valor.copy())
+        historicoMejor.append(mejor_valor.copy()) # Grafica
     print(f"Reinicios: {numero_reinicios}")
 
     return mejor_valor, (historicoMejor, historicoPeor), mejorValorAcumulado, mejor_individuo, numero_evaluaciones
