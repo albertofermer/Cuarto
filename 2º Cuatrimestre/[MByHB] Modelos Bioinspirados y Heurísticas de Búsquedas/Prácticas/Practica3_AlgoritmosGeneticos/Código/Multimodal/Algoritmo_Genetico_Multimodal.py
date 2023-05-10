@@ -273,6 +273,9 @@ def algoritmo_genetico_generacional_multimodal(semilla, isRandom):
 
         P += 1 # Aumentamos una generación
 
+    # Clearing final con kappa = 1
+    print(clearing(poblacion, Utils.RADIO_CLEARING, 1, isRandom))
+
     return mejor_valor, (historicoMejor, historicoPeor), mejorValorAcumulado, mejor_individuo, numero_evaluaciones
 
 def experimentar():
@@ -327,5 +330,5 @@ if __name__ == "__main__":
     # print("\n")
     # print("BEST PARAMETERS:\n ")
     # print(pd.DataFrame(data))
-    Utils.grafica(algoritmo_genetico_generacional_multimodal, israndom=not False)
-
+    # Utils.grafica(algoritmo_genetico_generacional_multimodal, israndom=False)
+    print(algoritmo_genetico_generacional_multimodal(12456, False)[0])
