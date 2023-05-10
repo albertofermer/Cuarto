@@ -58,6 +58,7 @@ def elitismo(poblacion, k, isRandom):
 
     return poblacion[top_5_indices].copy()
 
+
 def algoritmo_genetico_generacional_exp(semilla, poblacion_inicial, numIteraciones, mut, isRandom):
     np.random.seed(semilla)
     t = 0
@@ -87,18 +88,18 @@ def algoritmo_genetico_generacional_exp(semilla, poblacion_inicial, numIteracion
         t = t + 1
         # Seleccionamos la élite de la población:
         elite = elitismo(poblacion, Utils.ELITE, isRandom)
-        numero_evaluaciones += len(poblacion) # Evaluamos a toda la poblacion para escoger la élite.
+        numero_evaluaciones += len(poblacion)  # Evaluamos a toda la poblacion para escoger la élite.
 
         # Seleccionar los índices de los padres (K=3)
         # 2 veces torneo
-        candidatos = np.array([torneo(valores_poblacion, int(Utils.K * poblacion_inicial)) for _ in
+        candidatos = np.array([torneo(valores_poblacion, 3) for _ in
                                range(poblacion_inicial)])
 
         # Elegimos a los L=2 mejores de cada trío de padres
-        padres = np.zeros(shape=(poblacion_inicial-Utils.ELITE, 2), dtype=int)
+        padres = np.zeros(shape=(poblacion_inicial - Utils.ELITE, 2), dtype=int)
         # Generamos el numero de la población menos el número de individuos
         # de la élite parejas.
-        for i in range(poblacion_inicial-Utils.ELITE):
+        for i in range(poblacion_inicial - Utils.ELITE):
             padres[i] = candidatos[i][np.argsort(valores_poblacion[candidatos[i]])[-2:]]
 
         # Recombinar P(t)
@@ -106,7 +107,7 @@ def algoritmo_genetico_generacional_exp(semilla, poblacion_inicial, numIteracion
         # Añado la élite a la siguiente generación:
         hijos[0:Utils.ELITE, :] = elite
         for i in range(Utils.ELITE, poblacion_inicial, 2):
-            h1, h2 = cruce(poblacion[padres[i-Utils.ELITE][0].copy()],
+            h1, h2 = cruce(poblacion[padres[i - Utils.ELITE][0].copy()],
                            poblacion[padres[Utils.ELITE][1].copy()])
             hijos[i] = h1
             hijos[i + 1] = h2
@@ -127,7 +128,7 @@ def algoritmo_genetico_generacional_exp(semilla, poblacion_inicial, numIteracion
             mejor_valor = valores_poblacion[indice_maximo].copy()
             historicoMejor.append(mejor_valor)
             historicoPeor.append(peor_valor)
-            t = 0   # Cuando mejora, reiniciamos el contador de iteraciones.
+            t = 0  # Cuando mejora, reiniciamos el contador de iteraciones.
 
         mejorValorAcumulado.append(mejor_valor)
 
@@ -151,13 +152,13 @@ def algoritmo_genetico_generacional(semilla, isRandom):
     # Obtenemos el mejor individuo de la población inicial.
     mejor_individuo = poblacion[indice_maximo]
     mejor_valor = valores_poblacion[indice_maximo]
-    historicoMejor = [mejor_valor]
-    mejorValorAcumulado = [mejor_valor]
+    historicoMejor = [mejor_valor.copy()]
+    mejorValorAcumulado = [mejor_valor.copy()]
 
     # Obtenemos el peor individuo de la poblacion inicial
     peor_individuo = poblacion[indice_minimo]
     peor_valor = valores_poblacion[indice_minimo]
-    historicoPeor = [peor_valor]
+    historicoPeor = [peor_valor.copy()]
 
     # Evaluaciones
     # Inicializamos el numero de evaluaciones a la longitud de la poblacion porque la hemos evaluado inicialmente.
@@ -167,25 +168,25 @@ def algoritmo_genetico_generacional(semilla, isRandom):
         t = t + 1
         # Seleccionamos la élite de la población:
         elite = elitismo(poblacion, Utils.ELITE, isRandom)
-        numero_evaluaciones += len(poblacion) # Evaluamos a toda la poblacion para escoger la élite.
+        numero_evaluaciones += len(poblacion)  # Evaluamos a toda la poblacion para escoger la élite.
 
         # Seleccionar los índices de los padres (K=3)
-        candidatos = np.array([torneo(valores_poblacion, int(Utils.K * Utils.POBLACION_INICIAL)) for _ in
-                               range(Utils.POBLACION_INICIAL)])
-
+        candidatos = np.array([torneo(valores_poblacion, 3) for _ in
+                               range(Utils.POBLACION_INICIAL*2)])
         # Elegimos a los L=2 mejores de cada trío de padres
-        padres = np.zeros(shape=(Utils.POBLACION_INICIAL-Utils.ELITE, 2), dtype=int)
+        padres = np.zeros(shape=(Utils.POBLACION_INICIAL - Utils.ELITE, 2), dtype=int)
         # Generamos el numero de la población menos el número de individuos
         # de la élite parejas.
-        for i in range(Utils.POBLACION_INICIAL-Utils.ELITE):
-            padres[i] = candidatos[i][np.argsort(valores_poblacion[candidatos[i]])[-2:]]
+        for i in range(0, Utils.POBLACION_INICIAL - Utils.ELITE):
+            padres[i][0] = candidatos[i][-1]
+            padres[i][1] = candidatos[i + 1][-1]
 
         # Recombinar P(t)
         hijos = np.zeros(shape=(Utils.POBLACION_INICIAL, 24), dtype=int)
         # Añado la élite a la siguiente generación:
         hijos[0:Utils.ELITE, :] = elite
         for i in range(Utils.ELITE, Utils.POBLACION_INICIAL, 2):
-            h1, h2 = cruce(poblacion[padres[i-Utils.ELITE][0].copy()],
+            h1, h2 = cruce(poblacion[padres[i - Utils.ELITE][0].copy()],
                            poblacion[padres[Utils.ELITE][1].copy()])
             hijos[i] = h1
             hijos[i + 1] = h2
@@ -198,23 +199,27 @@ def algoritmo_genetico_generacional(semilla, isRandom):
         valores_poblacion, dinero_acumulado, bateria_acumulada = Utils.fitnessPoblacion(poblacion, isRandom)
         numero_evaluaciones += len(poblacion)
         indice_maximo = np.argmax(valores_poblacion)
-        indice_minimo = np.argmin(valores_poblacion)
 
         # Obtenemos el mejor individuo de la población.
         if mejor_valor < valores_poblacion[indice_maximo]:
             mejor_individuo = poblacion[indice_maximo].copy()
             mejor_valor = valores_poblacion[indice_maximo].copy()
-            historicoMejor.append(mejor_valor)
-            historicoPeor.append(peor_valor)
-            t = 0   # Cuando mejora, reiniciamos el contador de iteraciones.
+            t = 0  # Cuando mejora, reiniciamos el contador de iteraciones.
 
         mejorValorAcumulado.append(mejor_valor)
 
-        if peor_valor < valores_poblacion[indice_minimo]:
-            # Obtenemos el peor individuo de la poblacion
-            peor_valor = valores_poblacion[indice_minimo].copy()
 
+        valores_poblacion, dinero_acumulado, bateria_acumulada = Utils.fitnessPoblacion(poblacion, isRandom)
+        numero_evaluaciones += len(poblacion)
+        indice_maximo = np.argmax(valores_poblacion)
+        indice_minimo = np.argmin(valores_poblacion)
+        mejor_valor = valores_poblacion[indice_maximo].copy()
+        peor_valor = valores_poblacion[indice_minimo].copy()
+
+        historicoMejor.append(mejor_valor.copy())
+        historicoPeor.append(peor_valor.copy())
     return mejor_valor, (historicoMejor, historicoPeor), mejorValorAcumulado, mejor_individuo, numero_evaluaciones
+
 
 def experimentar():
     mejor_valor = 0
@@ -224,11 +229,12 @@ def experimentar():
             for mut in Utils.PTAJE_MUT:
                 valores = [0 for i in range(len(Utils.SEMILLAS))]
                 for semilla in range(len(Utils.SEMILLAS)):
-                    valor = algoritmo_genetico_generacional_exp(Utils.SEMILLAS[semilla], poblacion, iteraciones, mut, isRandom=False)[0]
+                    valor = algoritmo_genetico_generacional_exp(Utils.SEMILLAS[semilla], poblacion, iteraciones, mut,
+                                                                isRandom=False)[0]
                     valores[semilla] = valor
                     media_valores = statistics.mean(valores)
                     if semilla >= 2 and media_valores > mejor_valor:
-                        mejor_valor = valor
+                        mejor_valor = media_valores
                         data = {"Iteraciones": [iteraciones],
                                 "Poblacion Inicial": [poblacion],
                                 "Porcentaje Mutacion": [mut],
@@ -242,9 +248,8 @@ def experimentar():
                         # Mostramos los datos obtenidos
                         print(pd.DataFrame(data))
     return data
+
+
 if __name__ == "__main__":
     Utils.grafica(algoritmo_genetico_generacional, israndom=False)
     # experimentar()
-
-
-

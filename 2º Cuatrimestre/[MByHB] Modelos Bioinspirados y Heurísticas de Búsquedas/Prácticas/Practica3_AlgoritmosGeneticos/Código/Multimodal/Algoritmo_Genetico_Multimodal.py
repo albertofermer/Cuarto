@@ -41,10 +41,6 @@ def torneo(valores_cromosomas, k):
 
     valores_cromosomas[valores_cromosomas < 0] = 0
     probabilidades = valores_cromosomas / sum(valores_cromosomas)
-    # print(probabilidades)
-    # print("\n")
-    # print(k)
-    # print(len(valores_cromosomas))
     indices = np.random.choice(a=np.array([i for i in range(len(valores_cromosomas))]),
                                size=k, replace=True,
                                p=probabilidades)
@@ -107,7 +103,7 @@ def algoritmo_genetico_generacional_multimodal_exp(semilla, pob, mut, generacion
 
     # Multimodal
     P = 0   # Numero de generaciones que han transcurrido.
-    while t < Utils.NUM_ITERACIONES:
+    while t < Utils.NUM_ITERACIONES_MULTIMODAL:
         t = t + 1
         # Seleccionamos la élite de la población:
         elite = elitismo(poblacion, Utils.ELITE, isRandom)
@@ -138,7 +134,7 @@ def algoritmo_genetico_generacional_multimodal_exp(semilla, pob, mut, generacion
         hijos = np.zeros(shape=(pob, 24), dtype=int)
         # Añado la élite a la siguiente generación:
         hijos[0:Utils.ELITE, :] = elite
-        for i in range(Utils.ELITE, pob-2, 2):
+        for i in range(Utils.ELITE, pob, 2):
             if np.random.uniform() < 0.8: # Probabilidad de cruce del 80%
                 h1, h2 = cruce(poblacion[padres[i-Utils.ELITE][0].copy()],
                                poblacion[padres[Utils.ELITE][1].copy()])
@@ -148,12 +144,10 @@ def algoritmo_genetico_generacional_multimodal_exp(semilla, pob, mut, generacion
             hijos[i] = h1
             hijos[i + 1] = h2
 
-        hijos[pob-2] = np.random.randint(-100, 100, 24, dtype=int)
-        hijos[pob-1] = np.random.randint(-100, 100, 24, dtype=int)
         # Mutar P(t)
         hijos_mutados = np.apply_along_axis(mutacion, 1, hijos.copy(), mut)
         poblacion = hijos_mutados
-        # print(f"{poblacion}")
+
         # Evaluar P(t)
         valores_poblacion, dinero_acumulado, bateria_acumulada = Utils.fitnessPoblacion(poblacion, isRandom)
         numero_evaluaciones += len(poblacion)
@@ -165,12 +159,6 @@ def algoritmo_genetico_generacional_multimodal_exp(semilla, pob, mut, generacion
             mejor_individuo = poblacion[indice_maximo].copy()
             mejor_valor = valores_poblacion[indice_maximo].copy()
             t = 0   # Cuando mejora, reiniciamos el contador de iteraciones.
-
-        mejorValorAcumulado.append(mejor_valor)
-
-        if peor_valor < valores_poblacion[indice_minimo]:
-            # Obtenemos el peor individuo de la poblacion
-            peor_valor = valores_poblacion[indice_minimo].copy()
 
         P += 1 # Aumentamos una generación
 
@@ -202,7 +190,7 @@ def algoritmo_genetico_generacional_multimodal(semilla, isRandom):
 
     # Multimodal
     P = 0   # Numero de generaciones que han transcurrido.
-    while t < Utils.NUM_ITERACIONES:
+    while t < Utils.NUM_ITERACIONES_MULTIMODAL:
         t = t + 1
         # Seleccionamos la élite de la población:
         elite = elitismo(poblacion, Utils.ELITE, isRandom)
@@ -214,7 +202,6 @@ def algoritmo_genetico_generacional_multimodal(semilla, isRandom):
             P = 0
             numero_evaluaciones += len(poblacion)
             poblacion = clearing(poblacion, Utils.RADIO_CLEARING, Utils.KAPPA, isRandom)
-
             valores_poblacion = Utils.fitnessPoblacion(poblacion, isRandom)[0]
             numero_evaluaciones += len(poblacion)
 
@@ -243,8 +230,6 @@ def algoritmo_genetico_generacional_multimodal(semilla, isRandom):
             hijos[i] = h1
             hijos[i + 1] = h2
 
-        # hijos[Utils.POB_INICIAL_MULTIMODAL-2] = np.random.randint(-100, 100, 24, dtype=int)
-        # hijos[Utils.POB_INICIAL_MULTIMODAL-1] = np.random.randint(-100, 100, 24, dtype=int)
         # Mutar P(t)
         hijos_mutados = np.apply_along_axis(mutacion, 1, hijos.copy(), Utils.MUTACION_MULTIMODAL)
         poblacion = hijos_mutados.copy()
@@ -253,24 +238,23 @@ def algoritmo_genetico_generacional_multimodal(semilla, isRandom):
         valores_poblacion, dinero_acumulado, bateria_acumulada = Utils.fitnessPoblacion(poblacion, isRandom)
         numero_evaluaciones += len(poblacion)
         indice_maximo = np.argmax(valores_poblacion)
-        indice_minimo = np.argmin(valores_poblacion)
+        mejor_valor = valores_poblacion[indice_maximo]
 
         # Obtenemos el mejor individuo de la población.
         if mejor_valor < valores_poblacion[indice_maximo]:
             mejor_individuo = poblacion[indice_maximo].copy()
+            mejor_valor = valores_poblacion[indice_maximo]
             t = 0   # Cuando mejora, reiniciamos el contador de iteraciones.
 
-        mejorValorAcumulado.append(mejor_valor)
-
-        # if peor_valor < valores_poblacion[indice_minimo]:
-            # Obtenemos el peor individuo de la poblacion
 
         valores_poblacion, _ , _ = Utils.fitnessPoblacion(poblacion, isRandom)
-
+        numero_evaluaciones += len(poblacion)
+        indice_maximo = np.argmax(valores_poblacion)
+        indice_minimo = np.argmin(valores_poblacion)
         peor_valor = valores_poblacion[indice_minimo].copy()
         mejor_valor = valores_poblacion[indice_maximo].copy()
         P += 1 # Aumentamos una generación
-
+        mejorValorAcumulado.append(mejor_valor.copy())
         historicoMejor.append(mejor_valor.copy())
         historicoPeor.append(peor_valor.copy())
     # Clearing final con kappa = 1
@@ -284,20 +268,19 @@ def experimentar():
     for poblacion in Utils.POBINICIAL_EXP:
         for mut in Utils.PTAJE_MUT:
             for generaciones in Utils.NUMGENCLEARING_EXP:
-                for radio in Utils.RADIOCLEARING_EXP:
-                    for kappa in Utils.KAPPA_EXP:
-                        valores = [0 for i in range(len(Utils.SEMILLAS))]
-                        for semilla in range(len(Utils.SEMILLAS)):
+                for kappa in Utils.KAPPA_EXP:
+                    valores = [0 for i in range(len(Utils.SEMILLAS))]
+                    for semilla in range(len(Utils.SEMILLAS)):
                             valor = algoritmo_genetico_generacional_multimodal_exp(Utils.SEMILLAS[semilla],
-                                                                                   poblacion, mut, generaciones, radio,
-                                                                                   kappa,
+                                                                                   poblacion, mut, generaciones, Utils.RADIO_CLEARING,
+                                                                                   Utils.KAPPA,
                                                                                    isRandom=False)[0]
                             valores[semilla] = valor
                             media_valores = statistics.mean(valores)
                             data = {"Poblacion Inicial ": [poblacion],
                                          "Porcentaje Mutacion ": [mut],
                                          "Generaciones": [generaciones],
-                                         "Radio": [radio],
+                                         "Radio": [Utils.RADIO_CLEARING],
                                          "Kappa": [kappa],
                                          "Valor Obtenido": [valor]}
                             # Opciones de Pandas para mostrar la tabla completa en la consola
@@ -312,7 +295,7 @@ def experimentar():
                                 best_data = {"Poblacion Inicial " : [poblacion],
                                         "Porcentaje Mutacion " : [mut],
                                         "Generaciones": [generaciones],
-                                        "Radio": [radio],
+                                        "Radio": [Utils.RADIO_CLEARING],
                                         "Kappa": [kappa],
                                         "Valor Obtenido": [mejor_valor]}
                                 # Opciones de Pandas para mostrar la tabla completa en la consola
@@ -329,5 +312,5 @@ if __name__ == "__main__":
     # print("\n")
     # print("BEST PARAMETERS:\n ")
     # print(pd.DataFrame(data))
-    Utils.grafica(algoritmo_genetico_generacional_multimodal, israndom=False)
-    # print(algoritmo_genetico_generacional_multimodal(12456, False)[0])
+    # Utils.grafica(algoritmo_genetico_generacional_multimodal, israndom=False)
+    print(algoritmo_genetico_generacional_multimodal(12456, False)[0])
