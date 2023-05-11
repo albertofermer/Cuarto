@@ -251,5 +251,5 @@ def experimentar():
 
 
 if __name__ == "__main__":
-    Utils.grafica(algoritmo_genetico_generacional, israndom=False)
+    Utils.grafica(algoritmo_genetico_generacional, israndom=True)
     # experimentar()

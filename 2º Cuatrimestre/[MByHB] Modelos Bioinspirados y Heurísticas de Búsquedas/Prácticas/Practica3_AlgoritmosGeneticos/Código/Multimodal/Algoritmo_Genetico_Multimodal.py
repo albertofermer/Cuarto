@@ -312,5 +312,5 @@ if __name__ == "__main__":
     # print("\n")
     # print("BEST PARAMETERS:\n ")
     # print(pd.DataFrame(data))
-    # Utils.grafica(algoritmo_genetico_generacional_multimodal, israndom=False)
-    print(algoritmo_genetico_generacional_multimodal(12456, False)[0])
+    Utils.grafica(algoritmo_genetico_generacional_multimodal, israndom=True)
+    # print(algoritmo_genetico_generacional_multimodal(12456, False)[0])

@@ -12,8 +12,7 @@ POBLACION_INICIAL = 25
 POBINICIAL_EXP = [15, 17, 19, 21, 23, 25, 27, 29] # EXP
 PORCENTAJE_MUTACION = 0.3
 PTAJE_MUT = [0.01, 0.05, 0.1, 0.2, 0.3] # EXP
-K = 0.2
-NUM_ITERACIONES = 2000
+NUM_ITERACIONES = 1000
 NUMITER_EXP = [100, 200, 300, 500, 1000, 1500, 2000] # EXP
 
 ELITE = 5
@@ -26,9 +25,9 @@ NUM_ITERACIONES_CHC = 1000
 ITERACIONESCHC_EXP = [100, 200, 300, 500, 1000]
 
 # Multimodal
-NUM_ITERACIONES_MULTIMODAL = 200
+NUM_ITERACIONES_MULTIMODAL = 500
 POB_INICIAL_MULTIMODAL = 27
-MUTACION_MULTIMODAL = 0.3
+MUTACION_MULTIMODAL = 0.1
 NUMERO_GENERACIONES_CLEARING = 10
 NUMGENCLEARING_EXP = [10, 20, 50, 100]
 RADIO_CLEARING = 5
@@ -182,7 +181,7 @@ def grafica(funcion, israndom):
         ax.plot([i for i in range(len(historico[0]))], [i/100 for i in historico[0]], label="Fitness Mejor Individuo")
         ax.plot([i for i in range(len(historico[1]))], [i/100 for i in historico[1]], label="Fitness Peor Individuo")
         plt.legend()
-        plt.xlabel("Veces que mejora")
+        plt.xlabel("Iteraciones")
         plt.ylabel("Dinero (€)")
         plt.title(f"Convergencia del Mejor Individuo y el Peor.\n Semilla: {SEMILLAS[i]}")
         plt.savefig(f"./Graficas/Convergencia/{SEMILLAS[i]}_{'Datos_Aleatorios' if israndom else 'Datos_Reales'}.png")
