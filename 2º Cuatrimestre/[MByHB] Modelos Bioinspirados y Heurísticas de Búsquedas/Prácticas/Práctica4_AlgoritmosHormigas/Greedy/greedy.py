@@ -22,7 +22,7 @@ def tsp_greedy(coords):
     return path
 
 if __name__ == "__main__":
-    dimension, coords = Utils.leerFicheroTSP("../FicherosTSP/a280.tsp")
+    dimension, coords = Utils.leerFicheroTSP("../FicherosTSP/ch130.tsp")
     distancias = Utils.inicializarMatrizDistancias(coords)
     path = tsp_greedy(coords)
-    Utils.plot_path(coords, path)
+    Utils.plot_path(coords, path, "Camino generado por algoritmo Greedy")

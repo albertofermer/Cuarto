@@ -14,8 +14,7 @@ beta = 2
 
 # Sistema de Hormigas Elitista:
 numeroHormigasElitista = 15
-vaporacion = 0.1
-
+EVAPORACION = 0.1
 
 def inicializarMatrizDistancias(coords):
     n = len(coords)
@@ -98,7 +97,7 @@ def representaPuntos(coords, title):
     plt.show()
 
 
-def plot_path(coords, path):
+def plot_path(coords, path, titulo):
     # Dibujar los puntos
     x = [coord[0] for coord in coords]
     y = [coord[1] for coord in coords]
@@ -112,11 +111,13 @@ def plot_path(coords, path):
     plt.plot(path_x, path_y, color='red')
 
     # Configurar la gráfica
-    plt.title("Camino generado por TSP")
+    plt.title(titulo)
     plt.xlabel("Coordenada x")
     plt.ylabel("Coordenada y")
     plt.show()
 
+def reglaTransicion(L, tau, eta):
+    print()
 
 
 if __name__ == "__main__":
