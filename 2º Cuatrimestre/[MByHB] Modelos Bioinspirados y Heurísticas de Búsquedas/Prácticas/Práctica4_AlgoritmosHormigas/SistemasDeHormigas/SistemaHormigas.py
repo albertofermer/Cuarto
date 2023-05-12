@@ -23,6 +23,7 @@ def SistemaHormigas(semilla, problema):
                 MejorHormiga = solucionHormigas[k].copy()
 
 
+
     print(solucionHormigas)
 if __name__ == "__main__":
     SistemaHormigas(123456, "ch130")
