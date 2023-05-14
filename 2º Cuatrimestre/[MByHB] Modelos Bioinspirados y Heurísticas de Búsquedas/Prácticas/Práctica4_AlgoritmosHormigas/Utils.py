@@ -5,8 +5,6 @@ import math
 
 # Constantes
 semillas = [123456, 789456, 456123, 369852, 852321]
-sizech130 = 130
-sizea280 = 280
 # Sistema de Hormigas
 numeroHormigas = 30
 alpha = 1
