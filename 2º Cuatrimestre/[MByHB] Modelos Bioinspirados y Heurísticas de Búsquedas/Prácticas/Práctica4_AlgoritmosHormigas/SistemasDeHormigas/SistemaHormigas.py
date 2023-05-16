@@ -24,7 +24,7 @@ def SistemaHormigas(semilla, problema):
     feromonas = np.ones((dimension, dimension)) * (1 / (dimension * coste_greedy))
     # print(dimension)
     # Sembrar Feromonas del camino del Greedy
-    sembrarFeromonas(feromonas,  pathGreedy)
+    sembrarFeromonas(feromonas, pathGreedy)
     # print(feromonas)
     solucionHormigas = np.ones((Utils.numeroHormigas, dimension), dtype=int) * -1
     coste = np.ones(Utils.numeroHormigas) * float('inf')
@@ -32,9 +32,13 @@ def SistemaHormigas(semilla, problema):
     mejorGlobal = coste[0].copy()
     mejorHormiga = solucionHormigas[0]
     mejorHormigaActual = solucionHormigas[0]
+    MejorCosteIteracion = []
+    numeroEvaluaciones = 0
     # Comienza el algoritmo
     start = time.time()
-    while (time.time() - start) < Utils.TiempoParada(problema):
+    t = 0
+    while (time.time() - start) < Utils.TiempoParada(problema) or t < 400:
+        t += 1
         solucionHormigas = np.ones((Utils.numeroHormigas, dimension), dtype=int) * -1
         for hormiga in range(len(solucionHormigas)):  # Para cada hormiga
             solucionHormigas[hormiga][0] = 0  # El primer nodo es el 0
@@ -42,100 +46,78 @@ def SistemaHormigas(semilla, problema):
             for nodo in range(1, dimension):  # Para cada nodo
                 probabilidades = transicion(feromonas, distancias, solucionHormigas[hormiga])
                 # Elegir un nodo en funcion de las probabilidades calculadas
-                ciudad = elegirNodo(probabilidades)
-                solucionHormigas[hormiga][nodo] = ciudad
+                solucionHormigas[hormiga][nodo] = elegirNodo(probabilidades)
             coste[hormiga] = Utils.funcionCoste(distancias, solucionHormigas[hormiga])
+            numeroEvaluaciones += 1
             if coste[hormiga] < mejorActual:
                 mejorActual = coste[hormiga]
-                mejorHormigaActual = solucionHormigas[hormiga]
+                mejorHormigaActual = solucionHormigas[hormiga].copy()
 
-        #     # Aporte de Feromonas
-        #     aportarFeromonas(distancias, solucionHormigas[hormiga], feromonas)
-        #
-        # # Evaporacion de Feromonas
-        # evaporarFeromonas(feromonas)
         actualizarFeromonas(distancias, solucionHormigas, feromonas)
+        numeroEvaluaciones += Utils.numeroHormigas
 
         if mejorActual < mejorGlobal:
             mejorGlobal = mejorActual
             mejorHormiga = mejorHormigaActual.copy()
-            print(mejorHormiga)
-            print(f"Coste: {mejorGlobal}")
-
-    Utils.plot_path(ciudades, mejorHormiga, f"Hormiga: {mejorGlobal}")
-    return mejorGlobal, mejorHormiga
+            # print(mejorHormiga)
+            # print(f"Coste: {mejorGlobal}")
+        MejorCosteIteracion.append(mejorActual.copy())
+    # print(f"Iteraciones: {t}")
+    # print(f"Tiempo: {(time.time() - start)}")
+    return mejorGlobal, mejorHormiga, numeroEvaluaciones, MejorCosteIteracion
 
 
 def actualizarFeromonas(distancias, soluciones, feromonas):
-    delta = np.zeros((len(soluciones[0]),len(soluciones[0])))
-    # Calculo de delta
-    for r in range(len(soluciones[0])):  # Para cada arista
-        for s in range(len(soluciones[0])):
-            aux = 0
-            for hormiga in range(len(soluciones)):  # Para cada hormiga
-                if existeArco(soluciones[hormiga], r, s):  # Si la hormiga ha visitado el arco r -> r+1
-                    aux += 1 / Utils.funcionCoste(distancias, soluciones[hormiga])
-            # print(aux)
-            delta[r][s] = aux
-    # Actualizacion de cada arco de feromonas
-    for r in range(len(soluciones[0])):
-        for s in range(len(soluciones[0])):
+    num_hormigas = len(soluciones)
+    num_arcos = len(soluciones[0])
+
+    delta = np.zeros((num_arcos, num_arcos))
+    costes_hormigas = [Utils.funcionCoste(distancias, hormiga) for hormiga in soluciones]
+
+    for hormiga in range(num_hormigas):
+        for r in range(num_arcos):
+            for s in range(num_arcos):
+                if existeArco(soluciones[hormiga], r, s):
+                    aux = Utils.FACTOR_COSTE / costes_hormigas[hormiga]
+                    delta[r][s] += aux
+
+    for r in range(num_arcos):
+        for s in range(num_arcos):
             feromonas[r][s] = (1 - Utils.EVAPORACION) * feromonas[r][s] + delta[r][s]
 
 
 def existeArco(solucion, r, s):
-    encontrado = False
-    indice = 0
-    while not encontrado and indice < len(solucion) - 1:
-        # print(solucion)
-        if solucion[indice] == r and solucion[indice + 1] == s:
-            return True
-        indice += 1
-    return False
+    solucion_np = np.array(solucion)
+    indices = np.where((solucion_np[:-1] == r) & (solucion_np[1:] == s))[0]
+    return len(indices) > 0
 
 
 def transicion(feromonas, distancias, solucionHormiga):
-    sumaTotal = 0
-    i = 0
-    ultimoNodoVisitado = 0
-    while solucionHormiga[i] != -1 and i < len(solucionHormiga):
-        # print(solucionHormiga[i])
-        if solucionHormiga[i] != -1:
-            ultimoNodoVisitado = solucionHormiga[i]
-            i += 1
+    indices_validos = np.where(solucionHormiga != -1)[0]
+    ultimoNodoVisitado = solucionHormiga[indices_validos[-1]]
 
     r = ultimoNodoVisitado
-    for u in range(len(distancias)):
-        if u not in solucionHormiga:
-            sumaTotal += (feromonas[r][u] ** Utils.alpha) * (1 / (distancias[r][u])) ** Utils.beta
+    # Obtiene la diferencia entre todos los nodos y los que se encuentran en solucionhormiga
+    u_not_in_solucionHormiga = np.setdiff1d(np.arange(len(distancias)), solucionHormiga)
+    feromonas_r = feromonas[r]
+    # Realiza 1/distancia
+    distancias_r_inv = np.reciprocal(distancias[r])
+    sumaTotal = np.sum((feromonas_r[u_not_in_solucionHormiga] ** Utils.alpha) * (
+                distancias_r_inv[u_not_in_solucionHormiga] ** Utils.beta))
 
-    probabilidades = np.zeros((len(distancias)))
+    if sumaTotal <= 0:
+        sumaTotal = 1e-10
 
-    if sumaTotal == 0: sumaTotal = 1e-10
-
-    for s in range(len(distancias)):
-        if s not in solucionHormiga:
-            probabilidades[s] = (feromonas[r][s] ** Utils.alpha) * (1 / (distancias[r][s])) ** Utils.beta / sumaTotal
-        else:
-            probabilidades[s] = 0
+    probabilidades = np.zeros(len(distancias))
+    probabilidades[u_not_in_solucionHormiga] = (feromonas_r[u_not_in_solucionHormiga] ** Utils.alpha) * (
+                distancias_r_inv[u_not_in_solucionHormiga] ** Utils.beta) / sumaTotal
+    # print(probabilidades)
     return probabilidades
 
 
-def aportarFeromonas(distancias, solucionHormiga, feromonas):
-    for r in range(len(solucionHormiga)):
-        for s in range(len(solucionHormiga)):
-            if existeArco(solucionHormiga, r, s):
-                feromonas[r][s] += 1 / (Utils.funcionCoste(distancias, solucionHormiga))
-    # print(feromonas)
-
-
-def evaporarFeromonas(feromonas):
-    feromonas *= (1 - Utils.EVAPORACION)
-
-
 def sembrarFeromonas(feromonas, path):
-    for nodo in range(len(path) - 1):
-        feromonas[path[nodo]][path[nodo + 1]] *= 15
+    path_np = np.array(path)
+    feromonas[path_np[:-1], path_np[1:]] *= Utils.FACTOR_SEMBRADO
 
 
 def elegirNodo(probabilidades):
@@ -145,4 +127,4 @@ def elegirNodo(probabilidades):
 
 
 if __name__ == "__main__":
-    print(SistemaHormigas(123456, "ch130"))
+    Utils.graficasOCH(SistemaHormigas)

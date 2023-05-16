@@ -6,7 +6,6 @@ def tsp_greedy(coords):
     path = [0]
     visited[0] = True
     current_city = 0
-
     while len(path) < n:
         min_distance = np.inf
         nearest_city = None
