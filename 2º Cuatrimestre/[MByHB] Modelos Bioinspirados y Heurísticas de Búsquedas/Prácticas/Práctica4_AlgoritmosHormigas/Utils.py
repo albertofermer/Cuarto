@@ -155,14 +155,16 @@ def graficasOCH(funcion):
             plot_path(ch130 if problema == "ch130" else a280, mejorCamino, f"Coste Camino: {coste}", semilla, problema)
 
     data = {
-        'Media Evaluaciones': [round(statistics.mean(evaluaciones[:]),2)],
-        'Desviación Evaluaciones': [round(statistics.stdev(evaluaciones[:]),2)],
-        'Media Coste': [round(statistics.mean(costes[:]), 2)],
-        'Desviación Coste': [round(statistics.stdev(costes[:]), 2)]
+        'Media Evaluaciones': [round(statistics.mean(evaluaciones[:, 0]), 2),
+                               round(statistics.mean(evaluaciones[:, 1]), 2)],
+        'Desviación Evaluaciones': [round(statistics.stdev(evaluaciones[:, 0]), 2),
+                                    round(statistics.stdev(evaluaciones[:, 1]), 2)],
+        'Media Coste': [round(statistics.mean(costes[:, 0]), 2), round(statistics.mean(costes[:, 1]), 2)],
+        'Desviación Coste': [round(statistics.stdev(costes[:, 0]), 2), round(statistics.stdev(costes[:, 1]), 2)]
     }
 
     data_coste = {
-        'Ejecucion 1 ': [costes[0], evaluaciones[0]],
+        'Ejecucion 1    ': [costes[0], evaluaciones[0]],
         'Ejecucion 2 ': [costes[1], evaluaciones[1]],
         'Ejecucion 3 ': [costes[2], evaluaciones[2]],
         'Ejecucion 4 ': [costes[3], evaluaciones[3]],
@@ -179,6 +181,7 @@ def graficasOCH(funcion):
     print(pd.DataFrame(data))
     print("\n")
     print(pd.DataFrame(data_coste))
+
 
 if __name__ == "__main__":
     print()

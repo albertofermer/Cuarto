@@ -16,16 +16,14 @@ def SistemaHormigasElitista(semilla, problema):
     # Lectura de las coordenadas del problema:
     dimension, ciudades = Utils.leerFicheroTSP(f"..\\FicherosTSP\\{problema}.tsp")
     dimension = int(dimension)
-    pathGreedy = greedy.tsp_greedy(ciudades)
+    pathGreedy = greedy.tsp_greedy(semilla, problema)[1]
 
     # Inicializar matrices
     distancias = Utils.inicializarMatrizDistancias(ciudades)
     coste_greedy = Utils.funcionCoste(distancias, pathGreedy)
     feromonas = np.ones((dimension, dimension)) * (1 / (dimension * coste_greedy))
-    # print(dimension)
     # Sembrar Feromonas del camino del Greedy
-    sembrarFeromonas(feromonas, pathGreedy)
-    # print(feromonas)
+    # sembrarFeromonas(feromonas, pathGreedy)
     solucionHormigas = np.ones((Utils.numeroHormigasElitista, dimension), dtype=int) * -1
     coste = np.ones(Utils.numeroHormigasElitista) * float('inf')
     mejorActual = coste[0].copy()
@@ -38,7 +36,7 @@ def SistemaHormigasElitista(semilla, problema):
     # Comienza el algoritmo
     start = time.time()
     t = 0
-    while (time.time() - start) < Utils.TiempoParada(problema) or t < 400:
+    while (time.time() - start) < Utils.TiempoParada(problema):
         t += 1
         solucionHormigas = np.ones((Utils.numeroHormigasElitista, dimension), dtype=int) * -1
         for hormiga in range(len(solucionHormigas)):  # Para cada hormiga
@@ -59,45 +57,50 @@ def SistemaHormigasElitista(semilla, problema):
         if mejorActual < mejorGlobal:
             mejorGlobal = mejorActual
             mejorHormiga = mejorHormigaActual.copy()
-    #         print(mejorHormiga)
-    #         print(f"Coste: {mejorGlobal}")
+            print(mejorGlobal)
         MejorCosteIteracion.append(mejorActual.copy())
-    # print(f"Iteraciones: {t}")
-    # print(f"Tiempo: {(time.time() - start)}")
-    # Utils.plot_path(ciudades, mejorHormiga, f"Hormiga Elitista: {mejorGlobal}")
+
+    print(f"Tiempo: {time.time() - start}")
     return mejorGlobal, mejorHormiga, numEvaluaciones, MejorCosteIteracion
 
 
 def actualizarFeromonas(distancias, soluciones, feromonas, mejorHormiga):
-    num_hormigas = len(soluciones)
-    num_arcos = len(soluciones[0])
+    num_hormigas = len(soluciones)  # Número de hormigas en la población
+    num_arcos = len(soluciones[0])  # Número de arcos en una solución
 
-    delta = np.zeros((num_arcos, num_arcos))
-    costes_hormigas = [Utils.funcionCoste(distancias, hormiga) for hormiga in soluciones]
+    delta = np.zeros((num_arcos, num_arcos))  # Matriz para almacenar la cantidad de feromonas a actualizar
 
+    # Calcular los costes de todas las hormigas en paralelo utilizando operaciones vectorizadas
+    costes_hormigas = np.array([Utils.funcionCoste(distancias, hormiga) for hormiga in soluciones])
+
+    # Calcular el coste de la mejorHormiga
+    mejor_coste_hormiga = Utils.funcionCoste(distancias, mejorHormiga)
+
+    # Actualizar las feromonas para cada hormiga
     for hormiga in range(num_hormigas):
-        for r in range(num_arcos):
-            for s in range(num_arcos):
-                if existeArco(soluciones[hormiga], r, s):
-                    aux = Utils.FACTOR_COSTE / costes_hormigas[hormiga]
-                    delta[r][s] += aux
+        # Obtener los arcos existentes en la solución de la hormiga
+        arcos_existentes = existeArco(soluciones[hormiga], num_arcos)
 
-    coste_mejor_hormiga = Utils.funcionCoste(distancias, mejorHormiga)
+        # Calcular el valor auxiliar para la actualización de feromonas
+        aux = Utils.FACTOR_COSTE / costes_hormigas[hormiga]
 
-    for r in range(num_arcos):
-        for s in range(num_arcos):
-            deltaMejorHormiga = 0
-            if existeArco(mejorHormiga, r, s):
-                if coste_mejor_hormiga > 0:
-                    deltaMejorHormiga = 1 / coste_mejor_hormiga
+        # Actualizar delta sumando el valor auxiliar en los arcos existentes de la hormiga
+        delta[arcos_existentes] += aux
 
-            feromonas[r][s] = (1 - Utils.EVAPORACION) * feromonas[r][s] + delta[r][s] + Utils.numeroHormigasElitista*deltaMejorHormiga
+    mejor_coste_hormiga = 1e-10 if mejor_coste_hormiga == 0 else mejor_coste_hormiga
+    # Actualizar delta sumando el término correspondiente a la mejorHormiga
+    delta[existeArco(mejorHormiga, num_arcos)] += Utils.numeroHormigasElitista / mejor_coste_hormiga
+
+    # Aplicar evaporación y actualizar las feromonas
+    feromonas *= (1 - Utils.EVAPORACION)
+    feromonas += delta
 
 
-def existeArco(solucion, r, s):
-    solucion_np = np.array(solucion)
-    indices = np.where((solucion_np[:-1] == r) & (solucion_np[1:] == s))[0]
-    return len(indices) > 0
+def existeArco(solucion, num_arcos):
+    arcos = np.zeros((num_arcos, num_arcos), dtype=bool)  # Matriz para indicar la existencia de los arcos
+    arcos[solucion[:-1], solucion[1:]] = True  # Marcar como verdaderos los arcos existentes en la solución
+    return arcos
+
 
 
 def transicion(feromonas, distancias, solucionHormiga):
