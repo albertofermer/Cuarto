@@ -93,7 +93,7 @@ def vender(bateria, hora, solucion, dinero, israndom):
     precio_venta, precio_compra, r = get_vectores(israndom)
     # Vender
     energia_disponible = bateria + r[hora] * 0.2  # En KWh
-    energia_vendida = abs(solucion[hora]) / 100 * energia_disponible  # En KWh
+    energia_vendida = (abs(solucion[hora]) / 100) * energia_disponible  # En KWh
     dinero += energia_vendida * precio_venta[hora]  # En KWh
 
     if bateria >= energia_vendida:  # Si hay suficiente energia para vender en la bateria
@@ -138,7 +138,7 @@ def fitness(solucion, israndom):
 
             bateria += -energia_comprada
 
-            # Si la energia comprada es 0, entonces ¿vendo?
+            # Si la energia comprada es 0, entonces vendo
             if energia_comprada == 0:
                 bateria, energia_disponible, dinero = vender(bateria, hora, solucion, dinero, israndom)
 

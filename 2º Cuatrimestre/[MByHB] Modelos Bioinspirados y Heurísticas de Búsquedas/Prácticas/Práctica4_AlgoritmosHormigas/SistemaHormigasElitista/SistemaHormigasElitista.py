@@ -24,8 +24,8 @@ def SistemaHormigasElitista(semilla, problema):
     feromonas = np.ones((dimension, dimension)) * (1 / (dimension * coste_greedy))
     # Sembrar Feromonas del camino del Greedy
     # sembrarFeromonas(feromonas, pathGreedy)
-    solucionHormigas = np.ones((Utils.numeroHormigasElitista, dimension), dtype=int) * -1
-    coste = np.ones(Utils.numeroHormigasElitista) * float('inf')
+    solucionHormigas = np.ones((Utils.numeroHormigas, dimension), dtype=int) * -1
+    coste = np.ones(Utils.numeroHormigas) * float('inf')
     mejorActual = coste[0].copy()
     mejorGlobal = coste[0].copy()
     mejorHormiga = solucionHormigas[0]
@@ -38,7 +38,7 @@ def SistemaHormigasElitista(semilla, problema):
     t = 0
     while (time.time() - start) < Utils.TiempoParada(problema):
         t += 1
-        solucionHormigas = np.ones((Utils.numeroHormigasElitista, dimension), dtype=int) * -1
+        solucionHormigas = np.ones((Utils.numeroHormigas, dimension), dtype=int) * -1
         for hormiga in range(len(solucionHormigas)):  # Para cada hormiga
             solucionHormigas[hormiga][0] = 0  # El primer nodo es el 0
             for nodo in range(1, dimension):  # Para cada nodo
@@ -52,7 +52,7 @@ def SistemaHormigasElitista(semilla, problema):
                 mejorHormigaActual = solucionHormigas[hormiga].copy()
 
         actualizarFeromonas(distancias, solucionHormigas, feromonas, mejorHormiga)
-        numEvaluaciones += Utils.numeroHormigasElitista
+        numEvaluaciones += Utils.numeroHormigas
 
         if mejorActual < mejorGlobal:
             mejorGlobal = mejorActual
@@ -104,8 +104,6 @@ def existeArco(solucion, num_arcos):
 
 
 def transicion(feromonas, distancias, solucionHormiga):
-    sumaTotal = 0
-    i = 0
     indices_validos = np.where(solucionHormiga != -1)[0]
     ultimoNodoVisitado = solucionHormiga[indices_validos[-1]]
 
@@ -114,7 +112,6 @@ def transicion(feromonas, distancias, solucionHormiga):
     u_not_in_solucionHormiga = np.setdiff1d(np.arange(len(distancias)), solucionHormiga)
     feromonas_r = feromonas[r]
     # Realiza 1/distancia
-
     distancias_r_inv = np.reciprocal(distancias[r])
     sumaTotal = np.sum((feromonas_r[u_not_in_solucionHormiga] ** Utils.alpha) * (
                 distancias_r_inv[u_not_in_solucionHormiga] ** Utils.beta))
