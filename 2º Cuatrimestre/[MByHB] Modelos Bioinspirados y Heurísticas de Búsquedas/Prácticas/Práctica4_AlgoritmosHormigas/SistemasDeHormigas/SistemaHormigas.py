@@ -24,12 +24,11 @@ def SistemaHormigas(semilla, problema):
     feromonas = np.ones((dimension, dimension)) * (1 / (dimension * coste_greedy))
     # Sembrar Feromonas del camino del Greedy
     # sembrarFeromonas(feromonas, pathGreedy)
-    solucionHormigas = np.ones((Utils.numeroHormigas, dimension), dtype=int) * -1
     coste = np.ones(Utils.numeroHormigas) * float('inf')
-    mejorActual = coste[0].copy()
-    mejorGlobal = coste[0].copy()
-    mejorHormiga = solucionHormigas[0]
-    mejorHormigaActual = solucionHormigas[0]
+    mejorActual = coste_greedy
+    mejorGlobal = coste_greedy
+    mejorHormiga = pathGreedy
+    mejorHormigaActual = pathGreedy
     MejorCosteIteracion = []
     numeroEvaluaciones = 0
     # Comienza el algoritmo

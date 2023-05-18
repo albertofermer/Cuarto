@@ -26,10 +26,10 @@ def SistemaHormigasElitista(semilla, problema):
     # sembrarFeromonas(feromonas, pathGreedy)
     solucionHormigas = np.ones((Utils.numeroHormigas, dimension), dtype=int) * -1
     coste = np.ones(Utils.numeroHormigas) * float('inf')
-    mejorActual = coste[0].copy()
-    mejorGlobal = coste[0].copy()
-    mejorHormiga = solucionHormigas[0]
-    mejorHormigaActual = solucionHormigas[0]
+    mejorActual = coste_greedy
+    mejorGlobal = coste_greedy
+    mejorHormiga = pathGreedy
+    mejorHormigaActual = pathGreedy
 
     numEvaluaciones = 0
     MejorCosteIteracion = []
