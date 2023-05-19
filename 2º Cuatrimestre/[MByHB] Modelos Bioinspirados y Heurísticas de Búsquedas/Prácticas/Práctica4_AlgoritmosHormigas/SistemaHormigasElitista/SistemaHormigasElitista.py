@@ -102,7 +102,6 @@ def existeArco(solucion, num_arcos):
     return arcos
 
 
-
 def transicion(feromonas, distancias, solucionHormiga):
     indices_validos = np.where(solucionHormiga != -1)[0]
     ultimoNodoVisitado = solucionHormiga[indices_validos[-1]]
