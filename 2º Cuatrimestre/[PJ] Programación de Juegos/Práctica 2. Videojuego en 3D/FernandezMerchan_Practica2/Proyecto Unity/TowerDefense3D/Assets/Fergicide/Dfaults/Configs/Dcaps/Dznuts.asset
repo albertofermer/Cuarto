@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43d778ce142c0f4439872f9dc51253fc, type: 3}
+  m_Name: Dznuts
+  m_EditorClassIdentifier: 
+  liveEditInPlay: 1
+  saveRandomSeed: 1
+  seed: 0.20814386
+  bodyUpperColor: {r: 0.9490196, g: 0.6431373, b: 0.20392157, a: 1}
+  bodyLowerColor: {r: 0.67058825, g: 0.3647059, b: 0.93333334, a: 1}
+  bodyLowerUnder: 1
+  hatColor: {r: 0.18699998, g: 1, b: 0.28015617, a: 1}
+  hatUnder: 1
+  edgeHeight: {x: 0.27, y: 0.17}
+  eyeColorOuter: {r: 1, g: 1, b: 1, a: 1}
+  eyeColorPupil: {r: 0, g: 0, b: 0, a: 1}
+  mouthColor: {r: 1, g: 0, b: 0, a: 1}
+  smoothness: 0.85
+  metallic: 0
+  tilingAndOffset: {x: 0.05, y: 0.1, z: 0, w: 0}
+  scrollingOffset: {x: -5.75, y: -7.38}
+  eyeSize: {x: 1.28, y: 1.6}
+  eyeBlinkSpeed: 0
+  eyeDistance: {x: 1.7, y: -0.04}
+  eyePupil: 0.099
+  eyePupilRange: {x: 0.05, y: 0.666, z: 0.1, w: 12}
+  mouth: {x: -5, y: -6.43, z: 8.43, w: 2.25}
+  mouthShaper: {x: -0.05, y: 1.67, z: 1.53, w: 1.15}
+  animSpeed: {x: 2, y: 2}

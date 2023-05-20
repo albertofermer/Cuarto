@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43d778ce142c0f4439872f9dc51253fc, type: 3}
+  m_Name: Djay
+  m_EditorClassIdentifier: 
+  liveEditInPlay: 1
+  saveRandomSeed: 1
+  seed: 0.37533706
+  bodyUpperColor: {r: 0.9843137, g: 0.27058825, b: 0.08235294, a: 1}
+  bodyLowerColor: {r: 0.08627451, g: 0.7176471, b: 0.92941177, a: 1}
+  hatColor: {r: 1, g: 1, b: 0.05882353, a: 1}
+  hatUnder: 0
+  edgeHeight: {x: 0.333, y: 0.12}
+  eyeColorOuter: {r: 1, g: 1, b: 1, a: 1}
+  eyeColorPupil: {r: 0, g: 0, b: 0, a: 1}
+  mouthColor: {r: 0.25, g: 0.052734368, b: 0, a: 1}
+  smoothness: 0.85
+  metallic: 0
+  tilingAndOffset: {x: 0.05, y: 0.1, z: 0, w: 0}
+  scrollingOffset: {x: -5.62, y: -7.38}
+  eyeSize: {x: 0.7, y: 0.44}
+  eyeBlinkSpeed: 0.02
+  eyeDistance: {x: 1.35, y: 0.17}
+  eyePupil: 0.099
+  eyePupilRange: {x: 0.02, y: 0.4, z: 0.5, w: 2.71}
+  mouth: {x: -5.18, y: -6, z: 0.79, w: 1.5}
+  mouthShaper: {x: -0.05, y: 2, z: 7.06, w: 0.75}
+  animSpeed: {x: 1, y: 1}

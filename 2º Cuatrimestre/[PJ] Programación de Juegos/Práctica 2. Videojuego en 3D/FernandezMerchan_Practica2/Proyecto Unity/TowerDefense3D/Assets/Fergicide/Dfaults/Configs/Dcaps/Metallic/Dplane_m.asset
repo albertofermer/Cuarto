@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43d778ce142c0f4439872f9dc51253fc, type: 3}
+  m_Name: Dplane_m
+  m_EditorClassIdentifier: 
+  liveEditInPlay: 0
+  saveRandomSeed: 1
+  seed: 0.584
+  bodyUpperColor: {r: 1, g: 0.58879733, b: 0.559, a: 1}
+  bodyLowerColor: {r: 0.9529412, g: 0.9843137, b: 0.93333334, a: 1}
+  bodyLowerUnder: 1
+  hatColor: {r: 0.1509434, g: 0.1509434, b: 0.1509434, a: 1}
+  hatUnder: 0
+  edgeHeight: {x: 0.46, y: 0.25}
+  eyeColorOuter: {r: 1, g: 1, b: 1, a: 1}
+  eyeColorPupil: {r: 0, g: 0, b: 0, a: 1}
+  mouthColor: {r: 0.4392157, g: 0.13333334, b: 0.1254902, a: 1}
+  smoothness: 0.6
+  metallic: 1
+  tilingAndOffset: {x: 0.05, y: 0.09, z: 0, w: 0}
+  scrollingOffset: {x: -5.67, y: -7.4}
+  eyeSize: {x: 0.12, y: 0.12}
+  eyeBlinkSpeed: 0.02
+  eyeDistance: {x: 1.38, y: -0.19}
+  eyePupil: 0.029
+  eyePupilRange: {x: 0, y: 0, z: 1, w: 0}
+  mouth: {x: -4.94, y: -6.4, z: 0.18, w: 2.5}
+  mouthShaper: {x: -0.05, y: 3.5, z: 76.45, w: 2.3}
+  animSpeed: {x: 0.12, y: 30}

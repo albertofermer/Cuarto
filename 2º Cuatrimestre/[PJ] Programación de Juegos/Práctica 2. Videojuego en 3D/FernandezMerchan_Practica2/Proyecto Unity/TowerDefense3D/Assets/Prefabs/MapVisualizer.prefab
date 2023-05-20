@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3767283009853991460
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3767283009853991466}
+  - component: {fileID: 3767283009853991461}
+  m_Layer: 0
+  m_Name: MapVisualizer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3767283009853991466
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3767283009853991460}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3767283009853991461
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3767283009853991460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c315811989f278c4ba890ac15efa6b5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startColor: {r: 0, g: 1, b: 0.23608065, a: 0}
+  exitColor: {r: 1, g: 0, b: 0, a: 0}
+  roadStraight: {fileID: -927199367670048503, guid: 355ae750ffa048944a06b7035218160c, type: 3}
+  roadTileCorner: {fileID: -927199367670048503, guid: 244f0e0d3a9397241a523beb97ea38e6, type: 3}
+  tileEmpty: {fileID: -927199367670048503, guid: d6c08152ea172d147a59e2891bcffdea, type: 3}
+  startTile: {fileID: -927199367670048503, guid: a1df9455fa456e2438800ed96a640477, type: 3}
+  exitTile: {fileID: 6094801259876275154, guid: a47e9602ef1486b41b15f0a654fbb852, type: 3}
+  environmentTiles:
+  - {fileID: -927199367670048503, guid: 24abf5b0ac409a84593e0afa0e3b7f55, type: 3}
+  - {fileID: -927199367670048503, guid: 58ac81c1b8764ce41ac972f9b4f0482b, type: 3}
+  - {fileID: -927199367670048503, guid: 1198d8470423f1d42a52db281d394a88, type: 3}
+  - {fileID: -927199367670048503, guid: afd0cd7bb40b9b34687be9eaa2dba49b, type: 3}
+  - {fileID: -927199367670048503, guid: 7d86cc91f68492a408173d5e5e7aa034, type: 3}
+  animate: 1
