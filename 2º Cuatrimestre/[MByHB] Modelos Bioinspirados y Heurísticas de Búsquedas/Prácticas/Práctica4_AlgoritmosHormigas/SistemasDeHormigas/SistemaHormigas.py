@@ -64,23 +64,17 @@ def SistemaHormigas(semilla, problema):
 def actualizarFeromonas(distancias, soluciones, feromonas):
     num_hormigas = len(soluciones)  # Número de hormigas en la población
     num_arcos = len(soluciones[0])  # Número de arcos en una solución
-
     delta = np.zeros((num_arcos, num_arcos))  # Matriz para almacenar la cantidad de feromonas a actualizar
-
     # Calcular los costes de todas las hormigas en paralelo utilizando operaciones vectorizadas
     costes_hormigas = np.array([Utils.funcionCoste(distancias, hormiga) for hormiga in soluciones])
-
     # Actualizar las feromonas para cada hormiga
     for hormiga in range(num_hormigas):
         # Obtener los arcos existentes en la solución de la hormiga
         arcos_existentes = existeArco(soluciones[hormiga], num_arcos)
-
         # Calcular el valor auxiliar para la actualización de feromonas
         aux = Utils.FACTOR_COSTE / costes_hormigas[hormiga]
-
         # Actualizar delta sumando el valor auxiliar en los arcos existentes de la hormiga
         delta[arcos_existentes] += aux
-
     # Aplicar evaporación y actualizar las feromonas
     feromonas *= (1 - Utils.EVAPORACION)
     feromonas += delta
