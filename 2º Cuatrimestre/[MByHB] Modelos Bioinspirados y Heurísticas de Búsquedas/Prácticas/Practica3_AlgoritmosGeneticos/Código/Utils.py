@@ -18,7 +18,7 @@ NUMITER_EXP = [100, 200, 300, 500] # EXP
 ELITE = 5
 
 # CHC
-POBLACION_CHC = 16
+POBLACION_CHC = 18
 ALPHA = 0.1 # 0.05
 ALPHA_EXP = [0.0001, 0.005, 0.01, 0.05, 0.1, 0.5]
 NUM_ITERACIONES_CHC = 1000
@@ -137,10 +137,6 @@ def fitness(solucion, israndom):
             dinero += energia_comprada * precio_compra[hora]  # Como energia_comprada es < 0 entonc es se resta.
 
             bateria += -energia_comprada
-
-            # Si la energia comprada es 0, entonces vendo
-            if energia_comprada == 0:
-                bateria, energia_disponible, dinero = vender(bateria, hora, solucion, dinero, israndom)
 
         # Guardamos los datos para las gráficas
         energia_disponible_hora[hora] = energia_disponible
