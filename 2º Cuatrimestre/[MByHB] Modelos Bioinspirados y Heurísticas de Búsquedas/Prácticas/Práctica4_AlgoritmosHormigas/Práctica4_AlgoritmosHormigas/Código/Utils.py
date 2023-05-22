@@ -8,7 +8,7 @@ import math
 # Constantes
 problemas = ["ch130", "a280"]
 semillas = [123456, 789456, 456123, 369852, 852321]
-FACTOR_COSTE = 5  # 10
+FACTOR_COSTE = 10  # 10
 FACTOR_SEMBRADO = 1
 # Sistema de Hormigas
 numeroHormigas = 30
